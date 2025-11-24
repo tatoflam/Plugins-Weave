@@ -168,6 +168,25 @@ if [ $# -eq 0 ]; then
     echo ""
 
     echo "========================================"
+    echo "[!] TodoWrite Required"
+    echo "========================================"
+    echo ""
+    echo "Create task list with TodoWrite tool:"
+    echo ""
+    echo 'TodoWrite({'
+    echo '  "todos": ['
+    echo '    {"content": "generate_digest_auto.sh実行", "status": "completed", "activeForm": "generate_digest_auto.sh実行中"},'
+    echo '    {"content": "ShadowGrandDigest更新確認", "status": "in_progress", "activeForm": "ShadowGrandDigest更新確認中"},'
+    echo '    {"content": "DigestAnalyzer並列起動", "status": "pending", "activeForm": "DigestAnalyzer並列起動中"},'
+    echo '    {"content": "Provisional保存実行", "status": "pending", "activeForm": "Provisional保存実行中"},'
+    echo '    {"content": "Shadow統合更新", "status": "pending", "activeForm": "Shadow統合更新中"},'
+    echo '    {"content": "次アクション提示", "status": "pending", "activeForm": "次アクション提示中"}'
+    echo '  ]'
+    echo '})'
+    echo ""
+    echo "All tasks must be completed. Update status after each step."
+    echo ""
+    echo "========================================"
     echo "[!] CRITICAL: Claude Analysis Required NOW"
     echo "========================================"
     echo ""
@@ -267,6 +286,26 @@ echo "========================================"
 echo ""
 
 # **手順2: ShadowGrandDigest状態確認**
+echo "========================================"
+echo "[!] TodoWrite Required"
+echo "========================================"
+echo ""
+echo "Create task list with TodoWrite tool:"
+echo ""
+echo 'TodoWrite({'
+echo '  "todos": ['
+echo '    {"content": "generate_digest_auto.sh '$LEVEL'実行", "status": "completed", "activeForm": "generate_digest_auto.sh '$LEVEL'実行中"},'
+echo '    {"content": "ShadowGrandDigest状態確認", "status": "in_progress", "activeForm": "ShadowGrandDigest状態確認中"},'
+echo '    {"content": "DigestAnalyzer並列起動（必要な場合）", "status": "pending", "activeForm": "DigestAnalyzer並列起動中"},'
+echo '    {"content": "Provisional保存実行（必要な場合）", "status": "pending", "activeForm": "Provisional保存実行中"},'
+echo '    {"content": "タイトル提案", "status": "pending", "activeForm": "タイトル提案中"},'
+echo '    {"content": "finalize_from_shadow.py実行", "status": "pending", "activeForm": "finalize_from_shadow.py実行中"},'
+echo '    {"content": "完了確認", "status": "pending", "activeForm": "完了確認中"}'
+echo '  ]'
+echo '})'
+echo ""
+echo "All tasks must be completed. Update status after each step."
+echo ""
 echo "========================================"
 echo "[手順 2/3] ShadowGrandDigest State Check"
 echo "========================================"

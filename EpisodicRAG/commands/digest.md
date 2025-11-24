@@ -44,6 +44,48 @@ description: EpisodicRAG階層的ダイジェスト生成（8層100年）
 
 ---
 
+## 実行時のタスク管理
+
+**重要**: `/digest`コマンド実行時、**必ず**TodoWriteツールを使用してタスクリストを作成してから処理を開始すること。
+
+### パターン1: `/digest` (引数なし) のタスクリスト
+
+```python
+TodoWrite({
+  "todos": [
+    {"content": "generate_digest_auto.sh実行", "status": "pending", "activeForm": "generate_digest_auto.sh実行中"},
+    {"content": "ShadowGrandDigest更新確認", "status": "pending", "activeForm": "ShadowGrandDigest更新確認中"},
+    {"content": "DigestAnalyzer並列起動", "status": "pending", "activeForm": "DigestAnalyzer並列起動中"},
+    {"content": "Provisional保存実行", "status": "pending", "activeForm": "Provisional保存実行中"},
+    {"content": "Shadow統合更新", "status": "pending", "activeForm": "Shadow統合更新中"},
+    {"content": "次アクション提示", "status": "pending", "activeForm": "次アクション提示中"}
+  ]
+})
+```
+
+### パターン2: `/digest <type>` (階層確定) のタスクリスト
+
+```python
+TodoWrite({
+  "todos": [
+    {"content": "generate_digest_auto.sh <type>実行", "status": "pending", "activeForm": "generate_digest_auto.sh <type>実行中"},
+    {"content": "ShadowGrandDigest状態確認", "status": "pending", "activeForm": "ShadowGrandDigest状態確認中"},
+    {"content": "DigestAnalyzer並列起動（必要な場合）", "status": "pending", "activeForm": "DigestAnalyzer並列起動中"},
+    {"content": "Provisional保存実行（必要な場合）", "status": "pending", "activeForm": "Provisional保存実行中"},
+    {"content": "タイトル提案", "status": "pending", "activeForm": "タイトル提案中"},
+    {"content": "finalize_from_shadow.py実行", "status": "pending", "activeForm": "finalize_from_shadow.py実行中"},
+    {"content": "完了確認", "status": "pending", "activeForm": "完了確認中"}
+  ]
+})
+```
+
+**ルール**:
+- 全てのタスクは等しく重要
+- 各タスク完了時、必ずステータスを`completed`に更新
+- タスクをスキップしないこと
+
+---
+
 ## 実行フロー
 
 ### パターン1: `/digest` (引数なし - 新Loop検出)
