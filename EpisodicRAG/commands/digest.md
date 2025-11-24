@@ -40,7 +40,9 @@ description: EpisodicRAG階層的ダイジェスト生成（8層100年）
 4. タイトル提案とユーザー承認
 5. RegularDigest作成（Provisionalマージ）
 6. GrandDigest更新、次階層Shadowカスケード
-7. 完了確認
+7. 次階層Provisional作成（short版生成）
+8. 次階層Shadow統合更新（overall_digest生成）
+9. 完了確認
 
 ---
 
@@ -74,6 +76,8 @@ TodoWrite({
     {"content": "Provisional保存実行（必要な場合）", "status": "pending", "activeForm": "Provisional保存実行中"},
     {"content": "タイトル提案", "status": "pending", "activeForm": "タイトル提案中"},
     {"content": "finalize_from_shadow.py実行", "status": "pending", "activeForm": "finalize_from_shadow.py実行中"},
+    {"content": "次階層Provisional作成", "status": "pending", "activeForm": "次階層Provisional作成中"},
+    {"content": "次階層Shadow統合更新", "status": "pending", "activeForm": "次階層Shadow統合更新中"},
     {"content": "完了確認", "status": "pending", "activeForm": "完了確認中"}
   ]
 })
@@ -272,7 +276,47 @@ python3 finalize_from_shadow.py {{type}} "承認されたタイトル"
    - last_digest_times.json更新
    - Provisionalファイル削除（マージ後クリーンアップ）
 
-7. **完了確認**
+7. **次階層Provisional作成**
+   - 次階層Shadowのsource_filesを確認（例：monthly → W0001, W0002）
+   - DigestAnalyzerを並列起動して各ファイル全体のshort版を生成:
+     * 各ファイルのoverall_digest.abstractを1200文字に圧縮
+     * 各ファイルのoverall_digest.impressionを400文字に圧縮
+   - individual_digests JSON作成:
+     ```python
+     individual_digests = []
+     for source_file, analysis in zip(source_files, analyzer_results):
+         individual_digests.append({
+             "filename": source_file,
+             "timestamp": datetime.now().isoformat(),
+             "digest_type": analysis["digest_type"],
+             "keywords": analysis["keywords"],
+             "abstract": analysis["abstract"]["short"],  # 1200文字版
+             "impression": analysis["impression"]["short"]  # 400文字版
+         })
+     ```
+   - save_provisional_digest.py実行:
+     ```bash
+     cd Plugins/EpisodicRAG/scripts
+     python3 save_provisional_digest.py <next_level> '<individual_digests JSON>'
+     ```
+   - 次階層Provisionalファイル作成:
+     - weekly確定時 → M{次番号}_Individual.txt → Provisional/2_Monthly/
+     - monthly確定時 → Q{次番号}_Individual.txt → Provisional/3_Quarterly/
+     - 以下、階層的に継続
+
+8. **次階層Shadow統合更新**
+   - 次階層Shadowのsource_filesから各ファイルのoverall_digestを読み込む
+     * 例: W0001のoverall_digest（long版：abstract 2400文字, impression 800文字）
+     * 例: W0002のoverall_digest（long版：abstract 2400文字, impression 800文字）
+   - メインエージェントが統合分析を実行:
+     * digest_type: 複数ファイルの統合テーマ（10-20文字）
+     * keywords: 5個の統合キーワード（各20-50文字）
+     * abstract: 2400文字の統合分析（次階層overall用）
+     * impression: 800文字の所感・展望（次階層overall用）
+   - Edit toolでShadowGrandDigest.{next_level}.overall_digestを更新
+   - 注意: DigestAnalyzerは使用しない（構造的統合が必要なため、メインエージェントが直接実行）
+
+9. **完了確認**
    - 生成されたRegularDigestファイルパスを表示
    - GrandDigest.txtの更新内容を表示
    - 次の階層生成の可能性を確認
