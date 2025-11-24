@@ -15,7 +15,9 @@
       "source": "./EpisodicRAG",
       "description": "Hierarchical memory system for Claude. Digests conversation logs into 8 tiers spanning ~100 years. Prevents memory fragmentation and enables cross-session memory inheritance.",
       "version": "1.1.0",
-      "author": "Weave @ EpisodicRAG",
+      "author": {
+        "name": "Weave @ EpisodicRAG"
+      },
       "homepage": "https://note.com/weave_ai",
       "repository": "https://github.com/Bizuayeu/Plugins-Weave",
       "license": "MIT",
