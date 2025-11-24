@@ -256,6 +256,32 @@ python scripts/finalize_from_shadow.py
 
 ---
 
+## 開発環境での注意事項
+
+### インストールテスト時の環境混在
+
+開発環境とインストール済プラグインが同じマシンに存在する場合、以下に注意してください：
+
+**問題**: `@digest-setup`等を実行すると、開発フォルダに設定ファイルが作成される可能性があります
+
+**確認方法**:
+```bash
+cd plugins-weave/EpisodicRAG
+git status
+# 期待: "nothing to commit, working tree clean"
+```
+
+**ベストプラクティス**:
+
+1. **インストール後は必ずgit statusで確認**
+2. **設定ファイルは開発フォルダにコミットしない**
+3. **設定の編集はインストール済プラグイン側で行う**
+   - インストール先: `~/.claude/plugins/marketplaces/Plugins-Weave/EpisodicRAG/`
+
+詳細は[TROUBLESHOOTING.md](EpisodicRAG/docs/TROUBLESHOOTING.md#開発環境とインストール環境の混在)を参照してください。
+
+---
+
 ## ドキュメント
 
 コードの変更に伴い、必要に応じてドキュメントを更新してください：

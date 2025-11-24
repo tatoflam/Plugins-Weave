@@ -1,3 +1,5 @@
+![EpisodicRAG Plugin](EpisodicRAG.png)
+
 # EpisodicRAG Plugin
 
 階層的記憶・ダイジェスト生成システム（8層100年、完全自己完結版）

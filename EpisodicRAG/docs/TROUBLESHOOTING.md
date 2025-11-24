@@ -289,6 +289,45 @@ cat {path_to_generated_json}
 
 ---
 
+### 開発環境とインストール環境の混在
+
+**症状**: インストール済プラグインをテストしているが、開発フォルダに設定ファイルが作成される
+
+**原因**: 開発フォルダとインストール済プラグインが同じマシンに存在する環境で発生
+
+**診断**:
+```bash
+cd plugins-weave/EpisodicRAG
+git status
+# 期待: "nothing to commit, working tree clean"
+# 問題: config.json や last_digest_times.json が untracked として表示される
+```
+
+**解決方法**:
+
+1. **開発フォルダから設定ファイルを削除**:
+   ```bash
+   cd plugins-weave/EpisodicRAG
+   rm .claude-plugin/config.json
+   rm .claude-plugin/last_digest_times.json
+   git status  # clean を確認
+   ```
+
+2. **インストール済プラグインに正しく配置**:
+   ```bash
+   # config.jsonの場所確認
+   cat ~/.claude/plugins/marketplaces/Plugins-Weave/EpisodicRAG/.claude-plugin/config.json
+   ```
+
+**重要な原則**:
+- **開発フォルダ**: ソースコードのみ（設定ファイルは.gitignoreで除外）
+- **インストール済プラグイン**: 実行環境・設定ファイル配置場所（`~/.claude/plugins/marketplaces/`）
+- **データディレクトリ**: base_dirからの相対パスで別の場所に配置
+
+**参考**: この問題は開発者が新規インストールをテストする際の特殊ケースです。通常のユーザーは遭遇しません。
+
+---
+
 ## システム状態の詳細診断
 
 問題が発生した場合、以下の手順で状態を詳細に診断してください：
