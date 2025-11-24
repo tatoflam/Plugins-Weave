@@ -302,7 +302,7 @@ for source_file in source_files:
 
 ### 設定ファイルの場所
 
-`~/.claude/plugins/EpisodicRAG-Plugin@Toybox/.claude-plugin/config.json`
+`~/.claude/plugins/EpisodicRAG-Plugin@Plugins-Weave/.claude-plugin/config.json`
 
 Plugin内に完全自己完結しており、プロジェクトルートをクリーンに保ちます。
 
@@ -541,14 +541,14 @@ Weaveプロジェクトと統合する場合：
 
 ```bash
 # Pythonスクリプトで確認
-cd ~/.claude/plugins/EpisodicRAG-Plugin@Toybox
+cd ~/.claude/plugins/EpisodicRAG-Plugin@Plugins-Weave
 python scripts/config.py --show-paths
 ```
 
 **出力例:**
 ```
-Plugin Root: ~/.claude/plugins/EpisodicRAG-Plugin@Toybox
-Config File: ~/.claude/plugins/EpisodicRAG-Plugin@Toybox/.claude-plugin/config.json
+Plugin Root: ~/.claude/plugins/EpisodicRAG-Plugin@Plugins-Weave
+Config File: ~/.claude/plugins/EpisodicRAG-Plugin@Plugins-Weave/.claude-plugin/config.json
 Base Dir (setting): ../../..
 Base Dir (resolved): /Users/username/DEV
 Loops Path: /Users/username/DEV/homunculus/Weave/EpisodicRAG/Loops
@@ -575,12 +575,12 @@ Identity File: /Users/username/DEV/homunculus/Weave/Identities/UserIdentity.md
 
 2. マーケットプレイスを追加
    ```bash
-   /marketplace add https://github.com/bizuayeu/Toybox
+   /marketplace add https://github.com/Bizuayeu/Plugins-Weave
    ```
 
 3. 再度インストール
    ```bash
-   /plugin install EpisodicRAG-Plugin@Toybox
+   /plugin install EpisodicRAG-Plugin@Plugins-Weave
    ```
 
 ---
@@ -597,7 +597,7 @@ Identity File: /Users/username/DEV/homunculus/Weave/Identities/UserIdentity.md
 
 または手動でセットアップスクリプトを実行：
 ```bash
-cd ~/.claude/plugins/EpisodicRAG-Plugin@Toybox
+cd ~/.claude/plugins/EpisodicRAG-Plugin@Plugins-Weave
 bash templates/setup.sh
 ```
 
@@ -637,7 +637,7 @@ bash templates/setup.sh
 **解決方法**:
 ```bash
 # パス情報を確認
-cd ~/.claude/plugins/EpisodicRAG-Plugin@Toybox
+cd ~/.claude/plugins/EpisodicRAG-Plugin@Plugins-Weave
 python scripts/config.py --show-paths
 ```
 
