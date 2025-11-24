@@ -349,8 +349,42 @@ class DigestFinalizerFromShadow:
             # ProvisionalDigest削除フラグ（後でクリーンアップ）
             provisional_file_to_delete = provisional_path
         else:
-            print(f"[INFO] No Provisional digest found, individual_digests will be empty")
+            # Provisionalファイルが存在しない場合、source_filesから自動生成（まだらボケ回避）
+            print(f"[INFO] No Provisional digest found, generating from source files...")
             provisional_file_to_delete = None
+
+            # source_filesからindividual_digestsを自動生成
+            source_files = shadow_digest.get("source_files", [])
+
+            for source_file in source_files:
+                # ソースファイルの実体を探す
+                try:
+                    source_dir = self.shadow_manager._get_source_path(level)
+                    source_path = source_dir / source_file
+
+                    if source_path.exists() and source_path.suffix == '.txt':
+                        with open(source_path, 'r', encoding='utf-8') as f:
+                            source_data = json.load(f)
+                            overall = source_data.get("overall_digest", {})
+
+                            # individual_digestsエントリ作成
+                            individual_entry = {
+                                "filename": source_file,
+                                "timestamp": overall.get("timestamp", ""),
+                                "digest_type": overall.get("digest_type", ""),
+                                "keywords": overall.get("keywords", []),
+                                "abstract": overall.get("abstract", ""),
+                                "impression": overall.get("impression", "")
+                            }
+                            individual_digests.append(individual_entry)
+
+                            print(f"  [INFO] Auto-generated individual digest from {source_file}")
+                except json.JSONDecodeError:
+                    print(f"  [WARN] Failed to parse {source_file} as JSON")
+                except Exception as e:
+                    print(f"  [WARN] Error reading {source_file}: {e}")
+
+            print(f"[INFO] Auto-generated {len(individual_digests)} individual digests from source files")
 
         # RegularDigestの構造を作成
         regular_digest = {

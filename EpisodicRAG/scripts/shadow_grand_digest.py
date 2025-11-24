@@ -207,12 +207,35 @@ class ShadowGrandDigestManager:
 
         return new_files
 
+    def _get_source_path(self, level: str) -> Path:
+        """
+        指定レベルのソースファイルが格納されているディレクトリを返す
+
+        Args:
+            level: "weekly", "monthly", "quarterly"など
+
+        Returns:
+            Path: ソースファイルのディレクトリ
+        """
+        source_type = self.level_hierarchy[level]["source"]
+
+        if source_type == "loops":
+            # Weekly: Loopファイルを参照
+            return self.loops_path
+        else:
+            # Monthly以上: 下位レベルのDigestファイルを参照
+            source_config = self.digest_config.get(source_type)
+            if source_config:
+                return self.digests_path / source_config["dir"]
+            else:
+                raise ValueError(f"Unknown source type: {source_type}")
+
     def add_files_to_shadow(self, level: str, new_files: List[Path]):
         """
         指定レベルのShadowに新しいファイルを追加（増分更新）
 
-        source_filesのみ追加（individual_digestsは空のまま）
-        Claudeが分析時に直接individual_digestsを作成します
+        Weekly: source_filesのみ追加（PLACEHOLDERのまま）→ Claude分析待ち
+        Monthly以上: Digestファイル内容を読み込んでログ出力（まだらボケ回避）
         """
         shadow_data = self.load_or_create_shadow()
         overall_digest = shadow_data["latest_digests"][level]["overall_digest"]
@@ -242,6 +265,9 @@ class ShadowGrandDigestManager:
         # 既存のファイルリストを取得
         existing_files = set(overall_digest["source_files"])
 
+        # レベルに応じたソースタイプを取得
+        source_type = self.level_hierarchy[level]["source"]
+
         # 新しいファイルだけをsource_filesに追加
         added_count = 0
         for file_path in new_files:
@@ -250,19 +276,51 @@ class ShadowGrandDigestManager:
                 added_count += 1
                 print(f"  + {file_path.name}")
 
-        # ファイル数に応じてabstractのプレースホルダーを更新
-        total_files = len(overall_digest["source_files"])
-        overall_digest["abstract"] = f"<!-- PLACEHOLDER: {total_files}ファイル分の全体統合分析 (2400文字程度) -->"
+                # Monthly以上: Digestファイルの内容を読み込んでログ出力（まだらボケ回避）
+                if source_type != "loops":
+                    source_dir = self._get_source_path(level)
+                    full_path = source_dir / file_path.name
 
-        # 全てのフィールドをプレースホルダーに戻す（Claudeが新しい分析で埋める）
-        overall_digest["impression"] = "<!-- PLACEHOLDER: 所感・展望 (800文字程度) -->"
-        overall_digest["keywords"] = [
-            "<!-- PLACEHOLDER: keyword1 -->",
-            "<!-- PLACEHOLDER: keyword2 -->",
-            "<!-- PLACEHOLDER: keyword3 -->",
-            "<!-- PLACEHOLDER: keyword4 -->",
-            "<!-- PLACEHOLDER: keyword5 -->"
-        ]
+                    if full_path.exists() and full_path.suffix == '.txt':
+                        try:
+                            with open(full_path, 'r', encoding='utf-8') as f:
+                                digest_data = json.load(f)
+                                overall = digest_data.get("overall_digest", {})
+
+                                # ログ出力: Digestファイルから読み込んだ情報
+                                print(f"    [INFO] Read digest content from {file_path.name}")
+                                print(f"      - digest_type: {overall.get('digest_type', 'N/A')}")
+                                print(f"      - keywords: {len(overall.get('keywords', []))} items")
+                                print(f"      - abstract: {len(overall.get('abstract', ''))} chars")
+                                print(f"      - impression: {len(overall.get('impression', ''))} chars")
+                        except json.JSONDecodeError:
+                            print(f"    [WARN] Failed to parse {file_path.name} as JSON")
+                        except Exception as e:
+                            print(f"    [WARN] Error reading {file_path.name}: {e}")
+
+        # 既存分析がPLACEHOLDERかどうか確認
+        total_files = len(overall_digest["source_files"])
+        is_placeholder = (
+            isinstance(overall_digest.get("abstract", ""), str) and
+            "<!-- PLACEHOLDER" in overall_digest.get("abstract", "")
+        )
+
+        if is_placeholder:
+            # PLACEHOLDERの場合のみ更新
+            overall_digest["abstract"] = f"<!-- PLACEHOLDER: {total_files}ファイル分の全体統合分析 (2400文字程度) -->"
+            overall_digest["impression"] = "<!-- PLACEHOLDER: 所感・展望 (800文字程度) -->"
+            overall_digest["keywords"] = [
+                "<!-- PLACEHOLDER: keyword1 -->",
+                "<!-- PLACEHOLDER: keyword2 -->",
+                "<!-- PLACEHOLDER: keyword3 -->",
+                "<!-- PLACEHOLDER: keyword4 -->",
+                "<!-- PLACEHOLDER: keyword5 -->"
+            ]
+            print(f"[INFO] Initialized placeholder for {total_files} file(s)")
+        else:
+            # 既存の分析を保持
+            print(f"[INFO] Preserved existing analysis (now {total_files} file(s) total)")
+            print(f"[INFO] Claude should re-analyze all {total_files} files to integrate new content")
 
         self.save_shadow(shadow_data)
         print(f"[INFO] Added {added_count} file(s) to ShadowGrandDigest.{level}")

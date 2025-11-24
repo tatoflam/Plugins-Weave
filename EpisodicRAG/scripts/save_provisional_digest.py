@@ -67,9 +67,10 @@ class ProvisionalDigestSaver:
 
         prefix = config["prefix"]
 
-        # 既存のRegularDigestファイルを検索
+        # 既存のRegularDigestファイルを検索（サブディレクトリ内）
+        subdir = self.digests_path / config["dir"]
         pattern = f"*{prefix}[0-9]*.txt"
-        existing_files = list(self.digests_path.glob(pattern))
+        existing_files = list(subdir.glob(pattern)) if subdir.exists() else []
 
         if not existing_files:
             return 1
