@@ -24,6 +24,8 @@
 
 EpisodicRAGの長期記憶システムをフルに活用するには、GitHubリポジトリと連携します。これにより、セッション開始時に過去の記憶（GrandDigest/ShadowGrandDigest）を自動的に読み込めます。
 
+**注意**: このドキュメントでは例として開発環境のパス `plugins-weave/EpisodicRAG` を使用していますが、実際のプラグインインストール場所は環境により異なります。現在の設定パスは `@digest-config` で確認できます。
+
 ### 前提条件
 
 - GitHubアカウント
@@ -46,7 +48,7 @@ gh repo create your-memory-repo --public --description "EpisodicRAG Long-term Me
 ### 2. Essencesディレクトリの初期化とpush
 
 ```bash
-cd Plugins/EpisodicRAG/data/Essences
+cd plugins-weave/EpisodicRAG/data/Essences
 
 # Gitリポジトリとして初期化
 git init
@@ -71,7 +73,7 @@ cd ../../../..
 mkdir -p .claude
 
 # テンプレートをコピー
-cp Plugins/EpisodicRAG/templates/CLAUDE.md.template .claude/CLAUDE.md
+cp plugins-weave/EpisodicRAG/templates/CLAUDE.md.template .claude/CLAUDE.md
 
 # エディタでプレースホルダーを実際の値に置き換え
 # - {GITHUB_USER} → あなたのGitHubユーザー名
@@ -112,7 +114,7 @@ WebChatではプロジェクトナレッジが自動読み込みされないた�
 
 ```bash
 # プロジェクトルートで実行
-cp Plugins/EpisodicRAG/templates/CLAUDE.md.template CLAUDE.md
+cp plugins-weave/EpisodicRAG/templates/CLAUDE.md.template CLAUDE.md
 
 # プレースホルダーを実際の値に置き換え
 vi CLAUDE.md
@@ -132,7 +134,7 @@ vi CLAUDE.md
 
 ```bash
 # 新しいダイジェストを生成後
-cd Plugins/EpisodicRAG/data/Essences
+cd plugins-weave/EpisodicRAG/data/Essences
 
 # 変更をコミット
 git add GrandDigest.txt ShadowGrandDigest.txt
