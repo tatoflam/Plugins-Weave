@@ -30,12 +30,12 @@
 
 1. **config.jsonが存在するか**
    ```bash
-   ls ~/.claude/plugins/EpisodicRAG-Plugin@Toybox/.claude-plugin/config.json
+   ls ~/.claude/plugins/EpisodicRAG-Plugin@Plugins-Weave/.claude-plugin/config.json
    ```
 
 2. **パス解決が正しいか**
    ```bash
-   cd ~/.claude/plugins/EpisodicRAG-Plugin@Toybox
+   cd ~/.claude/plugins/EpisodicRAG-Plugin@Plugins-Weave
    python scripts/config.py --show-paths
    ```
 
@@ -120,7 +120,7 @@ impression: ...
 `/digest weekly` 実行時のエラーログを確認:
 ```bash
 # 手動で finalize_from_shadow.py を実行してエラー詳細を確認
-cd ~/.claude/plugins/EpisodicRAG-Plugin@Toybox
+cd ~/.claude/plugins/EpisodicRAG-Plugin@Plugins-Weave
 python scripts/finalize_from_shadow.py weekly "テストタイトル"
 ```
 
@@ -172,7 +172,7 @@ python scripts/finalize_from_shadow.py weekly "テストタイトル"
    cp {essences_dir}/ShadowGrandDigest.txt {essences_dir}/ShadowGrandDigest.txt.bak
 
    # 手動で shadow_grand_digest.py を実行
-   cd ~/.claude/plugins/EpisodicRAG-Plugin@Toybox
+   cd ~/.claude/plugins/EpisodicRAG-Plugin@Plugins-Weave
    python scripts/shadow_grand_digest.py --init
    ```
 
@@ -308,14 +308,14 @@ cat {path_to_generated_json}
 ### 2. パス設定確認
 
 ```bash
-cd ~/.claude/plugins/EpisodicRAG-Plugin@Toybox
+cd ~/.claude/plugins/EpisodicRAG-Plugin@Plugins-Weave
 python scripts/config.py --show-paths
 ```
 
 出力例:
 ```
-Plugin Root: ~/.claude/plugins/EpisodicRAG-Plugin@Toybox
-Config File: ~/.claude/plugins/EpisodicRAG-Plugin@Toybox/.claude-plugin/config.json
+Plugin Root: ~/.claude/plugins/EpisodicRAG-Plugin@Plugins-Weave
+Config File: ~/.claude/plugins/EpisodicRAG-Plugin@Plugins-Weave/.claude-plugin/config.json
 Base Dir (setting): ../../..
 Base Dir (resolved): /Users/username/DEV
 Loops Path: /Users/username/DEV/homunculus/Weave/EpisodicRAG/Loops
@@ -370,7 +370,7 @@ cat {essences_dir}/ShadowGrandDigest.txt
 ### generate_digest_auto.sh のデバッグ
 
 ```bash
-cd ~/.claude/plugins/EpisodicRAG-Plugin@Toybox
+cd ~/.claude/plugins/EpisodicRAG-Plugin@Plugins-Weave
 bash -x scripts/generate_digest_auto.sh
 ```
 
@@ -379,7 +379,7 @@ bash -x scripts/generate_digest_auto.sh
 ### Pythonスクリプトのデバッグ
 
 ```bash
-cd ~/.claude/plugins/EpisodicRAG-Plugin@Toybox
+cd ~/.claude/plugins/EpisodicRAG-Plugin@Plugins-Weave
 
 # config.pyのデバッグ
 python -v scripts/config.py --show-paths
@@ -397,7 +397,7 @@ python scripts/finalize_from_shadow.py --help
 
 問題が解決しない場合は、GitHub Issuesで報告してください：
 
-https://github.com/bizuayeu/Toybox/issues
+https://github.com/Bizuayeu/Plugins-Weave/issues
 
 ### 報告時に含めると良い情報：
 
