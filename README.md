@@ -1,9 +1,8 @@
-![EpisodicRAG Plugin](EpisodicRAG.png)
-
 # EpisodicRAG Plugin
 
-階層的記憶・ダイジェスト生成システム（8層100年、完全自己完結版）
+階層的記憶・ダイジェスト生成システム（8 層 100 年、完全自己完結版）
 
+![EpisodicRAG Plugin](EpisodicRAG.png)
 [![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)](https://github.com/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
@@ -13,7 +12,7 @@
 
 1. [概要](#概要)
 2. [インストール](#インストール)
-3. [最初の3ステップ](#最初の3ステップ)
+3. [最初の 3 ステップ](#最初の3ステップ)
 4. [基本コマンド](#基本コマンド)
 5. [セッション間で記憶を引き継ぐ](#セッション間で記憶を引き継ぐ)
 6. [まだらボケ回避](#まだらボケ回避)
@@ -25,14 +24,14 @@
 
 ## 概要
 
-EpisodicRAGは、会話ログ（Loopファイル）を階層的にダイジェスト化し、長期記憶として構造化・継承するシステムです。
+EpisodicRAG は、会話ログ（Loop ファイル）を階層的にダイジェスト化し、長期記憶として構造化・継承するシステムです。
 
-8階層（Weekly → Centurial、約108年分）の記憶階層を自動生成・管理し、セッション間で記憶を引き継ぐことができます。
+8 階層（Weekly → Centurial、約 108 年分）の記憶階層を自動生成・管理し、セッション間で記憶を引き継ぐことができます。
 
 ### 主な特徴
 
-- **2段階ダイジェスト生成**: Provisional（仮）→ Regular（正式）の段階的記憶定着
-- **まだらボケ回避**: 未処理Loop即座検出・分析により、記憶の断片化（虫食い状態）を防止
+- **2 段階ダイジェスト生成**: Provisional（仮）→ Regular（正式）の段階的記憶定着
+- **まだらボケ回避**: 未処理 Loop 即座検出・分析により、記憶の断片化（虫食い状態）を防止
 - **long/short 二重出力**: 現階層用（long）と次階層用（short）を自動生成
 
 ### ユースケース
@@ -40,7 +39,7 @@ EpisodicRAGは、会話ログ（Loopファイル）を階層的にダイジェ�
 - 長期プロジェクトの知識管理
 - 複数セッションにわたる会話の記憶
 - プロジェクトの歴史的アーカイブ
-- AIとの対話履歴の構造化記憶
+- AI との対話履歴の構造化記憶
 
 ---
 
@@ -48,7 +47,7 @@ EpisodicRAGは、会話ログ（Loopファイル）を階層的にダイジェ�
 
 ### プラグインマーケットプレイス経由（推奨）
 
-1. **Plugins-Weaveマーケットプレイスを追加**
+1. **Plugins-Weave マーケットプレイスを追加**
 
    ```bash
    /marketplace add https://github.com/Bizuayeu/Plugins-Weave
@@ -67,11 +66,12 @@ EpisodicRAGは、会話ログ（Loopファイル）を階層的にダイジェ�
    ```
 
    対話形式で以下を設定：
-   - Loopファイルの配置先
-   - Digestファイルの出力先
-   - Essencesファイルの配置先
-   - 外部Identity.mdファイル（オプション）
-   - 各階層のthreshold値
+
+   - Loop ファイルの配置先
+   - Digest ファイルの出力先
+   - Essences ファイルの配置先
+   - 外部 Identity.md ファイル（オプション）
+   - 各階層の threshold 値
 
 これで準備完了です！
 
@@ -81,7 +81,7 @@ EpisodicRAGは、会話ログ（Loopファイル）を階層的にダイジェ�
 
 ---
 
-## 最初の3ステップ
+## 最初の 3 ステップ
 
 ### 1. セットアップ実行
 
@@ -91,16 +91,18 @@ EpisodicRAGは、会話ログ（Loopファイル）を階層的にダイジェ�
 
 対話形式で設定を行います。デフォルト値（完全自己完結型）を使用する場合は、すべて[1]を選択してください。
 
-### 2. Loopファイルの配置
+### 2. Loop ファイルの配置
 
-会話ログをLoop形式で保存します。
+会話ログを Loop 形式で保存します。
 
 **推奨ツール（Chrome Extension）:**
 
-会話ログを簡単に保存できるChrome Extensionを推奨します：
-- **[Save - Conversation Saver](https://save.hugocollin.com/)** - Claude/ChatGPTの会話を丸ごと保存
+会話ログを簡単に保存できる Chrome Extension を推奨します：
+
+- **[Save - Conversation Saver](https://save.hugocollin.com/)** - Claude/ChatGPT の会話を丸ごと保存
 
 **ファイル命名規則:**
+
 ```
 Loop0001_タイトル.txt
 Loop0002_タイトル.txt
@@ -108,29 +110,32 @@ Loop0002_タイトル.txt
 ```
 
 **命名ルール：**
+
 - 形式: `Loop[連番]_[タイトル].txt`
-- 連番: 4桁以上の数字（大きいほど新しい記録）
+- 連番: 4 桁以上の数字（大きいほど新しい記録）
 - タイトル: 英数字、日本語、ハイフン、アンダースコアなど
 - 正規表現: `^Loop[0-9]+_[\p{L}\p{N}ー・\w]+\.txt$`
 
 **配置先:**
+
 ```bash
 # デフォルト設定の場合
 ~/.claude/plugins/EpisodicRAG-Plugin@Toybox/data/Loops/
 ```
 
-### 3. 最初のLoop検出と分析
+### 3. 最初の Loop 検出と分析
 
-未処理のLoopファイルがあるときに `/digest` を実行してください。
+未処理の Loop ファイルがあるときに `/digest` を実行してください。
 
 ```bash
 /digest
 ```
 
 **実行内容:**
-1. 未処理のLoopファイルを検出
-2. ShadowGrandDigest.weeklyにプレースホルダー追加
-3. DigestAnalyzerで並列分析（まだらボケ回避）
+
+1. 未処理の Loop ファイルを検出
+2. ShadowGrandDigest.weekly にプレースホルダー追加
+3. DigestAnalyzer で並列分析（まだらボケ回避）
 4. 次のアクション提示
 
 これだけ！あとは `@digest-auto` が次に何をすべきか教えてくれます。
@@ -140,15 +145,17 @@ Loop0002_タイトル.txt
 ## 基本コマンド
 
 ### `/digest`
-新しいLoopファイルの検出と分析
+
+新しい Loop ファイルの検出と分析
 
 ```bash
 /digest  # 新規Loop検出と分析
 ```
 
-**重要**: Loop追加 → `/digest` の記憶定着サイクルを守ってください！
+**重要**: Loop 追加 → `/digest` の記憶定着サイクルを守ってください！
 
 ### `/digest <type>`
+
 特定階層の確定
 
 ```bash
@@ -158,6 +165,7 @@ Loop0002_タイトル.txt
 ```
 
 ### `@digest-auto`
+
 現在の状態確認と推奨アクション提示
 
 ```bash
@@ -170,34 +178,38 @@ Loop0002_タイトル.txt
 
 ## セッション間で記憶を引き継ぐ
 
-EpisodicRAGの最も重要な機能は、**セッション間で記憶を引き継ぐ**ことです。
+EpisodicRAG の最も重要な機能は、**セッション間で記憶を引き継ぐ**ことです。
 
 ### 記憶の読み込み方法
 
 各セッション開始時に、以下の手順で過去の記憶を読み込みます：
 
-**1. 最新のSHAを取得**
+**1. 最新の SHA を取得**
+
 ```
 https://api.github.com/repos/{USER}/{REPO}/git/refs/heads/main
 ```
-ブラウザまたはcurlでアクセスし、最新コミットのSHAを取得
+
+ブラウザまたは curl でアクセスし、最新コミットの SHA を取得
 
 **2. 記憶ファイルを読み込み**
 
-SHAを使って以下のURLを生成：
+SHA を使って以下の URL を生成：
+
 ```
 https://raw.githubusercontent.com/{USER}/{REPO}/{SHA}/{ESSENCES_PATH}/GrandDigest.txt
 https://raw.githubusercontent.com/{USER}/{REPO}/{SHA}/{ESSENCES_PATH}/ShadowGrandDigest.txt
 ```
-※ {ESSENCES_PATH} はGitHubリポジトリ内のEssencesディレクトリへの相対パス
 
-WebFetch機能で読み込み（Claude WebChat / Claude Code 両対応）
+※ {ESSENCES_PATH} は GitHub リポジトリ内の Essences ディレクトリへの相対パス
+
+WebFetch 機能で読み込み（Claude WebChat / Claude Code 両対応）
 
 **3. セッション開始**
 
 過去の記憶を持った状態で会話を開始できます
 
-> ⚠️ **注意**: この手順をスキップすると、AIは過去の記憶を持たない状態で開始します
+> ⚠️ **注意**: この手順をスキップすると、AI は過去の記憶を持たない状態で開始します
 
 **詳細な設定方法**: [docs/ADVANCED.md](docs/ADVANCED.md) を参照
 
@@ -205,7 +217,7 @@ WebFetch機能で読み込み（Claude WebChat / Claude Code 両対応）
 
 ## まだらボケ回避
 
-**まだらボケ** = AIがLoopの内容を記憶できていない（虫食い記憶）状態
+**まだらボケ** = AI が Loop の内容を記憶できていない（虫食い記憶）状態
 
 ### 記憶定着の原則
 
@@ -217,6 +229,7 @@ Loop追加 → `/digest` → Loop追加 → `/digest` → ...
 この原則を守ることで、AI は全ての Loop を記憶できます。
 
 **やってはいけないこと:**
+
 ```
 Loop0001追加 → `/digest`せず → Loop0002追加
                               ↑
@@ -230,20 +243,20 @@ Loop0001追加 → `/digest`せず → Loop0002追加
 
 ## 記憶階層
 
-### 8階層構造
+### 8 階層構造
 
-| 階層 | 時間スケール | 必要数（デフォルト） | 累積Loop数 |
-|------|------------|---------------------|----------|
-| Weekly | ~1週間 | 5 Loops | 5 |
-| Monthly | ~1ヶ月 | 5 Weekly | 25 |
-| Quarterly | ~3ヶ月 | 3 Monthly | 75 |
-| Annual | ~1年 | 4 Quarterly | 300 |
-| Triennial | ~3年 | 3 Annual | 900 |
-| Decadal | ~9年 | 3 Triennial | 2,700 |
-| Multi-decadal | ~27年 | 3 Decadal | 8,100 |
-| Centurial | **~108年** | 4 Multi-decadal | **32,400** |
+| 階層          | 時間スケール | 必要数（デフォルト） | 累積 Loop 数 |
+| ------------- | ------------ | -------------------- | ------------ |
+| Weekly        | ~1 週間      | 5 Loops              | 5            |
+| Monthly       | ~1 ヶ月      | 5 Weekly             | 25           |
+| Quarterly     | ~3 ヶ月      | 3 Monthly            | 75           |
+| Annual        | ~1 年        | 4 Quarterly          | 300          |
+| Triennial     | ~3 年        | 3 Annual             | 900          |
+| Decadal       | ~9 年        | 3 Triennial          | 2,700        |
+| Multi-decadal | ~27 年       | 3 Decadal            | 8,100        |
+| Centurial     | **~108 年**  | 4 Multi-decadal      | **32,400**   |
 
-約1世紀分の対話履歴を階層的に圧縮保持します。
+約 1 世紀分の対話履歴を階層的に圧縮保持します。
 
 **Threshold（必要数）**は`@digest-config`でカスタマイズ可能です。
 
@@ -252,22 +265,27 @@ Loop0001追加 → `/digest`せず → Loop0002追加
 ## 次のステップ
 
 ### 📘 基本を使いこなす
+
 詳しいコマンド解説、設定のカスタマイズ、よくある問題と解決方法
 → [docs/GUIDE.md](docs/GUIDE.md)
 
 ### 📙 深く理解する
+
 内部構造と技術仕様
 → [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 
-### 🔧 GitHub連携（高度な機能）
+### 🔧 GitHub 連携（高度な機能）
+
 セッション間で長期記憶を自動読み込み
 → [docs/ADVANCED.md](docs/ADVANCED.md)
 
 ### 🆘 トラブルシューティング
+
 高度な問題の診断と解決
 → [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)
 
 ### 🛠️ 開発に参加する
+
 プラグイン開発に参加したい方
 → [CONTRIBUTING.md](CONTRIBUTING.md)
 
@@ -279,18 +297,19 @@ Loop0001追加 → `/digest`せず → Loop0002追加
 
 MIT License
 
-本ソフトウェアはMITライセンスの下で提供されています。
+本ソフトウェアは MIT ライセンスの下で提供されています。
 
 ### 特許
 
-EpisodicRAGの中核技術は日本国特許出願中です：
+EpisodicRAG の中核技術は日本国特許出願中です：
 
-**特願2025-198943** - 階層的記憶・ダイジェスト生成システム
+**特願 2025-198943** - 階層的記憶・ダイジェスト生成システム
 
-本特許出願は、8階層の記憶構造とダイジェスト生成プロセスに関する技術を対象としています。
+本特許出願は、8 階層の記憶構造とダイジェスト生成プロセスに関する技術を対象としています。
 
 **商用利用について:**
-- 個人・非商用利用: MITライセンスの範囲で自由に利用可能
+
+- 個人・非商用利用: MIT ライセンスの範囲で自由に利用可能
 - 商用利用: 特許権との関係について、事前にご相談ください
 
 詳細は [LICENSE](LICENSE) をご確認ください。
@@ -301,5 +320,5 @@ Weave @ EpisodicRAG
 
 ---
 
-*Last Updated: 2025-11-24*
-*Version: 1.1.0*
+_Last Updated: 2025-11-24_
+_Version: 1.1.0_
