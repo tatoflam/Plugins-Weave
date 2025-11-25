@@ -27,7 +27,8 @@ from pathlib import Path
 from typing import List, Dict, Any, Optional, Tuple
 
 # Plugin版: config.pyをインポート
-from config import DigestConfig
+from config import DigestConfig, LEVEL_CONFIG, LEVEL_NAMES, PLACEHOLDER_LIMITS, extract_number_only
+from utils import log_warning
 
 
 class ShadowGrandDigestManager:
@@ -49,44 +50,33 @@ class ShadowGrandDigestManager:
         self.shadow_digest_file = self.essences_path / "ShadowGrandDigest.txt"
         self.last_digest_file = self.config.plugin_root / ".claude-plugin" / "last_digest_times.json"
 
-        # レベル設定
-        self.levels = ["weekly", "monthly", "quarterly", "annual", "triennial", "decadal", "multi_decadal", "centurial"]
+        # レベル設定（共通定数を参照）
+        self.levels = LEVEL_NAMES
         self.level_hierarchy = {
-            "weekly": {"source": "loops", "next": "monthly"},
-            "monthly": {"source": "weekly", "next": "quarterly"},
-            "quarterly": {"source": "monthly", "next": "annual"},
-            "annual": {"source": "quarterly", "next": "triennial"},
-            "triennial": {"source": "annual", "next": "decadal"},
-            "decadal": {"source": "triennial", "next": "multi_decadal"},
-            "multi_decadal": {"source": "decadal", "next": "centurial"},
-            "centurial": {"source": "multi_decadal", "next": None}
+            level: {"source": cfg["source"], "next": cfg["next"]}
+            for level, cfg in LEVEL_CONFIG.items()
         }
+        self.digest_config = LEVEL_CONFIG
 
-        # ダイジェスト設定
-        self.digest_config = {
-            "weekly": {"dir": "1_Weekly", "prefix": "W"},
-            "monthly": {"dir": "2_Monthly", "prefix": "M"},
-            "quarterly": {"dir": "3_Quarterly", "prefix": "Q"},
-            "annual": {"dir": "4_Annual", "prefix": "A"},
-            "triennial": {"dir": "5_Triennial", "prefix": "T"},
-            "decadal": {"dir": "6_Decadal", "prefix": "D"},
-            "multi_decadal": {"dir": "7_Multi-decadal", "prefix": "MD"},
-            "centurial": {"dir": "8_Centurial", "prefix": "C"}
+    def _create_empty_overall_digest(self) -> dict:
+        """
+        プレースホルダー付きoverall_digestを生成（Single Source of Truth）
+
+        Returns:
+            プレースホルダーを含むoverall_digest構造体
+        """
+        limits = PLACEHOLDER_LIMITS
+        return {
+            "timestamp": "<!-- PLACEHOLDER -->",
+            "source_files": [],
+            "digest_type": "<!-- PLACEHOLDER -->",
+            "keywords": [f"<!-- PLACEHOLDER: keyword{i} -->" for i in range(1, limits["keyword_count"] + 1)],
+            "abstract": f"<!-- PLACEHOLDER: 全体統合分析 ({limits['abstract_chars']}文字程度) -->",
+            "impression": f"<!-- PLACEHOLDER: 所感・展望 ({limits['impression_chars']}文字程度) -->"
         }
 
     def get_template(self) -> dict:
         """ShadowGrandDigest.txtのテンプレートを返す"""
-        overall_digest_placeholder = {
-            "timestamp": "<!-- PLACEHOLDER -->",
-            "source_files": [],
-            "digest_type": "<!-- PLACEHOLDER -->",
-            "keywords": ["<!-- PLACEHOLDER: keyword1 -->", "<!-- PLACEHOLDER: keyword2 -->",
-                        "<!-- PLACEHOLDER: keyword3 -->", "<!-- PLACEHOLDER: keyword4 -->",
-                        "<!-- PLACEHOLDER: keyword5 -->"],
-            "abstract": "<!-- PLACEHOLDER: 全体統合分析 (2400文字程度) -->",
-            "impression": "<!-- PLACEHOLDER: 所感・展望 (800文字程度) -->"
-        }
-
         return {
             "metadata": {
                 "last_updated": datetime.now().isoformat(),
@@ -94,30 +84,8 @@ class ShadowGrandDigestManager:
                 "description": "GrandDigest更新後に作成された新しいコンテンツの増分ダイジェスト（下書き帳）"
             },
             "latest_digests": {
-                "weekly": {
-                    "overall_digest": overall_digest_placeholder.copy()
-                },
-                "monthly": {
-                    "overall_digest": overall_digest_placeholder.copy()
-                },
-                "quarterly": {
-                    "overall_digest": overall_digest_placeholder.copy()
-                },
-                "annual": {
-                    "overall_digest": overall_digest_placeholder.copy()
-                },
-                "triennial": {
-                    "overall_digest": overall_digest_placeholder.copy()
-                },
-                "decadal": {
-                    "overall_digest": overall_digest_placeholder.copy()
-                },
-                "multi_decadal": {
-                    "overall_digest": overall_digest_placeholder.copy()
-                },
-                "centurial": {
-                    "overall_digest": overall_digest_placeholder.copy()
-                }
+                level: {"overall_digest": self._create_empty_overall_digest()}
+                for level in self.levels
             }
         }
 
@@ -165,12 +133,8 @@ class ShadowGrandDigestManager:
         return level_data.get("last_processed")
 
     def extract_number_from_filename(self, filename: str) -> Optional[int]:
-        """ファイル名から数値部分を抽出"""
-        # Loop0186 → 186, W0037 → 37, M001 → 1
-        match = re.search(r'(Loop|[WMQATD])(\d+)', filename)
-        if match:
-            return int(match.group(2))
-        return None
+        """ファイル名から数値部分を抽出（共通関数を使用）"""
+        return extract_number_only(filename)
 
     def find_new_files(self, level: str) -> List[Path]:
         """GrandDigest更新後に作成された新しいファイルを検出"""
@@ -242,20 +206,7 @@ class ShadowGrandDigestManager:
 
         # overall_digestがnullの場合、初期化
         if overall_digest is None:
-            overall_digest = {
-                "timestamp": "<!-- PLACEHOLDER -->",
-                "source_files": [],
-                "digest_type": "<!-- PLACEHOLDER -->",
-                "keywords": [
-                    "<!-- PLACEHOLDER: keyword1 -->",
-                    "<!-- PLACEHOLDER: keyword2 -->",
-                    "<!-- PLACEHOLDER: keyword3 -->",
-                    "<!-- PLACEHOLDER: keyword4 -->",
-                    "<!-- PLACEHOLDER: keyword5 -->"
-                ],
-                "abstract": "<!-- PLACEHOLDER: 全体統合分析 (2400文字程度) -->",
-                "impression": "<!-- PLACEHOLDER: 所感・展望 (800文字程度) -->"
-            }
+            overall_digest = self._create_empty_overall_digest()
             shadow_data["latest_digests"][level]["overall_digest"] = overall_digest
 
         # source_filesがoverall_digest内に存在しない場合、初期化
@@ -294,9 +245,9 @@ class ShadowGrandDigestManager:
                                 print(f"      - abstract: {len(overall.get('abstract', ''))} chars")
                                 print(f"      - impression: {len(overall.get('impression', ''))} chars")
                         except json.JSONDecodeError:
-                            print(f"    [WARN] Failed to parse {file_path.name} as JSON")
+                            log_warning(f"Failed to parse {file_path.name} as JSON")
                         except Exception as e:
-                            print(f"    [WARN] Error reading {file_path.name}: {e}")
+                            log_warning(f"Error reading {file_path.name}: {e}")
 
         # 既存分析がPLACEHOLDERかどうか確認
         total_files = len(overall_digest["source_files"])
@@ -331,16 +282,7 @@ class ShadowGrandDigestManager:
         shadow_data = self.load_or_create_shadow()
 
         # overall_digestを空のプレースホルダーにリセット
-        shadow_data["latest_digests"][level]["overall_digest"] = {
-            "timestamp": "<!-- PLACEHOLDER -->",
-            "source_files": [],
-            "digest_type": "<!-- PLACEHOLDER -->",
-            "keywords": ["<!-- PLACEHOLDER: keyword1 -->", "<!-- PLACEHOLDER: keyword2 -->",
-                        "<!-- PLACEHOLDER: keyword3 -->", "<!-- PLACEHOLDER: keyword4 -->",
-                        "<!-- PLACEHOLDER: keyword5 -->"],
-            "abstract": "<!-- PLACEHOLDER: 全体統合分析 (2400文字程度) -->",
-            "impression": "<!-- PLACEHOLDER: 所感・展望 (800文字程度) -->"
-        }
+        shadow_data["latest_digests"][level]["overall_digest"] = self._create_empty_overall_digest()
 
         self.save_shadow(shadow_data)
         print(f"[INFO] Cleared ShadowGrandDigest for level: {level}")

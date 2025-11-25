@@ -28,7 +28,8 @@ if sys.platform == 'win32':
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
     sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
 
-from config import DigestConfig
+from config import DigestConfig, LEVEL_CONFIG
+from utils import log_error, log_warning
 
 
 class ProvisionalDigestSaver:
@@ -38,17 +39,8 @@ class ProvisionalDigestSaver:
         self.config = DigestConfig()
         self.digests_path = self.config.digests_path
 
-        # レベル設定（prefix, 桁数, サブディレクトリ）
-        self.level_config = {
-            "weekly": {"prefix": "W", "digits": 4, "dir": "1_Weekly"},
-            "monthly": {"prefix": "M", "digits": 3, "dir": "2_Monthly"},
-            "quarterly": {"prefix": "Q", "digits": 3, "dir": "3_Quarterly"},
-            "annual": {"prefix": "A", "digits": 2, "dir": "4_Annual"},
-            "triennial": {"prefix": "T", "digits": 2, "dir": "5_Triennial"},
-            "decadal": {"prefix": "D", "digits": 2, "dir": "6_Decadal"},
-            "multi_decadal": {"prefix": "MD", "digits": 2, "dir": "7_Multi-decadal"},
-            "centurial": {"prefix": "C", "digits": 2, "dir": "8_Centurial"}
-        }
+        # レベル設定（共通定数を参照）
+        self.level_config = LEVEL_CONFIG
 
     def get_next_digest_number(self, level: str) -> int:
         """
@@ -247,7 +239,7 @@ class ProvisionalDigestSaver:
                     # マージ（重複は上書き）
                     individual_digests = self.merge_individual_digests(existing_digests, individual_digests)
             else:
-                print(f"[WARN] --append specified but no existing Provisional found. Creating new file.")
+                log_warning("--append specified but no existing Provisional found. Creating new file.")
                 digest_num = self.get_next_digest_number(level)
         else:
             # 通常モード: 次のダイジェスト番号を取得
@@ -367,19 +359,15 @@ Examples:
         print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
 
     except FileNotFoundError as e:
-        print(f"[ERROR] File not found: {e}")
-        sys.exit(1)
+        log_error(f"File not found: {e}", exit_code=1)
     except json.JSONDecodeError as e:
-        print(f"[ERROR] Invalid JSON format: {e}")
-        sys.exit(1)
+        log_error(f"Invalid JSON format: {e}", exit_code=1)
     except ValueError as e:
-        print(f"[ERROR] {e}")
-        sys.exit(1)
+        log_error(str(e), exit_code=1)
     except Exception as e:
-        print(f"[ERROR] Unexpected error: {e}")
         import traceback
         traceback.print_exc()
-        sys.exit(1)
+        log_error(f"Unexpected error: {e}", exit_code=1)
 
 
 if __name__ == "__main__":

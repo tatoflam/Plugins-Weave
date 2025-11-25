@@ -6,9 +6,73 @@ Digest Plugin Configuration Manager
 Plugin自己完結版：Plugin内の.claude-plugin/config.jsonから設定を読み込む
 """
 import json
+import re
 import sys
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Tuple
+
+
+# =============================================================================
+# 共通定数: レベル設定（Single Source of Truth）
+# =============================================================================
+
+LEVEL_CONFIG: Dict[str, Dict[str, Any]] = {
+    "weekly": {"prefix": "W", "digits": 4, "dir": "1_Weekly", "source": "loops", "next": "monthly"},
+    "monthly": {"prefix": "M", "digits": 3, "dir": "2_Monthly", "source": "weekly", "next": "quarterly"},
+    "quarterly": {"prefix": "Q", "digits": 3, "dir": "3_Quarterly", "source": "monthly", "next": "annual"},
+    "annual": {"prefix": "A", "digits": 2, "dir": "4_Annual", "source": "quarterly", "next": "triennial"},
+    "triennial": {"prefix": "T", "digits": 2, "dir": "5_Triennial", "source": "annual", "next": "decadal"},
+    "decadal": {"prefix": "D", "digits": 2, "dir": "6_Decadal", "source": "triennial", "next": "multi_decadal"},
+    "multi_decadal": {"prefix": "MD", "digits": 2, "dir": "7_Multi-decadal", "source": "decadal", "next": "centurial"},
+    "centurial": {"prefix": "C", "digits": 2, "dir": "8_Centurial", "source": "multi_decadal", "next": None}
+}
+
+LEVEL_NAMES = list(LEVEL_CONFIG.keys())
+
+# プレースホルダー文字数制限（Claudeへのガイドライン）
+PLACEHOLDER_LIMITS: Dict[str, int] = {
+    "abstract_chars": 2400,      # abstract（全体統合分析）の文字数
+    "impression_chars": 800,     # impression（所感・展望）の文字数
+    "keyword_count": 5,          # キーワードの個数
+}
+
+
+# =============================================================================
+# 共通関数: ファイル番号抽出
+# =============================================================================
+
+def extract_file_number(filename: str) -> Optional[Tuple[str, int]]:
+    """
+    ファイル名からプレフィックスと番号を抽出
+
+    Args:
+        filename: ファイル名（例: "Loop0186_xxx.txt", "MD01_xxx.txt"）
+
+    Returns:
+        (prefix, number) のタプル、またはNone
+    """
+    # MDプレフィックス（2文字）を先にチェック（M単独より優先）
+    match = re.search(r'(Loop|MD)(\d+)', filename)
+    if match:
+        return (match.group(1), int(match.group(2)))
+
+    # 1文字プレフィックス
+    match = re.search(r'([WMQATDC])(\d+)', filename)
+    if match:
+        return (match.group(1), int(match.group(2)))
+
+    return None
+
+
+def extract_number_only(filename: str) -> Optional[int]:
+    """番号のみを抽出（後方互換性用）"""
+    result = extract_file_number(filename)
+    return result[1] if result else None
+
+
+# =============================================================================
+# DigestConfig クラス
+# =============================================================================
 
 
 class DigestConfig:

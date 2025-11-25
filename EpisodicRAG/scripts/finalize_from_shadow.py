@@ -44,88 +44,13 @@ from pathlib import Path
 from typing import Dict, Any, Optional
 
 # Plugin版: config.pyをインポート
-from config import DigestConfig
+from config import DigestConfig, LEVEL_CONFIG, extract_file_number
 
-# shadow_grand_digest.pyから相対インポート
+# 分割したモジュールをインポート
+from grand_digest import GrandDigestManager
+from digest_times import DigestTimesTracker
+from utils import sanitize_filename, log_error, log_warning
 from shadow_grand_digest import ShadowGrandDigestManager
-
-
-class GrandDigestManager:
-    """GrandDigest.txt管理クラス（config.py統合版）"""
-
-    def __init__(self, config: DigestConfig):
-        self.config = config
-        self.grand_digest_file = config.essences_path / "GrandDigest.txt"
-
-    def get_template(self) -> dict:
-        """GrandDigest.txtのテンプレートを返す（全8レベル対応）"""
-        return {
-            "metadata": {
-                "last_updated": datetime.now().isoformat(),
-                "version": "1.0"
-            },
-            "major_digests": {
-                "weekly": {
-                    "overall_digest": None
-                },
-                "monthly": {
-                    "overall_digest": None
-                },
-                "quarterly": {
-                    "overall_digest": None
-                },
-                "annual": {
-                    "overall_digest": None
-                },
-                "triennial": {
-                    "overall_digest": None
-                },
-                "decadal": {
-                    "overall_digest": None
-                },
-                "multi_decadal": {
-                    "overall_digest": None
-                },
-                "centurial": {
-                    "overall_digest": None
-                }
-            }
-        }
-
-    def load_or_create(self) -> dict:
-        """GrandDigest.txtを読み込む。存在しなければテンプレートで作成"""
-        if self.grand_digest_file.exists():
-            with open(self.grand_digest_file, 'r', encoding='utf-8') as f:
-                return json.load(f)
-        else:
-            print("[INFO] GrandDigest.txt not found. Creating new file.")
-            template = self.get_template()
-            self.save(template)
-            return template
-
-    def save(self, data: dict):
-        """GrandDigest.txtを保存"""
-        with open(self.grand_digest_file, 'w', encoding='utf-8') as f:
-            json.dump(data, f, ensure_ascii=False, indent=2)
-
-    def update_digest(self, level: str, digest_name: str, overall_digest: dict):
-        """指定レベルのダイジェストを更新"""
-        grand_data = self.load_or_create()
-
-        if level not in grand_data["major_digests"]:
-            print(f"[ERROR] Unknown level: {level}")
-            return False
-
-        # overall_digestを更新（完全なオブジェクトとして保存）
-        grand_data["major_digests"][level]["overall_digest"] = overall_digest
-
-        # メタデータを更新
-        grand_data["metadata"]["last_updated"] = datetime.now().isoformat()
-
-        # 保存
-        self.save(grand_data)
-        print(f"[INFO] Updated GrandDigest.txt for level: {level}")
-        return True
 
 
 class DigestFinalizerFromShadow:
@@ -139,35 +64,17 @@ class DigestFinalizerFromShadow:
 
         # パスを設定から取得
         self.digests_path = config.digests_path
-        self.last_digest_file = self.config.plugin_root / ".claude-plugin" / "last_digest_times.json"
 
         # マネージャー初期化
         self.grand_digest_manager = GrandDigestManager(config)
         self.shadow_manager = ShadowGrandDigestManager(config)
+        self.times_tracker = DigestTimesTracker(config)
 
-        # レベル設定
-        self.level_config = {
-            "weekly": {"prefix": "W", "digits": 4, "dir": "1_Weekly"},
-            "monthly": {"prefix": "M", "digits": 3, "dir": "2_Monthly"},
-            "quarterly": {"prefix": "Q", "digits": 3, "dir": "3_Quarterly"},
-            "annual": {"prefix": "A", "digits": 2, "dir": "4_Annual"},
-            "triennial": {"prefix": "T", "digits": 2, "dir": "5_Triennial"},
-            "decadal": {"prefix": "D", "digits": 2, "dir": "6_Decadal"},
-            "multi_decadal": {"prefix": "MD", "digits": 2, "dir": "7_Multi-decadal"},
-            "centurial": {"prefix": "C", "digits": 2, "dir": "8_Centurial"}
-        }
+        # レベル設定（共通定数を参照）
+        self.level_config = LEVEL_CONFIG
 
         # レベル→Provisionalサブディレクトリのマッピング（level_configのdirと同じ）
         self.level_to_subdir = {level: config["dir"] for level, config in self.level_config.items()}
-
-    def sanitize_filename(self, title: str) -> str:
-        """ファイル名として安全な文字列に変換"""
-        sanitized = re.sub(r'[<>:"/\\|?*]', '', title)
-        sanitized = re.sub(r'\s+', '_', sanitized)
-        sanitized = sanitized.strip('_')
-        if len(sanitized) > 50:
-            sanitized = sanitized[:50].rstrip('_')
-        return sanitized
 
     def get_next_digest_number(self, level: str) -> int:
         """次のダイジェスト番号を取得"""
@@ -189,71 +96,6 @@ class DigestFinalizerFromShadow:
 
         return max(numbers) + 1 if numbers else 1
 
-    def load_last_digest_times(self) -> dict:
-        """最終ダイジェスト生成時刻を読み込む（存在しなければテンプレートから初期化）"""
-        if self.last_digest_file.exists():
-            with open(self.last_digest_file, 'r', encoding='utf-8') as f:
-                return json.load(f)
-        else:
-            # テンプレートから初期化
-            template_file = self.config.plugin_root / ".claude-plugin" / "last_digest_times.template.json"
-            if template_file.exists():
-                with open(template_file, 'r', encoding='utf-8') as f:
-                    template = json.load(f)
-                # テンプレートをコピーして保存
-                with open(self.last_digest_file, 'w', encoding='utf-8') as f:
-                    json.dump(template, f, indent=2, ensure_ascii=False)
-                print(f"[INFO] Initialized last_digest_times.json from template")
-                return template
-            else:
-                # テンプレートがない場合は空の階層的フォーマット
-                levels = list(self.level_config.keys())
-                return {level: {"timestamp": "", "last_processed": None} for level in levels}
-
-    def extract_file_numbers(self, level: str, input_files: list) -> list:
-        """ファイル名から連番を抽出（プレフィックス付き、ゼロ埋め維持）"""
-        if not input_files:
-            return []
-
-        numbers = []
-        for file in input_files:
-            # Loopファイルの場合: Loop0181_xxx.txt → "Loop0181"
-            match = re.search(r'(Loop\d+)', file)
-            if match:
-                numbers.append(match.group(1))
-            else:
-                # Digestファイルの場合: W0037_xxx.txt → "W0037", MD01_xxx.txt → "MD01", C01_xxx.txt → "C01"
-                for prefix in ['W', 'M', 'Q', 'A', 'T', 'D', 'MD', 'C']:
-                    match = re.search(rf'({prefix}\d+)', file)
-                    if match:
-                        numbers.append(match.group(1))
-                        break
-
-        return sorted(numbers)
-
-    def save_last_digest_time(self, level: str, input_files: list = None):
-        """最終ダイジェスト生成時刻と最新処理済みファイル番号を保存"""
-        times = self.load_last_digest_times()
-
-        # 連番を抽出
-        file_numbers = self.extract_file_numbers(level, input_files)
-
-        # 最後の要素のみを保存
-        last_file = file_numbers[-1] if file_numbers else None
-
-        # 保存
-        times[level] = {
-            "timestamp": datetime.now().isoformat(),
-            "last_processed": last_file
-        }
-
-        with open(self.last_digest_file, 'w', encoding='utf-8') as f:
-            json.dump(times, f, indent=2, ensure_ascii=False)
-
-        print(f"[INFO] Updated last_digest_times.json for level: {level}")
-        if last_file:
-            print(f"[INFO] Last processed: {last_file}")
-
     def validate_shadow_content(self, level: str, source_files: list) -> bool:
         """
         ShadowGrandDigestの内容が妥当かチェック
@@ -262,24 +104,24 @@ class DigestFinalizerFromShadow:
         - ファイル名が連番になっていること（警告のみ、継続可能）
         """
         if not source_files:
-            print(f"[ERROR] Shadow digest has no source files")
+            log_error("Shadow digest has no source files")
             return False
 
-        # ファイル名から番号を抽出
+        # ファイル名から番号を抽出（共通関数を使用）
         numbers = []
         for filename in source_files:
-            match = re.search(r'(Loop|[WMQATD])(\d+)', filename)
-            if match:
-                numbers.append(int(match.group(2)))
+            result = extract_file_number(filename)
+            if result:
+                numbers.append(result[1])
             else:
-                print(f"[ERROR] Invalid filename format: {filename}")
+                log_error(f"Invalid filename format: {filename}")
                 return False
 
         # 連番チェック
         numbers.sort()
         for i in range(len(numbers) - 1):
             if numbers[i + 1] != numbers[i] + 1:
-                print(f"[WARNING] Non-consecutive files detected:")
+                log_warning("Non-consecutive files detected:")
                 print(f"  Files: {source_files}")
                 print(f"  Numbers: {numbers}")
                 response = input("Continue anyway? (y/n): ")
@@ -310,7 +152,7 @@ class DigestFinalizerFromShadow:
         shadow_digest = self.shadow_manager.get_shadow_digest_for_level(level)
 
         if not shadow_digest:
-            print(f"[ERROR] No shadow digest found for level: {level}")
+            log_error(f"No shadow digest found for level: {level}")
             print(f"[HINT] Run 'python shadow_grand_digest.py' to update shadow first")
             return False
 
@@ -328,7 +170,7 @@ class DigestFinalizerFromShadow:
         digest_num = str(next_num).zfill(config["digits"])
 
         # ファイル名を生成
-        sanitized_title = self.sanitize_filename(weave_title)
+        sanitized_title = sanitize_filename(weave_title)
         new_digest_name = f"{config['prefix']}{digest_num}_{sanitized_title}"
 
         # ProvisionalDigestから個別ダイジェストを読み込み
@@ -380,9 +222,9 @@ class DigestFinalizerFromShadow:
 
                             print(f"  [INFO] Auto-generated individual digest from {source_file}")
                 except json.JSONDecodeError:
-                    print(f"  [WARN] Failed to parse {source_file} as JSON")
+                    log_warning(f"Failed to parse {source_file} as JSON")
                 except Exception as e:
-                    print(f"  [WARN] Error reading {source_file}: {e}")
+                    log_warning(f"Error reading {source_file}: {e}")
 
             print(f"[INFO] Auto-generated {len(individual_digests)} individual digests from source files")
 
@@ -414,7 +256,7 @@ class DigestFinalizerFromShadow:
 
         # 既存ファイルチェック
         if final_path.exists():
-            print(f"[WARNING] File already exists: {final_path}")
+            log_warning(f"File already exists: {final_path}")
             try:
                 response = input("Overwrite? (y/n): ")
                 if response.lower() != 'y':
@@ -443,7 +285,7 @@ class DigestFinalizerFromShadow:
 
         # ===== 処理4: last_digest_times更新 =====
         print(f"\n[処理4] Updating last_digest_times.json for {level}")
-        self.save_last_digest_time(level, source_files)
+        self.times_tracker.save(level, source_files)
 
         # ===== 処理5: ProvisionalDigest削除（クリーンアップ） =====
         if provisional_file_to_delete and provisional_file_to_delete.exists():
@@ -451,7 +293,7 @@ class DigestFinalizerFromShadow:
                 provisional_file_to_delete.unlink()
                 print(f"\n[処理5] Removed Provisional digest after merge: {provisional_file_to_delete.name}")
             except Exception as e:
-                print(f"\n[WARNING] Failed to remove Provisional digest: {e}")
+                log_warning(f"Failed to remove Provisional digest: {e}")
 
         print(f"\n{'='*60}")
         print(f"[SUCCESS] Digest finalization completed!")

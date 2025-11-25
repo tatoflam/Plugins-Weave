@@ -215,6 +215,16 @@ ShadowをGrandDigestに統合します。
 python scripts/finalize_from_shadow.py
 ```
 
+### 分割モジュール（内部使用）
+
+以下のモジュールは `finalize_from_shadow.py` から分割されたもので、直接実行することはありません。
+
+| モジュール | 役割 |
+|-----------|------|
+| `grand_digest.py` | GrandDigest.txt の CRUD 操作 |
+| `digest_times.py` | last_digest_times.json の管理 |
+| `utils.py` | ユーティリティ関数（sanitize_filename 等） |
+
 ---
 
 ## プルリクエストの作成
@@ -246,6 +256,26 @@ python scripts/finalize_from_shadow.py
 ---
 
 ## テスト
+
+### ユニット/統合テスト実行
+
+```bash
+cd plugins-weave/EpisodicRAG/scripts
+
+# 全テスト実行（pytest）
+python -m pytest test/ -v
+
+# unittest形式
+python -m unittest discover -s test -v
+
+# 個別実行
+python test/test_config.py
+python test/test_utils.py
+python test/test_grand_digest.py
+python test/test_digest_times.py
+```
+
+### 手動テスト
 
 変更を加えた後は、必ず以下をテストしてください：
 

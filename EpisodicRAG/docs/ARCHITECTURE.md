@@ -14,10 +14,11 @@
 3. [パス解決の仕組み](#パス解決の仕組み)
 4. [技術仕様](#技術仕様)
 5. [スクリプトの役割分担](#スクリプトの役割分担)
-6. [セキュリティとプライバシー](#セキュリティとプライバシー)
-7. [パフォーマンス](#パフォーマンス)
-8. [拡張性](#拡張性)
-9. [次のステップ](#次のステップ)
+6. [テスト](#テスト)
+7. [セキュリティとプライバシー](#セキュリティとプライバシー)
+8. [パフォーマンス](#パフォーマンス)
+9. [拡張性](#拡張性)
+10. [次のステップ](#次のステップ)
 
 ---
 
@@ -43,12 +44,21 @@
 ├── commands/
 │   └── digest.md                   # /digest コマンド
 ├── scripts/
-│   ├── config.py                   # 設定管理クラス
+│   ├── config.py                   # 設定管理クラス（LEVEL_CONFIG, extract_file_number含む）
+│   ├── grand_digest.py             # GrandDigest.txt管理
+│   ├── digest_times.py             # last_digest_times.json管理
+│   ├── utils.py                    # ユーティリティ関数（sanitize_filename等）
 │   ├── shadow_grand_digest.py      # Shadow管理
 │   ├── finalize_from_shadow.py     # Shadow確定
 │   ├── save_provisional_digest.py  # Provisional保存
 │   ├── generate_digest_auto.sh     # 自動Digest生成
-│   └── setup.sh                    # セットアップスクリプト
+│   ├── setup.sh                    # セットアップスクリプト
+│   └── test/                       # テストディレクトリ
+│       ├── __init__.py
+│       ├── test_config.py          # config.py ユニットテスト
+│       ├── test_utils.py           # utils.py ユニットテスト
+│       ├── test_grand_digest.py    # GrandDigestManager 統合テスト
+│       └── test_digest_times.py    # DigestTimesTracker 統合テスト
 ├── data/                           # Plugin内データ（@digest-setupで作成）
 │   ├── Loops/                      # Loopファイル配置先
 │   ├── Digests/                    # Digest出力先
@@ -293,7 +303,38 @@ impression: ...（short版: 400文字）
 | `save_provisional_digest.py` | Provisional Digest保存 | DigestAnalyzer分析後 |
 | `finalize_from_shadow.py` | Regular Digest作成、GrandDigest更新、カスケード | `/digest <type>` のタイトル承認後 |
 | `shadow_grand_digest.py` | ShadowGrandDigest管理（CRUD操作） | 各スクリプトから呼び出し |
-| `config.py` | 設定管理、パス解決 | 全スクリプトから参照 |
+| `config.py` | 設定管理、パス解決、LEVEL_CONFIG, PLACEHOLDER_LIMITS定数 | 全スクリプトから参照 |
+| `grand_digest.py` | GrandDigest.txt管理（CRUD操作） | finalize_from_shadowから呼び出し |
+| `digest_times.py` | last_digest_times.json管理 | finalize_from_shadowから呼び出し |
+| `utils.py` | ユーティリティ関数（sanitize_filename, ロギング等） | 各スクリプトから参照 |
+| `test/*.py` | ユニット/統合テスト | 開発時、CI |
+
+---
+
+## テスト
+
+### 実行方法
+
+```bash
+cd scripts
+
+# 全テスト実行（pytest）
+python -m pytest test/ -v
+
+# unittest形式
+python -m unittest discover -s test -v
+```
+
+### テスト構成
+
+| ファイル | 種別 | テスト数 |
+|----------|------|---------|
+| test_config.py | Unit | 8 |
+| test_utils.py | Unit | 7 |
+| test_grand_digest.py | Integration | 5 |
+| test_digest_times.py | Integration | 4 |
+
+**合計**: 24テスト
 
 ---
 
@@ -351,5 +392,5 @@ DigestAnalyzerエージェントをベースに、カスタム分析ロジック
 
 ---
 
-*Last Updated: 2025-11-24*
-*Version: 1.1.0*
+*Last Updated: 2025-11-25*
+*Version: 1.3.0*
