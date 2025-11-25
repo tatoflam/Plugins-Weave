@@ -23,13 +23,13 @@ from pathlib import Path
 from datetime import datetime
 from typing import List, Dict, Any, Optional
 
-# Windows環境でUTF-8出力を有効化
-if sys.platform == 'win32':
+# Windows環境でUTF-8出力を有効化（CLI実行時のみ）
+if sys.platform == 'win32' and __name__ == "__main__":
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
     sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
 
 from config import DigestConfig, LEVEL_CONFIG, extract_file_number
-from utils import log_error, log_warning, save_json
+from utils import log_error, log_warning, save_json, get_next_digest_number
 
 
 class ProvisionalDigestSaver:
@@ -42,39 +42,6 @@ class ProvisionalDigestSaver:
         # レベル設定（共通定数を参照）
         self.level_config = LEVEL_CONFIG
 
-    def get_next_digest_number(self, level: str) -> int:
-        """
-        次のダイジェスト番号を取得
-
-        Args:
-            level: ダイジェストレベル（weekly, monthly等）
-
-        Returns:
-            次のダイジェスト番号（1始まり）
-        """
-        # レベル設定を取得
-        config = self.level_config.get(level)
-        if not config:
-            raise ValueError(f"Invalid level: {level}")
-
-        prefix = config["prefix"]
-
-        # 既存のRegularDigestファイルを検索（サブディレクトリ内）
-        subdir = self.digests_path / config["dir"]
-        pattern = f"*{prefix}[0-9]*.txt"
-        existing_files = list(subdir.glob(pattern)) if subdir.exists() else []
-
-        if not existing_files:
-            return 1
-
-        # ファイル名から番号を抽出（共通関数を使用）
-        max_num = 0
-        for file_path in existing_files:
-            result = extract_file_number(file_path.stem)
-            if result and result[0] == prefix:
-                max_num = max(max_num, result[1])
-
-        return max_num + 1
 
     def get_current_digest_number(self, level: str) -> Optional[int]:
         """
@@ -249,10 +216,10 @@ class ProvisionalDigestSaver:
                     individual_digests = self.merge_individual_digests(existing_digests, individual_digests)
             else:
                 log_warning("--append specified but no existing Provisional found. Creating new file.")
-                digest_num = self.get_next_digest_number(level)
+                digest_num = get_next_digest_number(self.digests_path, level)
         else:
             # 通常モード: 次のダイジェスト番号を取得
-            digest_num = self.get_next_digest_number(level)
+            digest_num = get_next_digest_number(self.digests_path, level)
 
         # ファイル名: {prefix}{digest_num}_Individual.txt
         filename = f"{prefix}{str(digest_num).zfill(digits)}_Individual.txt"

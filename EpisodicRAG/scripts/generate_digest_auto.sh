@@ -1,8 +1,44 @@
 #!/bin/bash
+# =============================================================================
+# EpisodicRAG Digest Auto-Generator
+# =============================================================================
+#
+# DESCRIPTION:
+#   Main entry point for digest generation workflow.
+#   Handles Loop detection and digest finalization.
+#
+# USAGE:
+#   ./generate_digest_auto.sh              # Detect new Loops
+#   ./generate_digest_auto.sh <LEVEL>      # Finalize digest
+#
+# ARGUMENTS:
+#   LEVEL   weekly|monthly|quarterly|annual|triennial|decadal|multi_decadal|centurial
+#
+# PROCESS FLOW (no args):
+#   1. Load context (Identity.md, GrandDigest.txt)
+#   2. Run shadow_grand_digest.py for Loop detection
+#   3. Display ShadowGrandDigest.weekly
+#   4. Output DigestAnalyzer instructions
+#
+# PROCESS FLOW (with LEVEL):
+#   1. Load context files
+#   2. Check Shadow state for level
+#   3. Guide title proposal
+#   4. Execute finalize_from_shadow.py
+#   5. Cascade to next level
+#
+# EXIT CODES:
+#   0   Success
+#   1   Configuration error or invalid arguments
+#
+# DEPENDENCIES:
+#   - Python 3
+#   - config.py (path resolution)
+#
+# =============================================================================
 #
 # EpisodicRAG Digest Auto-Generator (Plugin版 - config.py統合)
 # ==============================================================
-#
 # 引数なし: 新Loopファイル検出 → ShadowGrandDigest.weeklyにプレースホルダー追加
 #           → Claudeが即座に分析すべき（まだらボケ回避）
 #

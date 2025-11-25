@@ -49,7 +49,7 @@ from config import DigestConfig, LEVEL_CONFIG, extract_file_number
 # 分割したモジュールをインポート
 from grand_digest import GrandDigestManager
 from digest_times import DigestTimesTracker
-from utils import sanitize_filename, log_error, log_warning, save_json
+from utils import sanitize_filename, log_error, log_warning, save_json, get_next_digest_number
 from shadow_grand_digest import ShadowGrandDigestManager
 
 
@@ -76,25 +76,6 @@ class DigestFinalizerFromShadow:
         # レベル→Provisionalサブディレクトリのマッピング（level_configのdirと同じ）
         self.level_to_subdir = {level: config["dir"] for level, config in self.level_config.items()}
 
-    def get_next_digest_number(self, level: str) -> int:
-        """次のダイジェスト番号を取得"""
-        config = self.level_config[level]
-        digest_dir = self.digests_path / config["dir"]
-
-        if not digest_dir.exists():
-            return 1
-
-        existing = list(digest_dir.glob(f"{config['prefix']}*.txt"))
-        if not existing:
-            return 1
-
-        numbers = []
-        for f in existing:
-            match = re.search(rf"{config['prefix']}(\d+)_", f.stem)
-            if match:
-                numbers.append(int(match.group(1)))
-
-        return max(numbers) + 1 if numbers else 1
 
     def validate_shadow_content(self, level: str, source_files: list) -> bool:
         """
@@ -187,7 +168,7 @@ class DigestFinalizerFromShadow:
 
         # 次のダイジェスト番号を取得
         config = self.level_config[level]
-        next_num = self.get_next_digest_number(level)
+        next_num = get_next_digest_number(self.digests_path, level)
         digest_num = str(next_num).zfill(config["digits"])
 
         # ファイル名を生成

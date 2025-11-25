@@ -1,8 +1,38 @@
 #!/bin/bash
+# =============================================================================
+# EpisodicRAG Plugin Setup Script
+# =============================================================================
+#
+# DESCRIPTION:
+#   Interactive setup wizard for EpisodicRAG plugin.
+#   Creates configuration and directory structure.
+#
+# USAGE:
+#   ./setup.sh
+#
+# INTERACTIVE PROMPTS:
+#   1. Loops directory path (default: data/Loops)
+#   2. Identity file path (optional)
+#
+# CREATED STRUCTURE:
+#   .claude-plugin/config.json
+#   data/Loops/           (if default)
+#   data/Digests/
+#     1_Weekly/Provisional/
+#     2_Monthly/Provisional/
+#     ... (8 levels)
+#   data/Essences/
+#     GrandDigest.txt
+#     ShadowGrandDigest.txt
+#
+# EXIT CODES:
+#   0   Success
+#   1   Error during setup
+#
+# =============================================================================
 #
 # EpisodicRAG Plugin Setup Script
 # ================================
-#
 # 完全自己完結型のEpisodicRAGシステムをセットアップ
 #
 

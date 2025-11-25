@@ -177,3 +177,51 @@ def save_json(file_path: Path, data: dict, indent: int = 2) -> None:
     except IOError as e:
         log_error(f"Failed to write {file_path}: {e}")
         raise
+
+
+# =============================================================================
+# Digest番号操作
+# =============================================================================
+
+
+def get_next_digest_number(digests_path: Path, level: str) -> int:
+    """
+    指定レベルの次のDigest番号を取得。
+
+    既存のRegularDigestファイルをスキャンし、最大番号+1を返す。
+    ファイルが存在しない場合は1を返す。
+
+    Args:
+        digests_path: Digestsディレクトリのパス
+        level: Digestレベル（weekly, monthly, quarterly, annual,
+               triennial, decadal, multi_decadal, centurial）
+
+    Returns:
+        次の番号（1始まり）
+
+    Raises:
+        ValueError: 無効なlevelが指定された場合
+    """
+    # 循環インポートを避けるためローカルインポート
+    from config import LEVEL_CONFIG, extract_file_number
+
+    config = LEVEL_CONFIG.get(level)
+    if not config:
+        raise ValueError(f"Invalid level: {level}")
+
+    prefix = config["prefix"]
+    level_dir = digests_path / config["dir"]
+
+    if not level_dir.exists():
+        return 1
+
+    # 既存ファイルから最大番号を取得
+    max_num = 0
+    pattern = f"{prefix}*_*.txt"
+
+    for f in level_dir.glob(pattern):
+        result = extract_file_number(f.name)
+        if result and result[0] == prefix:
+            max_num = max(max_num, result[1])
+
+    return max_num + 1
