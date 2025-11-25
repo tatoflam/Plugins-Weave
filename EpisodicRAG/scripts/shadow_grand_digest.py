@@ -28,7 +28,8 @@ from typing import List, Dict, Any, Optional, Tuple
 
 # Plugin版: config.pyをインポート
 from config import DigestConfig, LEVEL_CONFIG, LEVEL_NAMES, PLACEHOLDER_LIMITS, extract_number_only
-from utils import log_warning
+from utils import log_warning, load_json_with_template, save_json
+from digest_times import DigestTimesTracker
 
 
 class ShadowGrandDigestManager:
@@ -48,7 +49,9 @@ class ShadowGrandDigestManager:
         # ファイルパスを設定
         self.grand_digest_file = self.essences_path / "GrandDigest.txt"
         self.shadow_digest_file = self.essences_path / "ShadowGrandDigest.txt"
-        self.last_digest_file = self.config.plugin_root / ".claude-plugin" / "last_digest_times.json"
+
+        # DigestTimesTrackerを使用（重複コード排除）
+        self.digest_times_tracker = DigestTimesTracker(config)
 
         # レベル設定（共通定数を参照）
         self.levels = LEVEL_NAMES
@@ -56,7 +59,7 @@ class ShadowGrandDigestManager:
             level: {"source": cfg["source"], "next": cfg["next"]}
             for level, cfg in LEVEL_CONFIG.items()
         }
-        self.digest_config = LEVEL_CONFIG
+        self.level_config = LEVEL_CONFIG
 
     def _create_empty_overall_digest(self) -> dict:
         """
@@ -89,46 +92,22 @@ class ShadowGrandDigestManager:
             }
         }
 
-    def load_or_create_shadow(self) -> dict:
+    def load_or_create(self) -> dict:
         """ShadowGrandDigestを読み込む。存在しなければ作成"""
-        if self.shadow_digest_file.exists():
-            with open(self.shadow_digest_file, 'r', encoding='utf-8') as f:
-                return json.load(f)
-        else:
-            print("[INFO] ShadowGrandDigest.txt not found. Creating new file.")
-            template = self.get_template()
-            self.save_shadow(template)
-            return template
+        return load_json_with_template(
+            target_file=self.shadow_digest_file,
+            default_factory=self.get_template,
+            log_message="ShadowGrandDigest.txt not found. Creating new file."
+        )
 
-    def save_shadow(self, data: dict):
+    def save(self, data: dict):
         """ShadowGrandDigestを保存"""
         data["metadata"]["last_updated"] = datetime.now().isoformat()
-        with open(self.shadow_digest_file, 'w', encoding='utf-8') as f:
-            json.dump(data, f, ensure_ascii=False, indent=2)
-
-    def load_last_digest_times(self) -> dict:
-        """last_digest_times.jsonを読み込む（存在しなければテンプレートから初期化）"""
-        if self.last_digest_file.exists():
-            with open(self.last_digest_file, 'r', encoding='utf-8') as f:
-                return json.load(f)
-        else:
-            # テンプレートから初期化
-            template_file = self.config.plugin_root / ".claude-plugin" / "last_digest_times.template.json"
-            if template_file.exists():
-                with open(template_file, 'r', encoding='utf-8') as f:
-                    template = json.load(f)
-                # テンプレートをコピーして保存
-                with open(self.last_digest_file, 'w', encoding='utf-8') as f:
-                    json.dump(template, f, indent=2, ensure_ascii=False)
-                print(f"[INFO] Initialized last_digest_times.json from template")
-                return template
-            else:
-                # テンプレートがない場合は空の階層的フォーマット
-                return {level: {"timestamp": "", "last_processed": None} for level in self.levels}
+        save_json(self.shadow_digest_file, data)
 
     def get_max_file_number(self, level: str) -> Optional[str]:
         """指定レベルの最大ファイル番号を取得"""
-        times_data = self.load_last_digest_times()
+        times_data = self.digest_times_tracker.load_or_create()
         level_data = times_data.get(level, {})
         return level_data.get("last_processed")
 
@@ -146,7 +125,7 @@ class ShadowGrandDigestManager:
             source_dir = self.loops_path
             pattern = "Loop*.txt"
         else:
-            config = self.digest_config[source_info]
+            config = self.level_config[source_info]
             source_dir = self.digests_path / config["dir"]
             pattern = f"{config['prefix']}*.txt"
 
@@ -162,11 +141,17 @@ class ShadowGrandDigestManager:
 
         # 最大番号より大きいファイルを抽出
         max_num = self.extract_number_from_filename(max_file_number)
+
+        # max_numがNoneの場合（max_file_numberが無効な場合）は全ファイルを返す
+        if max_num is None:
+            log_warning(f"Invalid max_file_number format: {max_file_number}, returning all files")
+            return all_files
+
         new_files = []
 
         for file in all_files:
             file_num = self.extract_number_from_filename(file.name)
-            if file_num and file_num > max_num:
+            if file_num is not None and file_num > max_num:
                 new_files.append(file)
 
         return new_files
@@ -188,7 +173,7 @@ class ShadowGrandDigestManager:
             return self.loops_path
         else:
             # Monthly以上: 下位レベルのDigestファイルを参照
-            source_config = self.digest_config.get(source_type)
+            source_config = self.level_config.get(source_type)
             if source_config:
                 return self.digests_path / source_config["dir"]
             else:
@@ -201,11 +186,11 @@ class ShadowGrandDigestManager:
         Weekly: source_filesのみ追加（PLACEHOLDERのまま）→ Claude分析待ち
         Monthly以上: Digestファイル内容を読み込んでログ出力（まだらボケ回避）
         """
-        shadow_data = self.load_or_create_shadow()
+        shadow_data = self.load_or_create()
         overall_digest = shadow_data["latest_digests"][level]["overall_digest"]
 
-        # overall_digestがnullの場合、初期化
-        if overall_digest is None:
+        # overall_digestがnullまたは非dict型の場合、初期化
+        if overall_digest is None or not isinstance(overall_digest, dict):
             overall_digest = self._create_empty_overall_digest()
             shadow_data["latest_digests"][level]["overall_digest"] = overall_digest
 
@@ -236,7 +221,13 @@ class ShadowGrandDigestManager:
                         try:
                             with open(full_path, 'r', encoding='utf-8') as f:
                                 digest_data = json.load(f)
-                                overall = digest_data.get("overall_digest", {})
+                                # 型チェック
+                                if not isinstance(digest_data, dict):
+                                    log_warning(f"{file_path.name} is not a dict, skipping")
+                                    continue
+                                overall = digest_data.get("overall_digest")
+                                if not isinstance(overall, dict):
+                                    overall = {}
 
                                 # ログ出力: Digestファイルから読み込んだ情報
                                 print(f"    [INFO] Read digest content from {file_path.name}")
@@ -251,9 +242,10 @@ class ShadowGrandDigestManager:
 
         # 既存分析がPLACEHOLDERかどうか確認
         total_files = len(overall_digest["source_files"])
+        abstract = overall_digest.get("abstract", "")
         is_placeholder = (
-            isinstance(overall_digest.get("abstract", ""), str) and
-            "<!-- PLACEHOLDER" in overall_digest.get("abstract", "")
+            not abstract or  # 空文字列もプレースホルダー扱い
+            (isinstance(abstract, str) and "<!-- PLACEHOLDER" in abstract)
         )
 
         if is_placeholder:
@@ -273,18 +265,18 @@ class ShadowGrandDigestManager:
             print(f"[INFO] Preserved existing analysis (now {total_files} file(s) total)")
             print(f"[INFO] Claude should re-analyze all {total_files} files to integrate new content")
 
-        self.save_shadow(shadow_data)
+        self.save(shadow_data)
         print(f"[INFO] Added {added_count} file(s) to ShadowGrandDigest.{level}")
         print(f"[INFO] Total files in shadow: {total_files}")
 
     def clear_shadow_level(self, level: str):
         """指定レベルのShadowを初期化"""
-        shadow_data = self.load_or_create_shadow()
+        shadow_data = self.load_or_create()
 
         # overall_digestを空のプレースホルダーにリセット
         shadow_data["latest_digests"][level]["overall_digest"] = self._create_empty_overall_digest()
 
-        self.save_shadow(shadow_data)
+        self.save(shadow_data)
         print(f"[INFO] Cleared ShadowGrandDigest for level: {level}")
 
     def get_shadow_digest_for_level(self, level: str) -> Optional[Dict[str, Any]]:
@@ -293,7 +285,7 @@ class ShadowGrandDigestManager:
 
         finalize_from_shadow.pyで使用: これがRegularDigestの内容になります
         """
-        shadow_data = self.load_or_create_shadow()
+        shadow_data = self.load_or_create()
         overall_digest = shadow_data["latest_digests"][level]["overall_digest"]
 
         if not overall_digest or not overall_digest.get("source_files"):
@@ -322,7 +314,7 @@ class ShadowGrandDigestManager:
     def update_shadow_for_new_loops(self):
         """新しいLoopファイルを検出してShadowを増分更新"""
         # Shadowファイルを読み込み（存在しなければ作成）
-        shadow_data = self.load_or_create_shadow()
+        shadow_data = self.load_or_create()
 
         new_files = self.find_new_files("weekly")
 

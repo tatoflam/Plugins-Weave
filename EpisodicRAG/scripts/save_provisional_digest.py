@@ -28,8 +28,8 @@ if sys.platform == 'win32':
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
     sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
 
-from config import DigestConfig, LEVEL_CONFIG
-from utils import log_error, log_warning
+from config import DigestConfig, LEVEL_CONFIG, extract_file_number
+from utils import log_error, log_warning, save_json
 
 
 class ProvisionalDigestSaver:
@@ -67,22 +67,12 @@ class ProvisionalDigestSaver:
         if not existing_files:
             return 1
 
-        # ファイル名から番号を抽出
+        # ファイル名から番号を抽出（共通関数を使用）
         max_num = 0
         for file_path in existing_files:
-            name = file_path.stem
-            # プレフィックスの後の数字部分を抽出
-            try:
-                # 例: "2025-07-01_W0001_タイトル" → "0001"
-                parts = name.split('_')
-                for part in parts:
-                    if part.startswith(prefix) and len(part) > len(prefix):
-                        num_str = part[len(prefix):]
-                        # 数字部分のみ抽出
-                        num = int(''.join(c for c in num_str if c.isdigit()))
-                        max_num = max(max_num, num)
-            except (ValueError, IndexError):
-                continue
+            result = extract_file_number(file_path.stem)
+            if result and result[0] == prefix:
+                max_num = max(max_num, result[1])
 
         return max_num + 1
 
@@ -111,19 +101,12 @@ class ProvisionalDigestSaver:
         if not existing_files:
             return None
 
-        # 最新のファイル番号を取得
+        # 最新のファイル番号を取得（共通関数を使用）
         max_num = 0
         for file_path in existing_files:
-            name = file_path.stem
-            # プレフィックスの後の数字部分を抽出
-            try:
-                # 例: "W0001_Individual" → "0001"
-                if name.startswith(prefix):
-                    num_part = name[len(prefix):].split('_')[0]
-                    num = int(''.join(c for c in num_part if c.isdigit()))
-                    max_num = max(max_num, num)
-            except (ValueError, IndexError):
-                continue
+            result = extract_file_number(file_path.stem)
+            if result and result[0] == prefix:
+                max_num = max(max_num, result[1])
 
         return max_num if max_num > 0 else None
 
@@ -164,13 +147,20 @@ class ProvisionalDigestSaver:
         digits = config["digits"]
         filename = f"{prefix}{str(digest_num).zfill(digits)}_Individual.txt"
         provisional_dir = self.get_provisional_dir(level)
-        filepath = provisional_dir / filename
+        file_path = provisional_dir / filename
 
-        if not filepath.exists():
+        if not file_path.exists():
             return None
 
-        with open(filepath, 'r', encoding='utf-8') as f:
-            return json.load(f)
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except json.JSONDecodeError as e:
+            log_error(f"Invalid JSON in {file_path}: {e}")
+            raise
+        except IOError as e:
+            log_error(f"Failed to read {file_path}: {e}")
+            raise
 
     def merge_individual_digests(
         self,
@@ -186,7 +176,18 @@ class ProvisionalDigestSaver:
 
         Returns:
             マージされたindividual_digestsリスト
+
+        Raises:
+            ValueError: digestにfilenameキーがない場合
         """
+        # 入力検証
+        for i, d in enumerate(existing_digests):
+            if not isinstance(d, dict) or "filename" not in d:
+                raise ValueError(f"Invalid existing digest at index {i}: missing 'filename' key")
+        for i, d in enumerate(new_digests):
+            if not isinstance(d, dict) or "filename" not in d:
+                raise ValueError(f"Invalid new digest at index {i}: missing 'filename' key")
+
         # filenameをキーとした辞書を作成
         merged_dict = {d["filename"]: d for d in existing_digests}
 
@@ -235,7 +236,15 @@ class ProvisionalDigestSaver:
                 # 既存データを読み込み
                 existing_data = self.load_existing_provisional(level, digest_num)
                 if existing_data:
-                    existing_digests = existing_data.get("individual_digests", [])
+                    # 型検証
+                    if not isinstance(existing_data, dict):
+                        log_warning("Invalid existing data format, ignoring")
+                        existing_digests = []
+                    else:
+                        existing_digests = existing_data.get("individual_digests", [])
+                        if not isinstance(existing_digests, list):
+                            log_warning("Invalid individual_digests format, ignoring")
+                            existing_digests = []
                     # マージ（重複は上書き）
                     individual_digests = self.merge_individual_digests(existing_digests, individual_digests)
             else:
@@ -248,7 +257,7 @@ class ProvisionalDigestSaver:
         # ファイル名: {prefix}{digest_num}_Individual.txt
         filename = f"{prefix}{str(digest_num).zfill(digits)}_Individual.txt"
         provisional_dir = self.get_provisional_dir(level)
-        filepath = provisional_dir / filename
+        file_path = provisional_dir / filename
 
         # ProvisionalDigest構造
         provisional_data = {
@@ -262,10 +271,9 @@ class ProvisionalDigestSaver:
         }
 
         # JSON形式で保存
-        with open(filepath, 'w', encoding='utf-8') as f:
-            json.dump(provisional_data, f, indent=2, ensure_ascii=False)
+        save_json(file_path, provisional_data)
 
-        return filepath
+        return file_path
 
     def load_individual_digests(self, input_data: str) -> List[Dict[str, Any]]:
         """
@@ -276,7 +284,14 @@ class ProvisionalDigestSaver:
 
         Returns:
             individual_digestsのリスト
+
+        Raises:
+            ValueError: input_dataが空の場合
         """
+        # 空文字列チェック
+        if not input_data or not input_data.strip():
+            raise ValueError("input_data cannot be empty")
+
         # ファイルパスとして試行
         input_path = Path(input_data)
         if input_path.exists():
@@ -335,6 +350,10 @@ Examples:
 
         # individual_digestsを読み込み
         individual_digests = saver.load_individual_digests(args.input_data)
+
+        # 空リスト警告
+        if len(individual_digests) == 0:
+            log_warning("No individual digests to save. Creating empty Provisional file.")
 
         print(f"[INFO] Loaded {len(individual_digests)} individual digests")
 

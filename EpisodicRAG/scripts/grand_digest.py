@@ -11,7 +11,7 @@ from datetime import datetime
 from typing import Dict, Any
 
 from config import DigestConfig, LEVEL_NAMES
-from utils import log_error
+from utils import log_error, load_json_with_template, save_json
 
 
 class GrandDigestManager:
@@ -36,23 +36,28 @@ class GrandDigestManager:
 
     def load_or_create(self) -> dict:
         """GrandDigest.txtを読み込む。存在しなければテンプレートで作成"""
-        if self.grand_digest_file.exists():
-            with open(self.grand_digest_file, 'r', encoding='utf-8') as f:
-                return json.load(f)
-        else:
-            print("[INFO] GrandDigest.txt not found. Creating new file.")
-            template = self.get_template()
-            self.save(template)
-            return template
+        return load_json_with_template(
+            target_file=self.grand_digest_file,
+            default_factory=self.get_template,
+            log_message="GrandDigest.txt not found. Creating new file."
+        )
 
     def save(self, data: dict):
         """GrandDigest.txtを保存"""
-        with open(self.grand_digest_file, 'w', encoding='utf-8') as f:
-            json.dump(data, f, ensure_ascii=False, indent=2)
+        save_json(self.grand_digest_file, data)
 
     def update_digest(self, level: str, digest_name: str, overall_digest: dict) -> bool:
         """指定レベルのダイジェストを更新"""
         grand_data = self.load_or_create()
+
+        # 型チェック
+        if not isinstance(grand_data, dict):
+            log_error("GrandDigest.txt has invalid format: expected dict")
+            return False
+
+        if "major_digests" not in grand_data:
+            log_error("GrandDigest.txt missing 'major_digests' section")
+            return False
 
         if level not in grand_data["major_digests"]:
             log_error(f"Unknown level: {level}")

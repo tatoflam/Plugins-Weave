@@ -51,6 +51,10 @@ def extract_file_number(filename: str) -> Optional[Tuple[str, int]]:
     Returns:
         (prefix, number) のタプル、またはNone
     """
+    # 型チェック
+    if not isinstance(filename, str):
+        return None
+
     # MDプレフィックス（2文字）を先にチェック（M単独より優先）
     match = re.search(r'(Loop|MD)(\d+)', filename)
     if match:
@@ -103,9 +107,15 @@ class DigestConfig:
 
         Returns:
             PluginルートのPath
+
+        Raises:
+            FileNotFoundError: __file__が定義されていない場合、またはPluginルートが見つからない場合
         """
         # このファイル（config.py）の場所から相対的にPluginルートを検出
-        current_file = Path(__file__).resolve()
+        try:
+            current_file = Path(__file__).resolve()
+        except NameError:
+            raise FileNotFoundError("Cannot determine script location (__file__ not defined)")
 
         # scripts/config.py なので、2階層上がPluginルート
         plugin_root = current_file.parent.parent
@@ -146,10 +156,17 @@ class DigestConfig:
 
         Raises:
             FileNotFoundError: 設定ファイルが見つからない場合
+            json.JSONDecodeError: JSONのパースに失敗した場合
         """
         if self.config_file.exists():
-            with open(self.config_file, 'r', encoding='utf-8') as f:
-                return json.load(f)
+            try:
+                with open(self.config_file, 'r', encoding='utf-8') as f:
+                    return json.load(f)
+            except json.JSONDecodeError as e:
+                raise json.JSONDecodeError(
+                    f"Invalid JSON in config file {self.config_file}: {e.msg}",
+                    e.doc, e.pos
+                )
 
         raise FileNotFoundError(
             f"Config file not found: {self.config_file}\n"
@@ -165,7 +182,14 @@ class DigestConfig:
 
         Returns:
             解決された絶対Path
+
+        Raises:
+            KeyError: pathsセクションまたはキーが存在しない場合
         """
+        if "paths" not in self.config:
+            raise KeyError("'paths' section missing in config.json")
+        if key not in self.config["paths"]:
+            raise KeyError(f"Path key '{key}' not found in config.json")
         rel_path = self.config["paths"][key]
         return (self.base_dir / rel_path).resolve()
 

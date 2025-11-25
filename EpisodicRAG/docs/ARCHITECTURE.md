@@ -306,7 +306,7 @@ impression: ...（short版: 400文字）
 | `config.py` | 設定管理、パス解決、LEVEL_CONFIG, PLACEHOLDER_LIMITS定数 | 全スクリプトから参照 |
 | `grand_digest.py` | GrandDigest.txt管理（CRUD操作） | finalize_from_shadowから呼び出し |
 | `digest_times.py` | last_digest_times.json管理 | finalize_from_shadowから呼び出し |
-| `utils.py` | ユーティリティ関数（sanitize_filename, ロギング等） | 各スクリプトから参照 |
+| `utils.py` | ユーティリティ関数（sanitize_filename, load_json_with_template, save_json等） | 各スクリプトから参照 |
 | `test/*.py` | ユニット/統合テスト | 開発時、CI |
 
 ---

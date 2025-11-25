@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Dict, Any, Optional, List
 
 from config import DigestConfig, LEVEL_CONFIG, LEVEL_NAMES, extract_file_number
+from utils import load_json_with_template, save_json, log_warning
 
 
 class DigestTimesTracker:
@@ -20,29 +21,32 @@ class DigestTimesTracker:
     def __init__(self, config: DigestConfig):
         self.config = config
         self.last_digest_file = config.plugin_root / ".claude-plugin" / "last_digest_times.json"
+        self.template_file = config.plugin_root / ".claude-plugin" / "last_digest_times.template.json"
 
-    def load(self) -> dict:
+    def _get_default_template(self) -> dict:
+        """テンプレートがない場合のデフォルト構造を返す"""
+        return {level: {"timestamp": "", "last_processed": None} for level in LEVEL_NAMES}
+
+    def load_or_create(self) -> dict:
         """最終ダイジェスト生成時刻を読み込む（存在しなければテンプレートから初期化）"""
-        if self.last_digest_file.exists():
-            with open(self.last_digest_file, 'r', encoding='utf-8') as f:
-                return json.load(f)
-        else:
-            # テンプレートから初期化
-            template_file = self.config.plugin_root / ".claude-plugin" / "last_digest_times.template.json"
-            if template_file.exists():
-                with open(template_file, 'r', encoding='utf-8') as f:
-                    template = json.load(f)
-                # テンプレートをコピーして保存
-                with open(self.last_digest_file, 'w', encoding='utf-8') as f:
-                    json.dump(template, f, indent=2, ensure_ascii=False)
-                print(f"[INFO] Initialized last_digest_times.json from template")
-                return template
-            else:
-                # テンプレートがない場合は空の階層的フォーマット
-                return {level: {"timestamp": "", "last_processed": None} for level in LEVEL_NAMES}
+        return load_json_with_template(
+            target_file=self.last_digest_file,
+            template_file=self.template_file,
+            default_factory=self._get_default_template,
+            log_message="Initialized last_digest_times.json from template"
+        )
 
     def extract_file_numbers(self, level: str, input_files: List[str]) -> List[str]:
         """ファイル名から連番を抽出（プレフィックス付き、ゼロ埋め維持）"""
+        # None/空チェック
+        if input_files is None:
+            return []
+
+        # 型チェック
+        if not isinstance(input_files, list):
+            log_warning(f"input_files is not a list: {type(input_files).__name__}")
+            return []
+
         if not input_files:
             return []
 
@@ -51,6 +55,10 @@ class DigestTimesTracker:
 
         numbers = []
         for file in input_files:
+            # 各要素の型チェック
+            if not isinstance(file, str):
+                log_warning(f"Skipping non-string file: {file}")
+                continue
             result = extract_file_number(file)
             if result:
                 prefix, num = result
@@ -70,7 +78,11 @@ class DigestTimesTracker:
 
     def save(self, level: str, input_files: List[str] = None):
         """最終ダイジェスト生成時刻と最新処理済みファイル番号を保存"""
-        times = self.load()
+        # 空リスト警告
+        if input_files is not None and len(input_files) == 0:
+            log_warning(f"Empty input_files list for level: {level}")
+
+        times = self.load_or_create()
 
         # 連番を抽出
         file_numbers = self.extract_file_numbers(level, input_files)
@@ -84,8 +96,7 @@ class DigestTimesTracker:
             "last_processed": last_file
         }
 
-        with open(self.last_digest_file, 'w', encoding='utf-8') as f:
-            json.dump(times, f, indent=2, ensure_ascii=False)
+        save_json(self.last_digest_file, times)
 
         print(f"[INFO] Updated last_digest_times.json for level: {level}")
         if last_file:

@@ -38,9 +38,9 @@ class TestDigestTimesTracker(unittest.TestCase):
         """一時ディレクトリを削除"""
         shutil.rmtree(self.temp_dir)
 
-    def test_load_empty(self):
+    def test_load_or_create_empty(self):
         """空の状態からの読み込み"""
-        data = self.tracker.load()
+        data = self.tracker.load_or_create()
 
         # 全レベルが初期化されていることを確認
         self.assertIn("weekly", data)
@@ -51,7 +51,7 @@ class TestDigestTimesTracker(unittest.TestCase):
         input_files = ["Loop0001_Test.txt", "Loop0002_Test.txt"]
         self.tracker.save("weekly", input_files)
 
-        data = self.tracker.load()
+        data = self.tracker.load_or_create()
 
         self.assertIn("timestamp", data["weekly"])
         self.assertEqual(data["weekly"]["last_processed"], "Loop0002")
