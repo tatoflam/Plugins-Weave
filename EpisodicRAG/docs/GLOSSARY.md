@@ -6,6 +6,31 @@ EpisodicRAGプラグインで使用される専門用語の定義集です。
 
 ## 基本概念
 
+### plugin_root
+**定義**: プラグインのインストール先ディレクトリ
+
+- `.claude-plugin/config.json` が存在するディレクトリ
+- スキルやスクリプトはこのディレクトリを基準に動作
+- 例: `C:\Users\anyth\.claude\plugins\marketplaces\Plugins-Weave\EpisodicRAG`
+
+### base_dir
+**定義**: データ配置の基準ディレクトリ
+
+- **設定場所**: `config.json` の `base_dir` フィールド
+- **形式**: plugin_root からの相対パス
+- **例**: `.`（プラグイン内）、`../../../../../DEV/data`（外部）
+
+パス解決: `plugin_root + base_dir` → 実際のデータ基準ディレクトリ
+
+### paths
+**定義**: 各データディレクトリの配置先
+
+- **設定場所**: `config.json` の `paths` セクション
+- **形式**: base_dir からの相対パス
+- **含まれる設定**: `loops_dir`, `digests_dir`, `essences_dir`, `identity_file_path`
+
+パス解決: `base_dir + paths.loops_dir` → 実際のLoopディレクトリ
+
 ### Loop
 **定義**: AI との会話セッション全体を記録したテキストファイル
 

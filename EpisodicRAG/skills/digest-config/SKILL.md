@@ -7,6 +7,12 @@ description: EpisodicRAG設定変更（対話的）
 
 EpisodicRAG プラグインの設定を対話的に変更するスキルです。
 
+## 用語説明
+
+- **plugin_root**: プラグインのインストール先（`.claude-plugin/config.json` が存在するディレクトリ）
+- **base_dir**: データ配置の基準ディレクトリ（plugin_root からの相対パスで指定）
+- **paths**: 各データディレクトリ（base_dir からの相対パスで指定）
+
 ## 設定変更フロー
 
 ### 1. 設定ファイル読み込み
@@ -17,7 +23,7 @@ import json
 import sys
 
 # プラグインルート検出
-plugin_root = Path("{plugin_root}")  # 自動検出（実際のパスに調整）
+plugin_root = Path("homunculus/Toybox/EpisodicRAG")  # 実際のパスに調整
 config_file = plugin_root / ".claude-plugin" / "config.json"
 
 if not config_file.exists():
@@ -39,10 +45,10 @@ with open(config_file, 'r', encoding='utf-8') as f:
 📋 現在の設定
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Base Directory:
+Base Directory (plugin_rootからの相対パス):
   🔧 base_dir: .
 
-Paths:
+Paths (base_dirからの相対パス):
   📂 loops_dir: data/Loops
   📂 digests_dir: data/Digests
   📂 essences_dir: data/Essences
@@ -88,7 +94,7 @@ base_dirは、すべてのパス解決の基準となるディレクトリです
 プラグインルートからの相対パスで指定します。
 
 現在の設定: .
-解決後の絶対パス: {base_dir_resolved}
+解決後の絶対パス: C:\Users\anyth\DEV\homunculus\Toybox\EpisodicRAG
 
 設定例:
   "." - プラグインルート自身（デフォルト、自己完結）
@@ -394,10 +400,10 @@ print("━━━━━━━━━━━━━━━━━━━━━━━━�
 📋 更新後の設定
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Base Directory:
+Base Directory (plugin_rootからの相対パス):
   🔧 base_dir: ../../.. (変更されました)
 
-Paths:
+Paths (base_dirからの相対パス):
   📂 loops_dir: data/Loops
   📂 digests_dir: data/Digests
   📂 essences_dir: data/Essences
@@ -428,9 +434,14 @@ Thresholds:
 
 ### UI メッセージの出力形式
 
-> 詳細は [実装ノート](../shared/_implementation-notes.md#uiメッセージの出力形式) を参照
+**重要**: VSCode 拡張のマークダウンレンダリングでは、単一の改行は空白に変換されます。
+対話型 UI メッセージを表示する際は、必ず**コードブロック（三連バッククォート）**で囲んでください。
 
-UIメッセージはコードブロックで囲む（VSCode拡張のマークダウンレンダリング対応）
+```
+... (UIメッセージ)
+```
+
+これにより、改行がそのまま保持され、ユーザーに正しくフォーマットされたメッセージが表示されます。
 
 ## バリデーション
 

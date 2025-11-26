@@ -7,6 +7,12 @@ description: EpisodicRAG初期セットアップ（対話的）
 
 EpisodicRAG プラグインの初期セットアップを対話的に実行するスキルです。
 
+## 用語説明
+
+- **plugin_root**: プラグインのインストール先（`.claude-plugin/config.json` が存在するディレクトリ）
+- **base_dir**: データ配置の基準ディレクトリ（plugin_root からの相対パスで指定）
+- **paths**: 各データディレクトリ（base_dir からの相対パスで指定）
+
 ## セットアップフロー
 
 ### 1. 設定ファイル確認
@@ -18,7 +24,7 @@ from pathlib import Path
 import sys
 
 # プラグインルートの検出
-plugin_root = Path("{plugin_root}")  # 自動検出（実際のパスに調整）
+plugin_root = Path("homunculus/Toybox/EpisodicRAG")  # 実際のパスに調整
 config_file = plugin_root / ".claude-plugin" / "config.json"
 
 if config_file.exists():
@@ -222,25 +228,26 @@ essences_path = Path(essences_dir)
 if not essences_path.is_absolute():
     essences_path = plugin_root / essences_dir
 
-# ディレクトリリスト（各レベル内にProvisionalを配置）
+# ディレクトリリスト
 directories = [
     loops_path,
     digests_path / "1_Weekly",
-    digests_path / "1_Weekly" / "Provisional",
     digests_path / "2_Monthly",
-    digests_path / "2_Monthly" / "Provisional",
     digests_path / "3_Quarterly",
-    digests_path / "3_Quarterly" / "Provisional",
     digests_path / "4_Annual",
-    digests_path / "4_Annual" / "Provisional",
     digests_path / "5_Triennial",
-    digests_path / "5_Triennial" / "Provisional",
     digests_path / "6_Decadal",
-    digests_path / "6_Decadal" / "Provisional",
     digests_path / "7_Multi-decadal",
-    digests_path / "7_Multi-decadal" / "Provisional",
     digests_path / "8_Centurial",
-    digests_path / "8_Centurial" / "Provisional",
+    digests_path / "Provisional",
+    digests_path / "Provisional" / "1_Weekly",
+    digests_path / "Provisional" / "2_Monthly",
+    digests_path / "Provisional" / "3_Quarterly",
+    digests_path / "Provisional" / "4_Annual",
+    digests_path / "Provisional" / "5_Triennial",
+    digests_path / "Provisional" / "6_Decadal",
+    digests_path / "Provisional" / "7_Multi-decadal",
+    digests_path / "Provisional" / "8_Centurial",
     essences_path,
 ]
 
@@ -299,11 +306,14 @@ else:
 ✅ セットアップ完了
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-設定内容:
-  📂 Loops Path: {loops_dir}
-  📂 Digests Path: {digests_dir}
-  📂 Essences Path: {essences_dir}
-  📄 Identity File: {identity_file_path または "(なし)"}
+Base Directory (plugin_rootからの相対パス):
+  🔧 base_dir: {base_dir}
+
+Paths (base_dirからの相対パス):
+  📂 loops_dir: {loops_dir}
+  📂 digests_dir: {digests_dir}
+  📂 essences_dir: {essences_dir}
+  📄 identity_file_path: {identity_file_path または "null"}
 
 Threshold設定:
   - Weekly: 5 Loops
@@ -418,9 +428,14 @@ EpisodicRAGの最も重要な機能は、**セッション間で記憶を引き�
 
 ### UI メッセージの出力形式
 
-> 詳細は [実装ノート](../shared/_implementation-notes.md#uiメッセージの出力形式) を参照
+**重要**: VSCode 拡張のマークダウンレンダリングでは、単一の改行は空白に変換されます。
+対話型 UI メッセージを表示する際は、必ず**コードブロック（三連バッククォート）**で囲んでください。
 
-UIメッセージはコードブロックで囲む（VSCode拡張のマークダウンレンダリング対応）
+```
+... (UIメッセージ)
+```
+
+これにより、改行がそのまま保持され、ユーザーに正しくフォーマットされたメッセージが表示されます。
 
 ### エラーハンドリング
 
