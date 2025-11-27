@@ -1,4 +1,4 @@
-[Home](../README.md) > [Docs](README.md) > GLOSSARY
+[Home](../../README.md) > [Docs](README.md) > GLOSSARY
 
 [English](GLOSSARY.en.md) | 日本語
 
@@ -255,7 +255,7 @@ Monthly確定 → Quarterly Shadow に追加
 
 ## 関連ドキュメント
 
-- [README.md](../README.md) - プロジェクト概要
+- [README.md](../../README.md) - プロジェクト概要
 - [QUICKSTART.md](user/QUICKSTART.md) - 5分チュートリアル
 - [GUIDE.md](user/GUIDE.md) - ユーザーガイド
 - [ARCHITECTURE.md](dev/ARCHITECTURE.md) - 技術仕様

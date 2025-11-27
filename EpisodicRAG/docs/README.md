@@ -2,7 +2,7 @@
 
 Claude/AI エージェント向けの技術仕様ハブです。
 
-> 📖 **ユーザー向けドキュメント**は [プロジェクト README](../README.md) を参照してください。
+> 📖 **ユーザー向けドキュメント**は [プロジェクト README](../../README.md) を参照してください。
 
 ---
 
@@ -85,7 +85,7 @@ AI エージェントが参照すべき共通概念の Single Source of Truth:
 
 ## Related Links
 
-- [プロジェクト README](../README.md)
+- [プロジェクト README](../../README.md)
 - [CONTRIBUTING.md](../CONTRIBUTING.md)
 - [CHANGELOG.md](../CHANGELOG.md) - 変更履歴
 - [GitHub Repository](https://github.com/Bizuayeu/Plugins-Weave)

@@ -1,4 +1,4 @@
-[Home](../README.md) > [Docs](README.md) > GLOSSARY
+[Home](../../README.md) > [Docs](README.md) > GLOSSARY
 
 [English](GLOSSARY.en.md) | [日本語](GLOSSARY.md)
 
@@ -255,7 +255,7 @@ Examples: 2025-07-01_W0001_CognitiveArchitecture.txt
 
 ## Related Documents
 
-- [README.md](../README.md) - Project Overview
+- [README.md](../../README.md) - Project Overview
 - [QUICKSTART.md](user/QUICKSTART.md) - 5-minute Tutorial
 - [GUIDE.md](user/GUIDE.md) - User Guide
 - [ARCHITECTURE.md](dev/ARCHITECTURE.md) - Technical Specifications
