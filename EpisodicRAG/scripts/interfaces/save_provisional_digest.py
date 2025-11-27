@@ -34,13 +34,13 @@ from domain.version import DIGEST_FORMAT_VERSION
 from domain.exceptions import EpisodicRAGError, FileIOError
 
 # Infrastructure層
-from infrastructure import log_info, log_error, log_warning, save_json
+from infrastructure import log_info, log_error, log_warning, save_json, load_json
 
 # Application層
 from application.validators import is_valid_dict, is_valid_list
 
-# Utils（まだinfrastructureに移動していない関数）
-from utils import get_next_digest_number
+# Helpers
+from interfaces.interface_helpers import get_next_digest_number
 
 # 設定（config.pyはまだ移行していない）
 from config import DigestConfig, extract_file_number, format_digest_number
@@ -114,13 +114,7 @@ class ProvisionalDigestSaver:
         if not file_path.exists():
             return None
 
-        try:
-            with open(file_path, 'r', encoding='utf-8') as f:
-                return json.load(f)
-        except json.JSONDecodeError as e:
-            raise FileIOError(f"Invalid JSON in {file_path}: {e}")
-        except IOError as e:
-            raise FileIOError(f"Failed to read {file_path}: {e}")
+        return load_json(file_path)
 
     def merge_individual_digests(
         self,

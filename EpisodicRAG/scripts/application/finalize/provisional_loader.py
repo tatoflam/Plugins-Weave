@@ -13,7 +13,7 @@ from typing import Dict, Any, Optional, Tuple, List
 from config import DigestConfig, LEVEL_CONFIG
 from application.validators import is_valid_dict
 from domain.exceptions import DigestError, FileIOError
-from infrastructure import log_info, log_warning
+from infrastructure import log_info, log_warning, load_json
 from application.grand import ShadowGrandDigestManager
 
 
@@ -56,18 +56,12 @@ class ProvisionalLoader:
         provisional_file_to_delete: Optional[Path] = None
 
         if provisional_path.exists():
-            try:
-                with open(provisional_path, 'r', encoding='utf-8') as f:
-                    provisional_data = json.load(f)
-                    if not is_valid_dict(provisional_data):
-                        raise DigestError(f"Invalid format in {provisional_path.name}: expected dict")
-                    individual_digests = provisional_data.get("individual_digests", [])
-                log_info(f"Loaded {len(individual_digests)} individual digests from {provisional_path.name}")
-                provisional_file_to_delete = provisional_path
-            except json.JSONDecodeError as e:
-                raise FileIOError(f"Invalid JSON in {provisional_path.name}: {e}")
-            except IOError as e:
-                raise FileIOError(f"Failed to read {provisional_path}: {e}")
+            provisional_data = load_json(provisional_path)
+            if not is_valid_dict(provisional_data):
+                raise DigestError(f"Invalid format in {provisional_path.name}: expected dict")
+            individual_digests = provisional_data.get("individual_digests", [])
+            log_info(f"Loaded {len(individual_digests)} individual digests from {provisional_path.name}")
+            provisional_file_to_delete = provisional_path
         else:
             # Provisionalファイルが存在しない場合、source_filesから自動生成
             log_info("No Provisional digest found, generating from source files...")

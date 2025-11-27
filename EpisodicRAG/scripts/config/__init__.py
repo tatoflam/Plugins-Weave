@@ -1,0 +1,240 @@
+#!/usr/bin/env python3
+"""
+Digest Plugin Configuration Manager
+====================================
+
+Plugin自己完結版：Plugin内の.claude-plugin/config.jsonから設定を読み込む
+
+Usage:
+    # 推奨（新しいインポートパス）
+    from domain.file_naming import extract_file_number, format_digest_number
+
+    # 後方互換（従来のインポートパス）
+    from config import extract_file_number, format_digest_number
+"""
+import json
+import sys
+from pathlib import Path
+from typing import Dict, Any, Optional, List
+
+# Domain層から定数をインポート（Single Source of Truth）
+from domain.constants import (
+    LEVEL_CONFIG,
+    LEVEL_NAMES,
+    PLACEHOLDER_LIMITS,
+    PLACEHOLDER_MARKER,
+    PLACEHOLDER_END,
+    PLACEHOLDER_SIMPLE,
+    DEFAULT_THRESHOLDS,
+)
+from domain.types import LevelConfigData, ConfigData
+
+# Domain層からファイル命名関数を再エクスポート（後方互換性）
+from domain.file_naming import (
+    extract_file_number,
+    extract_number_only,
+    format_digest_number,
+)
+
+# 分割されたモジュールをインポート
+from .plugin_root_resolver import find_plugin_root
+from .config_repository import load_config
+from .path_resolver import PathResolver
+from .level_path_service import LevelPathService
+from .threshold_provider import ThresholdProvider
+from .directory_validator import DirectoryValidator
+
+
+# =============================================================================
+# DigestConfig クラス（Facade）
+# =============================================================================
+
+
+class DigestConfig:
+    """設定管理クラス（Plugin自己完結版）- Facade"""
+
+    def __init__(self, plugin_root: Optional[Path] = None):
+        """
+        初期化
+
+        Args:
+            plugin_root: Pluginルート（省略時は自動検出）
+        """
+        # Pluginルート検出
+        if plugin_root is None:
+            plugin_root = self._find_plugin_root()
+
+        self.plugin_root = plugin_root
+        self.config_file = self.plugin_root / ".claude-plugin" / "config.json"
+        self.config = self.load_config()
+
+        # 各コンポーネントを初期化（遅延初期化用のキャッシュ）
+        self._path_resolver = PathResolver(self.plugin_root, self.config)
+        self._threshold_provider = ThresholdProvider(self.config)
+        self._level_path_service_cache: Optional[LevelPathService] = None
+        self._directory_validator_cache: Optional[DirectoryValidator] = None
+
+        # 後方互換性のためbase_dirを公開
+        self.base_dir = self._path_resolver.base_dir
+
+    @property
+    def _level_path_service(self) -> LevelPathService:
+        """LevelPathServiceの遅延初期化"""
+        if self._level_path_service_cache is None:
+            self._level_path_service_cache = LevelPathService(self._path_resolver.digests_path)
+        return self._level_path_service_cache
+
+    @property
+    def _directory_validator(self) -> DirectoryValidator:
+        """DirectoryValidatorの遅延初期化"""
+        if self._directory_validator_cache is None:
+            self._directory_validator_cache = DirectoryValidator(
+                self._path_resolver.loops_path,
+                self._path_resolver.digests_path,
+                self._path_resolver.essences_path,
+                self._level_path_service
+            )
+        return self._directory_validator_cache
+
+    def _find_plugin_root(self) -> Path:
+        """
+        Plugin自身のルートディレクトリを検出
+
+        Returns:
+            PluginルートのPath
+
+        Raises:
+            FileNotFoundError: __file__が定義されていない場合、またはPluginルートが見つからない場合
+        """
+        try:
+            current_file = Path(__file__).resolve()
+        except NameError:
+            raise FileNotFoundError("Cannot determine script location (__file__ not defined)")
+
+        return find_plugin_root(current_file)
+
+    def load_config(self) -> Dict[str, Any]:
+        """設定読み込み"""
+        return load_config(self.config_file)
+
+    def resolve_path(self, key: str) -> Path:
+        """相対パスを絶対パスに解決（base_dir基準）"""
+        return self._path_resolver.resolve_path(key)
+
+    @property
+    def loops_path(self) -> Path:
+        """Loopファイル配置先"""
+        return self._path_resolver.loops_path
+
+    @property
+    def digests_path(self) -> Path:
+        """Digest出力先"""
+        return self._path_resolver.digests_path
+
+    @property
+    def essences_path(self) -> Path:
+        """GrandDigest配置先"""
+        return self._path_resolver.essences_path
+
+    def get_identity_file_path(self) -> Optional[Path]:
+        """外部identityファイルのパス"""
+        return self._path_resolver.get_identity_file_path()
+
+    def get_level_dir(self, level: str) -> Path:
+        """指定レベルのRegularDigest格納ディレクトリを取得"""
+        return self._level_path_service.get_level_dir(level)
+
+    def get_provisional_dir(self, level: str) -> Path:
+        """指定レベルのProvisionalDigest格納ディレクトリを取得"""
+        return self._level_path_service.get_provisional_dir(level)
+
+    def validate_directory_structure(self) -> List[str]:
+        """ディレクトリ構造の検証"""
+        return self._directory_validator.validate_directory_structure()
+
+    def get_threshold(self, level: str) -> int:
+        """指定レベルのthresholdを動的に取得"""
+        return self._threshold_provider.get_threshold(level)
+
+    @property
+    def weekly_threshold(self) -> int:
+        """Weekly生成に必要なLoop数"""
+        return self._threshold_provider.weekly_threshold
+
+    @property
+    def monthly_threshold(self) -> int:
+        """Monthly生成に必要なWeekly数"""
+        return self._threshold_provider.monthly_threshold
+
+    @property
+    def quarterly_threshold(self) -> int:
+        """Quarterly生成に必要なMonthly数"""
+        return self._threshold_provider.quarterly_threshold
+
+    @property
+    def annual_threshold(self) -> int:
+        """Annual生成に必要なQuarterly数"""
+        return self._threshold_provider.annual_threshold
+
+    @property
+    def triennial_threshold(self) -> int:
+        """Triennial生成に必要なAnnual数"""
+        return self._threshold_provider.triennial_threshold
+
+    @property
+    def decadal_threshold(self) -> int:
+        """Decadal生成に必要なTriennial数"""
+        return self._threshold_provider.decadal_threshold
+
+    @property
+    def multi_decadal_threshold(self) -> int:
+        """Multi-decadal生成に必要なDecadal数"""
+        return self._threshold_provider.multi_decadal_threshold
+
+    @property
+    def centurial_threshold(self) -> int:
+        """Centurial生成に必要なMulti-decadal数"""
+        return self._threshold_provider.centurial_threshold
+
+    def show_paths(self):
+        """パス設定を表示（デバッグ用）"""
+        print(f"Plugin Root: {self.plugin_root}")
+        print(f"Config File: {self.config_file}")
+        print(f"Base Dir (setting): {self.config.get('base_dir', '.')}")
+        print(f"Base Dir (resolved): {self.base_dir}")
+        print(f"Loops Path: {self.loops_path}")
+        print(f"Digests Path: {self.digests_path}")
+        print(f"Essences Path: {self.essences_path}")
+
+        identity_file = self.get_identity_file_path()
+        if identity_file:
+            print(f"Identity File: {identity_file}")
+
+
+def main():
+    """CLI エントリーポイント"""
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Digest Plugin Configuration Manager")
+    parser.add_argument("--show-paths", action="store_true", help="Show all configured paths")
+    parser.add_argument("--plugin-root", type=Path, help="Override plugin root")
+
+    args = parser.parse_args()
+
+    try:
+        config = DigestConfig(plugin_root=args.plugin_root)
+
+        if args.show_paths:
+            config.show_paths()
+        else:
+            # デフォルト: JSON出力
+            print(json.dumps(config.config, indent=2, ensure_ascii=False))
+
+    except FileNotFoundError as e:
+        # 循環インポートを避けるため直接出力
+        print(f"[ERROR] {e}", file=sys.stderr)
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()

@@ -462,5 +462,155 @@ class TestExtractNumberOnlyEdgeCases(unittest.TestCase):
         self.assertEqual(extract_number_only("Loop0000.txt"), 0)
 
 
+# =============================================================================
+# validate_directory_structure() テスト（Phase 0で追加）
+# =============================================================================
+
+
+class TestValidateDirectoryStructure(unittest.TestCase):
+    """validate_directory_structure() のテスト"""
+
+    def setUp(self):
+        """テスト用の一時ディレクトリとconfig.jsonを作成"""
+        self.temp_dir = tempfile.mkdtemp()
+        self.plugin_root = Path(self.temp_dir)
+
+        # .claude-plugin ディレクトリ作成
+        self.config_dir = self.plugin_root / ".claude-plugin"
+        self.config_dir.mkdir(parents=True)
+
+        # config.json 作成
+        self.config_data = {
+            "base_dir": ".",
+            "paths": {
+                "loops_dir": "data/Loops",
+                "digests_dir": "data/Digests",
+                "essences_dir": "data/Essences",
+                "identity_file_path": None
+            },
+            "levels": {
+                "weekly_threshold": 5,
+                "monthly_threshold": 5,
+                "quarterly_threshold": 3,
+                "annual_threshold": 4,
+                "triennial_threshold": 3,
+                "decadal_threshold": 3,
+                "multi_decadal_threshold": 3,
+                "centurial_threshold": 4
+            }
+        }
+        self.config_file = self.config_dir / "config.json"
+        with open(self.config_file, 'w', encoding='utf-8') as f:
+            json.dump(self.config_data, f)
+
+    def tearDown(self):
+        """一時ディレクトリを削除"""
+        import shutil
+        shutil.rmtree(self.temp_dir, ignore_errors=True)
+
+    def _create_full_directory_structure(self):
+        """完全なディレクトリ構造を作成"""
+        data_dir = self.plugin_root / "data"
+        (data_dir / "Loops").mkdir(parents=True, exist_ok=True)
+        (data_dir / "Digests").mkdir(parents=True, exist_ok=True)
+        (data_dir / "Essences").mkdir(parents=True, exist_ok=True)
+
+        # 各レベルディレクトリとProvisionalを作成
+        for level in LEVEL_NAMES:
+            level_subdir = LEVEL_CONFIG[level]["dir"]
+            level_dir = data_dir / "Digests" / level_subdir
+            level_dir.mkdir(parents=True, exist_ok=True)
+            (level_dir / "Provisional").mkdir(exist_ok=True)
+
+    def test_validate_directory_structure_all_present(self):
+        """全ディレクトリ存在時はエラーなし"""
+        self._create_full_directory_structure()
+        config = DigestConfig(plugin_root=self.plugin_root)
+        errors = config.validate_directory_structure()
+        self.assertEqual(errors, [])
+
+    def test_validate_directory_structure_missing_loops(self):
+        """Loopsディレクトリ欠落"""
+        self._create_full_directory_structure()
+        # Loopsを削除
+        import shutil
+        shutil.rmtree(self.plugin_root / "data" / "Loops")
+
+        config = DigestConfig(plugin_root=self.plugin_root)
+        errors = config.validate_directory_structure()
+
+        self.assertEqual(len(errors), 1)
+        self.assertIn("Loops", errors[0])
+
+    def test_validate_directory_structure_missing_digests(self):
+        """Digestsディレクトリ欠落"""
+        data_dir = self.plugin_root / "data"
+        (data_dir / "Loops").mkdir(parents=True, exist_ok=True)
+        (data_dir / "Essences").mkdir(parents=True, exist_ok=True)
+        # Digestsを作成しない
+
+        config = DigestConfig(plugin_root=self.plugin_root)
+        errors = config.validate_directory_structure()
+
+        # Digestsが無いので、Digests自体 + 全レベルディレクトリのエラー
+        self.assertGreater(len(errors), 0)
+        self.assertTrue(any("Digests" in e for e in errors))
+
+    def test_validate_directory_structure_missing_essences(self):
+        """Essencesディレクトリ欠落"""
+        self._create_full_directory_structure()
+        # Essencesを削除
+        import shutil
+        shutil.rmtree(self.plugin_root / "data" / "Essences")
+
+        config = DigestConfig(plugin_root=self.plugin_root)
+        errors = config.validate_directory_structure()
+
+        self.assertEqual(len(errors), 1)
+        self.assertIn("Essences", errors[0])
+
+    def test_validate_directory_structure_missing_level_dir(self):
+        """レベルディレクトリ（1_Weekly等）欠落"""
+        self._create_full_directory_structure()
+        # 1_Weeklyを削除
+        import shutil
+        weekly_dir = self.plugin_root / "data" / "Digests" / "1_Weekly"
+        shutil.rmtree(weekly_dir)
+
+        config = DigestConfig(plugin_root=self.plugin_root)
+        errors = config.validate_directory_structure()
+
+        self.assertEqual(len(errors), 1)
+        self.assertIn("weekly", errors[0].lower())
+
+    def test_validate_directory_structure_missing_provisional(self):
+        """Provisionalディレクトリ欠落"""
+        self._create_full_directory_structure()
+        # 1_Weekly/Provisionalを削除
+        import shutil
+        prov_dir = self.plugin_root / "data" / "Digests" / "1_Weekly" / "Provisional"
+        shutil.rmtree(prov_dir)
+
+        config = DigestConfig(plugin_root=self.plugin_root)
+        errors = config.validate_directory_structure()
+
+        self.assertEqual(len(errors), 1)
+        self.assertIn("Provisional", errors[0])
+
+    def test_validate_directory_structure_multiple_errors(self):
+        """複数エラーの集約"""
+        data_dir = self.plugin_root / "data"
+        # Loopsのみ作成（Digests, Essencesなし）
+        (data_dir / "Loops").mkdir(parents=True, exist_ok=True)
+
+        config = DigestConfig(plugin_root=self.plugin_root)
+        errors = config.validate_directory_structure()
+
+        # Digests, Essences, + 全レベルディレクトリのエラー
+        self.assertGreater(len(errors), 2)
+        self.assertTrue(any("Digests" in e for e in errors))
+        self.assertTrue(any("Essences" in e for e in errors))
+
+
 if __name__ == "__main__":
     unittest.main()

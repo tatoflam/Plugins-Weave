@@ -55,6 +55,17 @@ class LevelConfigData(TypedDict):
     next: Optional[str]
 
 
+class LevelHierarchyEntry(TypedDict):
+    """
+    レベル階層エントリの型（ShadowUpdater用）
+
+    Example:
+        {"source": "loops", "next": "monthly"}
+    """
+    source: str
+    next: Optional[str]
+
+
 # =============================================================================
 # Digest データの型定義
 # =============================================================================
