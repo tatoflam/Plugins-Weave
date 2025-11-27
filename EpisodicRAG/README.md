@@ -5,6 +5,9 @@
 ![EpisodicRAG Plugin](EpisodicRAG.png)
 [![Version](https://img.shields.io/badge/version-2.1.0-blue.svg)](https://github.com/Bizuayeu/Plugins-Weave)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![CI](https://github.com/Bizuayeu/Plugins-Weave/actions/workflows/test.yml/badge.svg)](https://github.com/Bizuayeu/Plugins-Weave/actions/workflows/test.yml)
+[![Tests](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/Bizuayeu/96d92fd7b8d51f31734ca068dfb1e850/raw/test_badge.json)](https://github.com/Bizuayeu/Plugins-Weave/actions)
+[![codecov](https://codecov.io/gh/Bizuayeu/Plugins-Weave/branch/main/graph/badge.svg)](https://codecov.io/gh/Bizuayeu/Plugins-Weave)
 
 ---
 

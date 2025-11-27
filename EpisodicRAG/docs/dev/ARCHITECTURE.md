@@ -53,7 +53,7 @@
 │   ├── application/                     # ユースケース
 │   ├── interfaces/                      # エントリーポイント
 │   ├── config.py                        # 設定管理クラス
-│   └── test/                            # テスト（556テスト）
+│   └── test/                            # テスト（CIバッジ参照）
 ├── data/                                # Plugin内データ（@digest-setupで作成）
 │   ├── Loops/                           # Loopファイル配置先
 │   ├── Digests/                         # Digest出力先
@@ -312,12 +312,12 @@ class DigestConfig:
 
 ### パス解決の例
 
-**設定:**
+**設定例1: 完全自己完結型（デフォルト）**
 ```json
 {
-  "base_dir": "../../..",
+  "base_dir": ".",
   "paths": {
-    "loops_dir": "homunculus/Weave/EpisodicRAG/Loops"
+    "loops_dir": "data/Loops"
   }
 }
 ```
@@ -325,9 +325,27 @@ class DigestConfig:
 **解決:**
 ```
 plugin_root = ~/.claude/plugins/EpisodicRAG-Plugin@Plugins-Weave
-base_dir = plugin_root / ../../.. = /Users/username/DEV
-loops_path = base_dir / homunculus/Weave/EpisodicRAG/Loops
-           = /Users/username/DEV/homunculus/Weave/EpisodicRAG/Loops
+base_dir = plugin_root / . = {plugin_root}
+loops_path = base_dir / data/Loops
+           = {plugin_root}/data/Loops
+```
+
+**設定例2: 外部ディレクトリ統合型**
+```json
+{
+  "base_dir": "../../..",
+  "paths": {
+    "loops_dir": "project/data/Loops"
+  }
+}
+```
+
+**解決:**
+```
+plugin_root = ~/.claude/plugins/EpisodicRAG-Plugin@Plugins-Weave
+base_dir = plugin_root / ../../.. = {workspace_root}
+loops_path = base_dir / project/data/Loops
+           = {workspace_root}/project/data/Loops
 ```
 
 ---
@@ -337,6 +355,39 @@ loops_path = base_dir / homunculus/Weave/EpisodicRAG/Loops
 ### ファイル形式
 
 > **Note**: 各ファイル形式の詳細なAPI仕様は [API_REFERENCE.md](API_REFERENCE.md) を参照してください。
+
+### テンプレートフィールド名の違い
+
+GrandDigest.txt と ShadowGrandDigest.txt では、トップレベルのフィールド名が異なります。
+
+| ファイル | フィールド名 | 用途 |
+|----------|--------------|------|
+| GrandDigest.txt | `major_digests` | 確定済みダイジェストの参照 |
+| ShadowGrandDigest.txt | `latest_digests` | 仮ダイジェストの最新状態 |
+
+**この命名の違いは意図的です**：
+- `major_digests`: 「主要な」確定済みダイジェストを強調
+- `latest_digests`: 「最新の」仮状態であることを強調
+
+```json
+// GrandDigest.txt
+{
+  "metadata": {...},
+  "major_digests": {
+    "weekly": {"overall_digest": {...}},
+    ...
+  }
+}
+
+// ShadowGrandDigest.txt
+{
+  "metadata": {...},
+  "latest_digests": {
+    "weekly": {"overall_digest": {...}},
+    ...
+  }
+}
+```
 
 #### GrandDigest.txt
 
@@ -394,15 +445,15 @@ python -m unittest discover -s test -v
 
 ### テスト構成
 
-| カテゴリ | ファイル数 | テスト数 |
-|----------|-----------|---------|
-| Domain層 | 1 | 5 |
-| Infrastructure層 | 2 | 15 |
-| Application層 | 12 | 180+ |
-| Interfaces層 | 3 | 40+ |
-| Integration | 2 | 60+ |
+| カテゴリ | ファイル数 |
+|----------|-----------|
+| Domain層 | 1 |
+| Infrastructure層 | 2 |
+| Application層 | 12 |
+| Interfaces層 | 3 |
+| Integration | 2 |
 
-**合計**: **556テスト**
+> 📊 最新のテスト数は [CI バッジ](https://github.com/Bizuayeu/Plugins-Weave/actions) を参照してください。
 
 ---
 

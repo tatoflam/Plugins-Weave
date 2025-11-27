@@ -1,0 +1,156 @@
+[Docs](../README.md) > QUICKSTART (English)
+
+[日本語](QUICKSTART.md) | English
+
+# 5-Minute Quickstart
+
+A guide to set up EpisodicRAG as quickly as possible and verify it works.
+
+---
+
+## Prerequisites
+
+- Claude Code or Claude VSCode Extension installed
+- Python 3.x installed
+
+---
+
+## Step 1: Installation (1 min)
+
+### 1-1. Add Marketplace
+
+```bash
+/marketplace add https://github.com/Bizuayeu/Plugins-Weave
+```
+
+### 1-2. Install Plugin
+
+```bash
+/plugin install EpisodicRAG-Plugin@Plugins-Weave
+```
+
+---
+
+## Step 2: Setup (1 min)
+
+```bash
+@digest-setup
+```
+
+Select **[1] (default)** for all questions:
+
+```
+Q1: Loop file location → [1] Inside Plugin (self-contained)
+Q2: Digest file output → [1] Inside Plugin (self-contained)
+Q3: Essences file location → [1] Inside Plugin (self-contained)
+Q4: External Identity.md file → [1] Don't use
+Q5-Q12: Threshold for each layer → [1] Default value
+```
+
+Confirm the setup completion message:
+
+```
+Setup complete!
+
+Created files:
+  - config.json
+  - GrandDigest.txt
+  - ShadowGrandDigest.txt
+```
+
+---
+
+## Step 3: Create Sample Loop (2 min)
+
+### 3-1. Create a Loop File
+
+Create a file with the following content:
+
+**Filename**: `Loop0001_TestConversation.txt`
+
+**Location**: `~/.claude/plugins/EpisodicRAG-Plugin@Plugins-Weave/data/Loops/`
+
+**Content** (copy-paste ready):
+
+```
+# Loop0001: Test Conversation
+
+User: Hello, this is a test for EpisodicRAG.
+Assistant: Hello! This is a test for EpisodicRAG. How can I help you?
+User: Tell me about the memory system.
+Assistant: EpisodicRAG is an 8-layer long-term memory system. It saves conversations as Loop files and manages long-term memory by hierarchically digesting them.
+```
+
+---
+
+## Step 4: Run Initial Analysis (1 min)
+
+```bash
+/digest
+```
+
+**Expected output**:
+
+```
+Unprocessed Loop files detected: 1
+
+  - Loop0001_TestConversation.txt
+
+Starting analysis with DigestAnalyzer...
+
+Analysis complete!
+ShadowGrandDigest.txt has been updated
+```
+
+---
+
+## Success Checklist
+
+Please verify the following:
+
+- [ ] `@digest-setup` completed successfully
+- [ ] Loop file is placed in `data/Loops/`
+- [ ] `/digest` detected the unprocessed Loop
+- [ ] `ShadowGrandDigest.txt` was updated
+
+If all items are checked, setup is complete!
+
+---
+
+## Next Steps
+
+### Check System Status
+
+```bash
+@digest-auto
+```
+
+This displays the current status and recommended actions.
+
+### Generate Weekly Digest After 5 Loops
+
+```bash
+# After adding 5 Loop files
+/digest weekly
+```
+
+---
+
+## Troubleshooting
+
+If you encounter problems:
+
+1. Check system status with `@digest-auto`
+2. Refer to [TROUBLESHOOTING.md](TROUBLESHOOTING.md)
+3. Check detailed usage in [GUIDE.md](GUIDE.md)
+
+---
+
+## Related Documentation
+
+- [GLOSSARY.md](../GLOSSARY.md) - Glossary
+- [GUIDE.md](GUIDE.md) - User Guide
+- [ARCHITECTURE.md](../dev/ARCHITECTURE.md) - Technical Specifications
+
+---
+**EpisodicRAG** by Weave | [GitHub](https://github.com/Bizuayeu/Plugins-Weave) | [Issues](https://github.com/Bizuayeu/Plugins-Weave/issues)

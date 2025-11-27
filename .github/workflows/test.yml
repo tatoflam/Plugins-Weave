@@ -1,4 +1,4 @@
-name: Tests
+name: CI
 
 on:
   push:
@@ -11,11 +11,50 @@ on:
       - 'EpisodicRAG/**'
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install ruff
+        run: pip install ruff
+
+      - name: Run ruff linter
+        working-directory: EpisodicRAG
+        run: ruff check scripts/
+
+      - name: Run ruff formatter check
+        working-directory: EpisodicRAG
+        run: ruff format --check scripts/
+
+  type-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install mypy
+        run: pip install mypy
+
+      - name: Run mypy
+        working-directory: EpisodicRAG
+        run: mypy scripts/
+        continue-on-error: true
+
   test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.9', '3.10', '3.11', '3.12']
+        python-version: ['3.10', '3.11', '3.12']
 
     steps:
       - uses: actions/checkout@v4
@@ -33,7 +72,36 @@ jobs:
       - name: Run tests with coverage
         working-directory: EpisodicRAG
         run: |
-          python -m pytest --cov-report=xml
+          python -m pytest --cov-report=xml --cov-fail-under=80 -v 2>&1 | tee pytest_output.txt
+          # Extract test count from pytest summary line (e.g., "556 passed")
+          TEST_COUNT=$(grep -oP '\d+(?= passed)' pytest_output.txt | head -1 || echo "0")
+          echo "TEST_COUNT=$TEST_COUNT" >> $GITHUB_ENV
+          echo "Detected $TEST_COUNT tests"
+
+      - name: Generate test badge JSON
+        if: matrix.python-version == '3.11'
+        working-directory: EpisodicRAG
+        run: |
+          echo "{\"schemaVersion\":1,\"label\":\"tests\",\"message\":\"$TEST_COUNT passed\",\"color\":\"brightgreen\"}" > test_badge.json
+          cat test_badge.json
+
+      - name: Upload test badge to Gist
+        if: matrix.python-version == '3.11' && github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: exuanbo/actions-deploy-gist@v1
+        with:
+          token: ${{ secrets.GIST_TOKEN }}
+          gist_id: ${{ vars.TEST_BADGE_GIST_ID }}
+          file_path: EpisodicRAG/test_badge.json
+          file_type: text
+
+      - name: Upload test results artifact
+        if: matrix.python-version == '3.11'
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            EpisodicRAG/pytest_output.txt
+            EpisodicRAG/coverage.xml
 
       - name: Upload coverage to Codecov
         if: matrix.python-version == '3.11'

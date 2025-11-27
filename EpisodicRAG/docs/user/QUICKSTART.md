@@ -1,5 +1,7 @@
 [Docs](../README.md) > QUICKSTART
 
+[English](QUICKSTART.en.md) | 日本語
+
 # 5分クイックスタート
 
 EpisodicRAGを最速でセットアップし、動作確認するためのガイドです。
