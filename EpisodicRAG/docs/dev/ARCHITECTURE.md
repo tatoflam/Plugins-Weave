@@ -241,25 +241,7 @@ ShadowGrandDigest.<type> 初期化
 
 ### 3. 階層的カスケード
 
-> SSoT: [_common-concepts.md](../../skills/shared/_common-concepts.md#階層的カスケード)
-
-```
-Loop (5個) → Weekly Digest
-  ↓ (5個蓄積)
-Weekly (5個) → Monthly Digest
-  ↓ (3個蓄積)
-Monthly (3個) → Quarterly Digest
-  ↓ (4個蓄積)
-Quarterly (4個) → Annual Digest
-  ↓ (3個蓄積)
-Annual (3個) → Triennial Digest
-  ↓ (3個蓄積)
-Triennial (3個) → Decadal Digest
-  ↓ (3個蓄積)
-Decadal (3個) → Multi-decadal Digest
-  ↓ (4個蓄積)
-Multi-decadal (4個) → Centurial Digest
-```
+> 📖 **SSoT**: 8階層の完全テーブル（プレフィックス・時間スケール・累積Loop数含む）は [GLOSSARY.md](../GLOSSARY.md#8階層構造) を参照
 
 ```mermaid
 flowchart LR

@@ -70,7 +70,7 @@ EpisodicRAGプラグインに関するよくある質問と回答集です。
 
 `base_dir`の設定が正しいか確認してください。デフォルト（`.`）はプラグインルート自身を指します。
 
-> 📖 パス設定の詳細は [GLOSSARY.md](../GLOSSARY.md#基本概念) を参照してください。
+> 📖 パス設定の詳細は [GLOSSARY.md](../GLOSSARY.md#基本概念) および [API_REFERENCE.md](../dev/API_REFERENCE.md#config.json-詳細仕様) を参照してください。
 
 ---
 
@@ -114,6 +114,8 @@ Loop[連番]_[タイトル].txt
 @digest-config
 → [4] Thresholds（生成条件）を選択
 ```
+
+> 📖 Thresholdの詳細は [API_REFERENCE.md](../dev/API_REFERENCE.md#config.json-詳細仕様) を参照してください。
 
 ---
 

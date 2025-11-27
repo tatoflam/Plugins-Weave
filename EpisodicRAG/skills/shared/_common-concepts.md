@@ -93,4 +93,12 @@ Multi-decadal (4個) → Centurial Digest
 
 ---
 
+## 関連ドキュメント
+
+- [GLOSSARY.md](../../docs/GLOSSARY.md) - 完全な用語定義（8階層構造、ファイル命名規則）
+- [ARCHITECTURE.md](../../docs/dev/ARCHITECTURE.md) - 技術仕様・データフロー
+- [GUIDE.md](../../docs/user/GUIDE.md) - ユーザーガイド
+
+---
+
 *このファイルは内部参照用です。直接編集する場合は、参照元のドキュメントも確認してください。*

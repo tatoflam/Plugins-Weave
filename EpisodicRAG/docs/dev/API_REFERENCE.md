@@ -663,6 +663,139 @@ def get_next_digest_number(digests_path: Path, level: str) -> int
 
 ---
 
+## config.json 詳細仕様
+
+> 📖 クイックリファレンスは [GUIDE.md](../user/GUIDE.md#設定ファイル仕様クイックリファレンス) を参照
+
+### 設定ファイルの場所
+
+`~/.claude/plugins/EpisodicRAG-Plugin@Plugins-Weave/.claude-plugin/config.json`
+
+### 設定項目詳細
+
+#### base_dir
+
+パス解決の基準ディレクトリ（プラグインルートからの相対パス）
+
+**デフォルト**: `.` (プラグインルート自身)
+
+**設定例：**
+- `"."` (デフォルト): プラグインルート自身を基準とする（完全自己完結型）
+- `"../../.."`: 3階層上を基準とする（例: DEVルート基準でデータを共有）
+- `"../.."`: 2階層上
+
+**パス解決の仕組み:**
+```
+最終的なパス = {plugin_root} / {base_dir} / {paths.*_dir}
+
+例:
+plugin_root = ~/.claude/plugins/EpisodicRAG-Plugin@Plugins-Weave
+base_dir = "../../.."
+loops_dir = "homunculus/Weave/EpisodicRAG/Loops"
+
+最終パス = {plugin_root}/../../.. / homunculus/Weave/EpisodicRAG/Loops
+         = {DEV}/homunculus/Weave/EpisodicRAG/Loops
+```
+
+**注意:**
+- 絶対パスは使用しないでください（Git公開時の可搬性のため）
+- 相対パスはプラグインルート基準で解釈されます
+
+---
+
+#### paths設定
+
+| 項目 | 説明 | デフォルト |
+|------|------|-----------|
+| `loops_dir` | Loopファイル配置先 | `data/Loops` |
+| `digests_dir` | Digest出力先 | `data/Digests` |
+| `essences_dir` | GrandDigest配置先 | `data/Essences` |
+| `identity_file_path` | 外部identityファイルのパス（オプション） | `null` |
+
+**digests_dir サブディレクトリ構造:**
+自動的に8階層のサブディレクトリが作成されます：
+- `1_Weekly`, `2_Monthly`, `3_Quarterly`, `4_Annual`, `5_Triennial`, `6_Decadal`, `7_Multi-decadal`, `8_Centurial`
+- 各階層に `Provisional/` サブディレクトリ（一時作業用）
+
+**Provisionalファイル命名規則:**
+
+| 階層 | プレフィックス | 桁数 | ファイル名例 |
+|------|---------------|------|-------------|
+| Weekly | W | 4 | `W0001_Individual.txt` |
+| Monthly | M | 3 | `M001_Individual.txt` |
+| Quarterly | Q | 3 | `Q001_Individual.txt` |
+| Annual | A | 2 | `A01_Individual.txt` |
+| Triennial | T | 2 | `T01_Individual.txt` |
+| Decadal | D | 2 | `D01_Individual.txt` |
+| Multi-decadal | MD | 2 | `MD01_Individual.txt` |
+| Centurial | C | 2 | `C01_Individual.txt` |
+
+---
+
+#### levels設定（Threshold）
+
+各階層のDigestを生成するために必要な最小ファイル数を設定します。
+
+| 階層 | 設定項目 | デフォルト | 説明 |
+|------|----------|-----------|------|
+| Weekly | `weekly_threshold` | 5 | 5つのLoopファイルでWeekly Digest生成 |
+| Monthly | `monthly_threshold` | 5 | 5つのWeekly DigestでMonthly Digest生成 |
+| Quarterly | `quarterly_threshold` | 3 | 3つのMonthly DigestでQuarterly Digest生成 |
+| Annual | `annual_threshold` | 4 | 4つのQuarterly DigestでAnnual Digest生成 |
+| Triennial | `triennial_threshold` | 3 | 3つのAnnual DigestでTriennial Digest生成 |
+| Decadal | `decadal_threshold` | 3 | 3つのTriennial DigestでDecadal Digest生成 |
+| Multi-decadal | `multi_decadal_threshold` | 3 | 3つのDecadal DigestでMulti-decadal Digest生成 |
+| Centurial | `centurial_threshold` | 4 | 4つのMulti-decadal DigestでCenturial Digest生成 |
+
+---
+
+### よくある設定パターン
+
+#### パターン1: 完全自己完結（推奨）
+
+プラグインをクリーンに管理したい場合：
+
+```json
+{
+  "base_dir": ".",
+  "paths": {
+    "loops_dir": "data/Loops",
+    "digests_dir": "data/Digests",
+    "essences_dir": "data/Essences",
+    "identity_file_path": null
+  },
+  "levels": {
+    "weekly_threshold": 5,
+    "monthly_threshold": 5,
+    "quarterly_threshold": 3,
+    "annual_threshold": 4,
+    "triennial_threshold": 3,
+    "decadal_threshold": 3,
+    "multi_decadal_threshold": 3,
+    "centurial_threshold": 4
+  }
+}
+```
+
+#### パターン2: 外部ディレクトリ統合型
+
+既存プロジェクトのデータを共有する場合：
+
+```json
+{
+  "base_dir": "../../..",
+  "paths": {
+    "loops_dir": "homunculus/Weave/EpisodicRAG/Loops",
+    "digests_dir": "homunculus/Weave/EpisodicRAG/Digests",
+    "essences_dir": "homunculus/Weave/EpisodicRAG/Essences",
+    "identity_file_path": "homunculus/Weave/Identities/UserIdentity.md"
+  },
+  "levels": { ... }
+}
+```
+
+---
+
 ## 設定（config/__init__.py）
 
 ### DigestConfig クラス
