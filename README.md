@@ -1,3 +1,5 @@
+[English](README.en.md) | 日本語
+
 # EpisodicRAG Plugin
 
 階層的記憶・ダイジェスト生成システム（8 層 100 年、完全自己完結版）

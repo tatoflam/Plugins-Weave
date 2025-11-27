@@ -20,7 +20,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from interfaces import DigestFinalizerFromShadow
 
 # Domain層
-from domain.exceptions import ValidationError, DigestError
+from domain.exceptions import ValidationError, DigestError, ConfigError
 
 # Helpers
 from interfaces.interface_helpers import get_next_digest_number
@@ -63,8 +63,8 @@ class TestGetNextDigestNumber(unittest.TestCase):
         self.assertEqual(result, 6)
 
     def test_invalid_level_raises(self):
-        """無効なレベルでValueError"""
-        with self.assertRaises(ValueError):
+        """無効なレベルでConfigError"""
+        with self.assertRaises(ConfigError):
             get_next_digest_number(self.digests_path, "invalid_level")
 
 

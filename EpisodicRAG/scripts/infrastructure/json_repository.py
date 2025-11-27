@@ -8,6 +8,7 @@ JSONファイルの読み書きを担当するインフラストラクチャ層�
 
 Usage:
     from infrastructure.json_repository import load_json, save_json, load_json_with_template
+    from infrastructure.json_repository import try_load_json, try_read_json_from_file
 """
 import json
 import logging
@@ -163,7 +164,7 @@ def ensure_directory(dir_path: Path) -> None:
         raise FileIOError(f"Failed to create directory {dir_path}: {e}") from e
 
 
-def safe_load_json(
+def try_load_json(
     file_path: Path,
     default: Optional[Dict[str, Any]] = None,
     log_on_error: bool = True
@@ -184,10 +185,10 @@ def safe_load_json(
 
     Example:
         # ファイルがなければ空dictを返す
-        data = safe_load_json(path, default={})
+        data = try_load_json(path, default={})
 
         # ファイルがなければNoneを返す
-        data = safe_load_json(path)
+        data = try_load_json(path)
         if data is None:
             # 初期化処理
     """
@@ -226,7 +227,7 @@ def confirm_file_overwrite(file_path: Path, force: bool = False) -> bool:
     return force
 
 
-def read_json_from_file_safe(
+def try_read_json_from_file(
     file_path: Path,
     log_on_error: bool = True
 ) -> Optional[Dict[str, Any]]:
@@ -245,7 +246,7 @@ def read_json_from_file_safe(
 
     Example:
         for source_file in source_files:
-            data = read_json_from_file_safe(source_path / source_file)
+            data = try_read_json_from_file(source_path / source_file)
             if data is None:
                 skipped_count += 1
                 continue

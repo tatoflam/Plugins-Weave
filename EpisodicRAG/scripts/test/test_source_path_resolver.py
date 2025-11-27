@@ -15,6 +15,7 @@ import pytest
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from config import DigestConfig, LEVEL_CONFIG
+from domain.exceptions import ConfigError
 from test_helpers import TempPluginEnvironment
 
 
@@ -57,9 +58,9 @@ class TestGetSourceDir:
             assert isinstance(result, Path)
 
     def test_invalid_level_raises_error(self, temp_plugin_env):
-        """無効なレベルはValueErrorを発生"""
+        """無効なレベルはConfigErrorを発生"""
         config = DigestConfig(plugin_root=temp_plugin_env.plugin_root)
-        with pytest.raises(ValueError):
+        with pytest.raises(ConfigError):
             config.get_source_dir("invalid")
 
 
@@ -101,9 +102,9 @@ class TestGetSourcePattern:
         assert result == "MD*.txt"
 
     def test_invalid_level_raises_error(self, temp_plugin_env):
-        """無効なレベルはValueErrorを発生"""
+        """無効なレベルはConfigErrorを発生"""
         config = DigestConfig(plugin_root=temp_plugin_env.plugin_root)
-        with pytest.raises(ValueError):
+        with pytest.raises(ConfigError):
             config.get_source_pattern("invalid")
 
 

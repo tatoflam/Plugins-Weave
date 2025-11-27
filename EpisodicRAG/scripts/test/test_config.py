@@ -327,7 +327,7 @@ class TestDigestConfig:
         """無効なレベル名の場合"""
         env = config_env["env"]
         config = DigestConfig(plugin_root=env.plugin_root)
-        with pytest.raises(ValueError):
+        with pytest.raises(ConfigError):
             config.get_level_dir("invalid_level")
 
     @pytest.mark.unit

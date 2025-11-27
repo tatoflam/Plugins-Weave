@@ -17,6 +17,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 # Interfaces層
 from interfaces import ProvisionalDigestSaver
+from domain.exceptions import ValidationError
 
 
 @pytest.fixture
@@ -60,8 +61,8 @@ class TestProvisionalDigestSaver:
 
     @pytest.mark.integration
     def test_load_individual_digests_empty_raises(self, provisional_saver):
-        """空文字列でValueError"""
-        with pytest.raises(ValueError):
+        """空文字列でValidationError"""
+        with pytest.raises(ValidationError):
             provisional_saver.load_individual_digests("")
 
     @pytest.mark.integration
@@ -85,11 +86,11 @@ class TestProvisionalDigestSaver:
 
     @pytest.mark.integration
     def test_merge_individual_digests_missing_filename_raises(self, provisional_saver):
-        """source_fileキーがない場合ValueError"""
+        """source_fileキーがない場合ValidationError"""
         existing = [{"keywords": ["test"]}]  # source_fileなし
         new = [{"source_file": "Loop0001.txt"}]
 
-        with pytest.raises(ValueError):
+        with pytest.raises(ValidationError):
             provisional_saver.merge_individual_digests(existing, new)
 
     @pytest.mark.integration

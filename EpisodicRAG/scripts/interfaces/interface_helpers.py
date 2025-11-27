@@ -11,6 +11,8 @@ Interfaces層で使用するヘルパー関数。
 import re
 from pathlib import Path
 
+from domain.exceptions import ConfigError, ValidationError
+
 
 def sanitize_filename(title: str, max_length: int = 50) -> str:
     """
@@ -29,9 +31,9 @@ def sanitize_filename(title: str, max_length: int = 50) -> str:
     """
     # 型チェック
     if not isinstance(title, str):
-        raise TypeError(f"title must be str, got {type(title).__name__}")
+        raise ValidationError(f"title must be str, got {type(title).__name__}")
     if max_length <= 0:
-        raise ValueError(f"max_length must be positive, got {max_length}")
+        raise ValidationError(f"max_length must be positive, got {max_length}")
 
     # 危険な文字を削除
     sanitized = re.sub(r'[<>:"/\\|?*]', '', title)
@@ -74,7 +76,7 @@ def get_next_digest_number(digests_path: Path, level: str) -> int:
 
     config = LEVEL_CONFIG.get(level)
     if not config:
-        raise ValueError(f"Invalid level: {level}")
+        raise ConfigError(f"Invalid level: {level}")
 
     prefix = config["prefix"]
     level_dir = digests_path / config["dir"]

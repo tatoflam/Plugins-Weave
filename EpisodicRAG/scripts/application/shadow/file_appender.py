@@ -10,7 +10,7 @@ from typing import Dict, List
 
 from domain.types import ShadowDigestData, OverallDigestData, LevelHierarchyEntry
 from domain.constants import SOURCE_TYPE_LOOPS
-from infrastructure import log_info, log_warning, read_json_from_file_safe
+from infrastructure import log_info, log_warning, try_read_json_from_file
 from application.validators import is_valid_dict
 
 from .template import ShadowTemplate
@@ -85,7 +85,7 @@ class FileAppender:
         source_dir = self.file_detector.get_source_path(level)
         full_path = source_dir / file_path.name
 
-        digest_data = read_json_from_file_safe(full_path)
+        digest_data = try_read_json_from_file(full_path)
         if digest_data is None:
             return
 

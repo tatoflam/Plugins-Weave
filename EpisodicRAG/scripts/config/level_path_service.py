@@ -8,6 +8,7 @@ Level Path Service
 from pathlib import Path
 
 from domain.constants import LEVEL_CONFIG, LEVEL_NAMES
+from domain.exceptions import ConfigError
 
 
 class LevelPathService:
@@ -33,10 +34,10 @@ class LevelPathService:
             RegularDigest格納ディレクトリの絶対Path
 
         Raises:
-            ValueError: 不正なレベル名の場合
+            ConfigError: 不正なレベル名の場合
         """
         if level not in LEVEL_CONFIG:
-            raise ValueError(f"Invalid level: {level}. Valid levels: {LEVEL_NAMES}")
+            raise ConfigError(f"Invalid level: {level}. Valid levels: {LEVEL_NAMES}")
         return self.digests_path / LEVEL_CONFIG[level]["dir"]
 
     def get_provisional_dir(self, level: str) -> Path:

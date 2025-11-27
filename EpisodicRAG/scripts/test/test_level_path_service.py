@@ -9,6 +9,7 @@ import pytest
 
 from config.level_path_service import LevelPathService
 from domain.constants import LEVEL_NAMES, LEVEL_CONFIG
+from domain.exceptions import ConfigError
 
 
 class TestLevelPathService:
@@ -63,16 +64,16 @@ class TestLevelPathService:
 
     @pytest.mark.unit
     def test_invalid_level_raises_value_error(self, service):
-        """不正レベル名でValueError"""
-        with pytest.raises(ValueError) as exc_info:
+        """不正レベル名でConfigError"""
+        with pytest.raises(ConfigError) as exc_info:
             service.get_level_dir("invalid_level")
 
         assert "Invalid level" in str(exc_info.value)
 
     @pytest.mark.unit
     def test_provisional_dir_invalid_level(self, service):
-        """不正レベル名でProvisional取得時もValueError"""
-        with pytest.raises(ValueError) as exc_info:
+        """不正レベル名でProvisional取得時もConfigError"""
+        with pytest.raises(ConfigError) as exc_info:
             service.get_provisional_dir("invalid_level")
 
         assert "Invalid level" in str(exc_info.value)

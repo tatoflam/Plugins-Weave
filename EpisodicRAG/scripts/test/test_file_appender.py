@@ -16,67 +16,17 @@ import pytest
 from pathlib import Path
 
 # Application層
-from application.shadow import ShadowIO, ShadowTemplate, FileDetector
 from application.shadow.file_appender import FileAppender
-from application.shadow.placeholder_manager import PlaceholderManager
-from application.tracking import DigestTimesTracker
 
-# Domain層
-from domain.constants import LEVEL_NAMES, LEVEL_CONFIG
-
-# 設定
-from config import DigestConfig
+# テストヘルパー
 from test_helpers import create_test_loop_file
 
 
 # =============================================================================
 # フィクスチャ
 # =============================================================================
-
-@pytest.fixture
-def config(temp_plugin_env):
-    """テスト用DigestConfig"""
-    return DigestConfig(plugin_root=temp_plugin_env.plugin_root)
-
-
-@pytest.fixture
-def times_tracker(config):
-    """テスト用DigestTimesTracker"""
-    return DigestTimesTracker(config)
-
-
-@pytest.fixture
-def template():
-    """テスト用ShadowTemplate"""
-    return ShadowTemplate(levels=LEVEL_NAMES)
-
-
-@pytest.fixture
-def shadow_io(temp_plugin_env, template):
-    """テスト用ShadowIO"""
-    shadow_file = temp_plugin_env.plugin_root / ".claude-plugin" / "ShadowGrandDigest.txt"
-    return ShadowIO(shadow_file, template.get_template)
-
-
-@pytest.fixture
-def file_detector(config, times_tracker):
-    """テスト用FileDetector"""
-    return FileDetector(config, times_tracker)
-
-
-@pytest.fixture
-def level_hierarchy():
-    """レベル階層情報"""
-    return {
-        level: {"source": cfg["source"], "next": cfg["next"]}
-        for level, cfg in LEVEL_CONFIG.items()
-    }
-
-
-@pytest.fixture
-def placeholder_manager():
-    """テスト用PlaceholderManager"""
-    return PlaceholderManager()
+# 注: config, times_tracker, template, shadow_io, file_detector,
+#     level_hierarchy, placeholder_manager は conftest.py で定義済み
 
 
 @pytest.fixture

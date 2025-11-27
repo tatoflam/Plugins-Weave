@@ -29,6 +29,7 @@ from domain.constants import (
     SOURCE_TYPE_LOOPS,
 )
 from domain.types import LevelConfigData, ConfigData
+from domain.exceptions import ConfigError
 
 # Domain層からファイル命名関数を再エクスポート（後方互換性）
 from domain.file_naming import (
@@ -162,10 +163,10 @@ class DigestConfig:
             - その他: 下位レベルのDigestディレクトリ
 
         Raises:
-            ValueError: 無効なlevelが指定された場合
+            ConfigError: 無効なlevelが指定された場合
         """
         if level not in LEVEL_CONFIG:
-            raise ValueError(f"Invalid level: {level}")
+            raise ConfigError(f"Invalid level: {level}")
 
         source_type = LEVEL_CONFIG[level]["source"]
 
@@ -185,10 +186,10 @@ class DigestConfig:
             ファイル検索パターン (例: "Loop*.txt", "W*.txt")
 
         Raises:
-            ValueError: 無効なlevelが指定された場合
+            ConfigError: 無効なlevelが指定された場合
         """
         if level not in LEVEL_CONFIG:
-            raise ValueError(f"Invalid level: {level}")
+            raise ConfigError(f"Invalid level: {level}")
 
         source_type = LEVEL_CONFIG[level]["source"]
 

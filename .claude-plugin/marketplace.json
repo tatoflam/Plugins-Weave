@@ -29,7 +29,15 @@
         "long-term-memory",
         "knowledge-management",
         "ai-memory"
-      ]
+      ],
+      "categories": ["memory", "knowledge-management", "productivity"],
+      "compatibility": {
+        "claudeCode": ">=1.0.0"
+      },
+      "dependencies": {
+        "python": ">=3.10"
+      },
+      "changelog": "./EpisodicRAG/CHANGELOG.md"
     }
   ]
 }

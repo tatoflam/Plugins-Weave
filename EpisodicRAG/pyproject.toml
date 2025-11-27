@@ -11,6 +11,10 @@ dependencies = []
 dev = [
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
+    "ruff>=0.8.0",
+    "mypy>=1.13.0",
+    "pre-commit>=3.8.0",
+    "hypothesis>=6.82.0",
 ]
 
 [tool.pytest.ini_options]
@@ -27,6 +31,7 @@ markers = [
     "unit: 単体テスト（高速、外部依存なし）",
     "integration: 統合テスト（ファイルI/O）",
     "slow: 時間のかかるテスト",
+    "property: Property-based tests using hypothesis",
 ]
 
 # デフォルトオプション
@@ -46,6 +51,7 @@ filterwarnings = [
 
 [tool.coverage.run]
 source = ["scripts"]
+branch = true
 omit = [
     "scripts/test/*",
     "*/__pycache__/*",
@@ -53,9 +59,59 @@ omit = [
 ]
 
 [tool.coverage.report]
+fail_under = 80
+show_missing = true
+precision = 1
 exclude_lines = [
     "pragma: no cover",
     "def __repr__",
     "raise NotImplementedError",
     "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
 ]
+
+# =============================================================================
+# Ruff Configuration
+# =============================================================================
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+src = ["scripts"]
+include = ["scripts/**/*.py"]
+exclude = [".pytest_cache", "__pycache__", ".venv", "*.egg-info"]
+
+[tool.ruff.format]
+quote-style = "preserve"
+indent-style = "space"
+docstring-code-format = false
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I"]
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"scripts/test/*" = ["E501", "F401"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["domain", "application", "infrastructure", "interfaces", "config"]
+known-third-party = ["pytest", "hypothesis"]
+
+# =============================================================================
+# Mypy Configuration
+# =============================================================================
+
+[tool.mypy]
+python_version = "3.10"
+mypy_path = "scripts"
+warn_redundant_casts = true
+warn_unused_configs = true
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "domain.*"
+disallow_untyped_defs = true
+
+[[tool.mypy.overrides]]
+module = "scripts.test.*"
+ignore_errors = true

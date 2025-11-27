@@ -13,15 +13,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **DEPRECATED メソッド完全削除**:
   - `load_or_create`, `save`, `find_new_files` を削除
-  - ShadowGrandDigestManager: 9 → 6メソッド
 
 ### Added
 
 - **型安全性向上**:
   - `ProvisionalDigestFile` 型追加
-  - `provisional_loader.py`: 6箇所の型置換
-  - `save_provisional_digest.py`: 7箇所の型置換
-  - `Dict[str, Any]` 使用箇所: ~23 → ~10（汎用関数のみ）
+  - `provisional_loader.py`, `save_provisional_digest.py` の型置換
+  - `Dict[str, Any]` 使用箇所を汎用関数のみに限定
 
 ---
 
@@ -29,12 +27,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **ログ統一**: `print` → `logger` に44箇所置換
-- **Facade簡潔化**: 13 → 9メソッド（6 public + 3 DEPRECATED）
+- **ログ統一**: `print` → `logger` に全面置換
+- **Facade簡潔化**: public APIを整理（DEPRECATED 3メソッド）
 
 ### Added
 
-- **テストカバレッジ拡大**: 384 → 407テスト
+- **テストカバレッジ拡大**
 - **型定義統一**: `DigestMetadataComplete` 追加
 
 ### Fixed
@@ -69,8 +67,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `application/` - ユースケース（Shadow管理、GrandDigest管理、Finalize処理）
   - `interfaces/` - エントリーポイント（DigestFinalizerFromShadow, ProvisionalDigestSaver）
 
-- **テスト大幅拡充**: 129テスト → **301テスト**（+172テスト）
-  - Phase 0で新規テストファイル9個追加
+- **テスト大幅拡充**:
+  - 新規テストファイル追加
   - 全テストが新アーキテクチャに対応
 
 - **ドキュメント更新**:
@@ -89,9 +87,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
-- **後方互換性レイヤー（19ファイル削除）**:
-  - `scripts/finalize/` (5ファイル)
-  - `scripts/shadow/` (5ファイル)
+- **後方互換性レイヤー削除**:
+  - `scripts/finalize/`
+  - `scripts/shadow/`
   - ルートレベルファイル: `validators.py`, `digest_times.py`, `grand_digest.py`, `shadow_grand_digest.py`, `finalize_from_shadow.py`, `save_provisional_digest.py`, `__version__.py`, `digest_types.py`, `exceptions.py`, `utils.py`
 
 ### Migration Guide
@@ -138,8 +136,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `ARCHITECTURE.md`, `TROUBLESHOOTING.md`, `API_REFERENCE.md` にバージョンヘッダー追加
 
 ### Documentation
-- ドキュメント健全性診断: 8.6/10 → 9.5+/10 を目標に改善
-- 重複コンテンツ削減（約40行削除）
+- ドキュメント健全性診断に基づく改善
+- 重複コンテンツ削減
 - ADVANCED.md 目次更新
 
 ---
@@ -148,10 +146,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - **ドキュメントリファクタリング**: 大規模なドキュメント整理
-  - README.md: トラフィックディレクター化（339行 → 120行）
+  - README.md: トラフィックディレクター化（大幅簡略化）
   - docs/README.md: AI Specification Hub に特化
-  - バージョンフッター削除（21ファイル）- SSoTに集約
-  - ブレッドクラム追加（docs/配下8ファイル）
+  - バージョンフッター削除 - SSoTに集約
+  - ブレッドクラム追加（docs/配下）
   - scripts/README.md: shadow/, finalize/, __version__.py を追記
 
 ### Fixed
@@ -174,13 +172,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `shadow/file_detector.py`: ファイル検出（FileDetector クラス）
   - `shadow/shadow_io.py`: Shadow I/O（ShadowIO クラス）
   - `shadow/shadow_updater.py`: Shadow更新（ShadowUpdater クラス）
-  - `shadow/__init__.py`: 公開API
 
 ### Changed
-- **リファクタリング Phase 5**: shadow_grand_digest.py のFacade分割
-  - 438行 → 154行に削減（約65%削減）
+- **リファクタリング**: shadow_grand_digest.py のFacade分割
   - 元ファイルはFacadeとして後方互換性を維持
-  - 既存APIに変更なし（全129テストがパス）
 
 ---
 
@@ -192,24 +187,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `finalize/provisional_loader.py`: Provisional読込（ProvisionalLoader クラス）
   - `finalize/digest_builder.py`: Digest構築（RegularDigestBuilder クラス）
   - `finalize/persistence.py`: 永続化処理（DigestPersistence クラス）
-  - `finalize/__init__.py`: 公開API
 
 ### Changed
-- **リファクタリング Phase 4**: finalize_from_shadow.py のFacade分割
-  - 497行 → 203行に削減（約59%削減）
+- **リファクタリング**: finalize_from_shadow.py のFacade分割
   - 元ファイルはFacadeとして後方互換性を維持
-  - 既存APIに変更なし（全129テストがパス）
 
 ---
 
 ## [1.1.4] - 2025-11-27
 
 ### Changed
-- **リファクタリング Phase 3**: 例外処理の完全移行
+- **リファクタリング**: 例外処理の完全移行
   - `exceptions.py` の例外クラス（`ValidationError`, `DigestError`, `FileIOError`）を実際に使用開始
-  - `grand_digest.py`: 3箇所の `log_error()` → `raise DigestError()` に置換
-  - `finalize_from_shadow.py`: 12箇所の `log_error()` → 適切な例外に置換、`main()` に例外ハンドラ追加
-  - `save_provisional_digest.py`: 2箇所の `log_error()` → `raise FileIOError()` に置換、`EpisodicRAGError` ハンドラ追加
+  - `log_error()` → 適切な例外に置換
   - 各メソッドの戻り値を `bool`/`Optional` から例外ベースに変更
   - 関連テストを `assertFalse()` → `assertRaises()` に更新
 
@@ -221,17 +211,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **__version__.py**: バージョン定数のSingle Source of Truth（`DIGEST_FORMAT_VERSION`）を新規作成
 
 ### Changed
-- **リファクタリング Phase 1**: バージョン文字列の集約
-  - `grand_digest.py`, `shadow_grand_digest.py`, `finalize_from_shadow.py`, `save_provisional_digest.py` でハードコードされていた `"1.0"` を `DIGEST_FORMAT_VERSION` 定数に置換
-- **リファクタリング Phase 2**: validators.py の段階的採用
-  - `grand_digest.py`: `isinstance()` → `is_valid_dict()` に置換
-  - `digest_times.py`: `isinstance()` → `is_valid_list()` に置換
-  - `shadow_grand_digest.py`: 3箇所の `isinstance()` → `is_valid_dict()` に置換
-  - `save_provisional_digest.py`: 6箇所の `isinstance()` → `is_valid_dict()`/`is_valid_list()` に置換
-  - `finalize_from_shadow.py`: 4箇所の `isinstance()` → `is_valid_dict()`/`is_valid_list()` に置換
-
-### Notes
-- Phase 3, Phase 4 は v1.1.4 で実施
+- **リファクタリング**: バージョン文字列の集約
+  - ハードコードされていた `"1.0"` を `DIGEST_FORMAT_VERSION` 定数に置換
+- **リファクタリング**: validators.py の段階的採用
+  - `isinstance()` → `is_valid_dict()`/`is_valid_list()` に置換
 
 ---
 
@@ -244,7 +227,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **ARCHITECTURE.md**: Provisional Digestのフィールド名を `source_file` に統一
 
 ### Changed
-- **SKILL.md (3ファイル)**: 実装ガイドラインを共通ファイル（_implementation-notes.md）への参照に変更（重複削減）
+- **SKILL.md**: 実装ガイドラインを共通ファイル（_implementation-notes.md）への参照に変更（重複削減）
 
 ---
 
@@ -317,3 +300,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 *For more details, see [ARCHITECTURE.md](docs/dev/ARCHITECTURE.md)*
+
+<!-- Version comparison links -->
+[2.1.0]: https://github.com/Bizuayeu/Plugins-Weave/compare/v2.0.1...v2.1.0
+[2.0.1]: https://github.com/Bizuayeu/Plugins-Weave/compare/v2.0.0...v2.0.1
+[2.0.0]: https://github.com/Bizuayeu/Plugins-Weave/compare/v1.1.8...v2.0.0
+[1.1.8]: https://github.com/Bizuayeu/Plugins-Weave/compare/v1.1.7...v1.1.8
+[1.1.7]: https://github.com/Bizuayeu/Plugins-Weave/compare/v1.1.6...v1.1.7
+[1.1.6]: https://github.com/Bizuayeu/Plugins-Weave/compare/v1.1.5...v1.1.6
+[1.1.5]: https://github.com/Bizuayeu/Plugins-Weave/compare/v1.1.4...v1.1.5
+[1.1.4]: https://github.com/Bizuayeu/Plugins-Weave/compare/v1.1.3...v1.1.4
+[1.1.3]: https://github.com/Bizuayeu/Plugins-Weave/compare/v1.1.2...v1.1.3
+[1.1.2]: https://github.com/Bizuayeu/Plugins-Weave/compare/v1.1.1...v1.1.2
+[1.1.1]: https://github.com/Bizuayeu/Plugins-Weave/compare/v1.1.0...v1.1.1
+[1.1.0]: https://github.com/Bizuayeu/Plugins-Weave/compare/v1.0.0...v1.1.0
+[1.0.0]: https://github.com/Bizuayeu/Plugins-Weave/releases/tag/v1.0.0

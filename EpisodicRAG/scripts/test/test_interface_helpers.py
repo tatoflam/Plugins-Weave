@@ -13,6 +13,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from interfaces.interface_helpers import sanitize_filename, get_next_digest_number
+from domain.exceptions import ConfigError, ValidationError
 
 
 # =============================================================================
@@ -72,25 +73,25 @@ class TestSanitizeFilenameEdgeCases(unittest.TestCase):
     """sanitize_filename() のエッジケーステスト"""
 
     def test_none_input_raises_typeerror(self):
-        """None入力でTypeError"""
-        with self.assertRaises(TypeError):
+        """None入力でValidationError"""
+        with self.assertRaises(ValidationError):
             sanitize_filename(None)
 
     def test_non_string_input_raises_typeerror(self):
-        """非文字列型入力でTypeError"""
-        with self.assertRaises(TypeError):
+        """非文字列型入力でValidationError"""
+        with self.assertRaises(ValidationError):
             sanitize_filename(123)
-        with self.assertRaises(TypeError):
+        with self.assertRaises(ValidationError):
             sanitize_filename(['test'])
 
     def test_zero_max_length_raises_valueerror(self):
-        """max_length=0でValueError"""
-        with self.assertRaises(ValueError):
+        """max_length=0でValidationError"""
+        with self.assertRaises(ValidationError):
             sanitize_filename("test", max_length=0)
 
     def test_negative_max_length_raises_valueerror(self):
-        """負のmax_lengthでValueError"""
-        with self.assertRaises(ValueError):
+        """負のmax_lengthでValidationError"""
+        with self.assertRaises(ValidationError):
             sanitize_filename("test", max_length=-1)
 
     def test_only_dangerous_chars(self):
@@ -168,8 +169,8 @@ class TestGetNextDigestNumber(unittest.TestCase):
         self.assertEqual(result, 4)
 
     def test_invalid_level_raises_valueerror(self):
-        """無効なレベル名でValueError"""
-        with self.assertRaises(ValueError):
+        """無効なレベル名でConfigError"""
+        with self.assertRaises(ConfigError):
             get_next_digest_number(self.digests_path, "invalid_level")
 
     def test_nonexistent_level_directory_returns_one(self):

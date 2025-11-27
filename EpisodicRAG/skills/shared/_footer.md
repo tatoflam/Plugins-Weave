@@ -25,3 +25,4 @@
 - `EpisodicRAG/CONTRIBUTING.md`
 - `EpisodicRAG/skills/README.md`
 - `EpisodicRAG/commands/README.md`
+- `README.en.md`（ルート - 英語版）

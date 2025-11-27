@@ -31,7 +31,7 @@ if sys.platform == 'win32' and __name__ == "__main__":
 # Domain層
 from domain.constants import LEVEL_CONFIG
 from domain.version import DIGEST_FORMAT_VERSION
-from domain.exceptions import EpisodicRAGError, FileIOError
+from domain.exceptions import EpisodicRAGError, FileIOError, ConfigError, ValidationError
 from domain.types import IndividualDigestData, ProvisionalDigestFile
 
 # Infrastructure層
@@ -72,7 +72,7 @@ class ProvisionalDigestSaver:
         # レベル設定を取得
         level_cfg = self.level_config.get(level)
         if not level_cfg:
-            raise ValueError(f"Invalid level: {level}")
+            raise ConfigError(f"Invalid level: {level}")
 
         prefix = level_cfg["prefix"]
         provisional_dir = self.config.get_provisional_dir(level)
@@ -100,7 +100,7 @@ class ProvisionalDigestSaver:
         """
         level_cfg = self.level_config.get(level)
         if not level_cfg:
-            raise ValueError(f"Invalid level: {level}")
+            raise ConfigError(f"Invalid level: {level}")
 
         # format_digest_number を使用して統一されたファイル名を生成
         filename = f"{format_digest_number(level, digest_num)}_Individual.txt"
@@ -133,10 +133,10 @@ class ProvisionalDigestSaver:
         # 入力検証
         for i, d in enumerate(existing_digests):
             if not is_valid_dict(d) or "source_file" not in d:
-                raise ValueError(f"Invalid existing digest at index {i}: missing 'source_file' key")
+                raise ValidationError(f"Invalid existing digest at index {i}: missing 'source_file' key")
         for i, d in enumerate(new_digests):
             if not is_valid_dict(d) or "source_file" not in d:
-                raise ValueError(f"Invalid new digest at index {i}: missing 'source_file' key")
+                raise ValidationError(f"Invalid new digest at index {i}: missing 'source_file' key")
 
         # source_fileをキーとした辞書を作成
         merged_dict = {d["source_file"]: d for d in existing_digests}
@@ -171,7 +171,7 @@ class ProvisionalDigestSaver:
         # レベル設定を取得
         level_cfg = self.level_config.get(level)
         if not level_cfg:
-            raise ValueError(f"Invalid level: {level}")
+            raise ConfigError(f"Invalid level: {level}")
 
         prefix = level_cfg["prefix"]
         digits = level_cfg["digits"]
@@ -242,7 +242,7 @@ class ProvisionalDigestSaver:
         """
         # 空文字列チェック
         if not input_data or not input_data.strip():
-            raise ValueError("input_data cannot be empty")
+            raise ValidationError("input_data cannot be empty")
 
         # ファイルパスとして試行
         input_path = Path(input_data)
@@ -262,7 +262,7 @@ class ProvisionalDigestSaver:
             return data["individual_digests"]
 
         # その他の場合はエラー
-        raise ValueError(
+        raise ValidationError(
             f"Invalid input format. Expected list or dict with 'individual_digests' key. Got: {type(data)}"
         )
 

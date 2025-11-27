@@ -232,7 +232,7 @@ Task(
     subagent_type="EpisodicRAG-Plugin:DigestAnalyzer",
     description="Analyze Loop0001 for digest generation",
     prompt="""
-分析対象ファイル: C:\Users\anyth\DEV\homunculus\Weave\EpisodicRAG\Loops\Loop0001_認知アーキテクチャ論.txt
+分析対象ファイル: {loops_path}/Loop0001_タイトル.txt
 
 このLoopファイルを深層分析し、以下の形式でJSON出力してください：
 {

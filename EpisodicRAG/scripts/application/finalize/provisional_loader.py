@@ -13,7 +13,7 @@ from config import DigestConfig, LEVEL_CONFIG
 from application.validators import is_valid_dict
 from domain.types import OverallDigestData, IndividualDigestData
 from domain.exceptions import DigestError, FileIOError
-from infrastructure import log_info, log_warning, load_json, read_json_from_file_safe
+from infrastructure import log_info, log_warning, load_json, try_read_json_from_file
 from application.grand import ShadowGrandDigestManager
 
 
@@ -103,7 +103,7 @@ class ProvisionalLoader:
             source_dir = self._get_source_path_for_level(level)
             source_path = source_dir / source_file
 
-            source_data = read_json_from_file_safe(source_path)
+            source_data = try_read_json_from_file(source_path)
             if source_data is None:
                 skipped_count += 1
                 continue
