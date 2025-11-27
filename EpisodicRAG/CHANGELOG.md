@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.8] - 2025-11-27
+
+### Added
+- **CLAUDE.md**: プロジェクト固有のAIエージェント向けガイドライン
+  - SSoTの場所と参照パターン
+  - 開発ワークフローとコーディング規約
+  - 用語統一ルール（Loop, Digest, GrandDigest）
+- **バックアップ＆リカバリ**: ADVANCED.md にセクション追加
+  - 長期記憶の4層構造（Loop/Provisional/階層Digest/Essence）
+  - バックアップ対象ファイルと優先度
+  - Git連携/手動/クラウド同期の3つの方法
+  - リカバリ手順（各層別）と推奨頻度
+
+### Changed
+- **SSoT参照の徹底**:
+  - `digest-auto/SKILL.md`: 「まだらボケ」説明を `_common-concepts.md` 参照に置換
+  - `FAQ.md`: 「まだらボケ」回答をSSoT参照に簡略化
+- **バージョン情報統一**:
+  - `ARCHITECTURE.md`, `TROUBLESHOOTING.md`, `API_REFERENCE.md` にバージョンヘッダー追加
+
+### Documentation
+- ドキュメント健全性診断: 8.6/10 → 9.5+/10 を目標に改善
+- 重複コンテンツ削減（約40行削除）
+- ADVANCED.md 目次更新
+
+---
+
 ## [1.1.7] - 2025-11-27
 
 ### Changed

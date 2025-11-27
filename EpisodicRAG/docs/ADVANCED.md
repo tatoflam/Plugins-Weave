@@ -18,7 +18,8 @@
 4. [なぜGitHubセットアップが必要なのか？](#なぜgithubセットアップが必要なのか)
 5. [キャッシュバスティングの仕組み](#キャッシュバスティングの仕組み)
 6. [高度なワークフロー](#高度なワークフロー)
-7. [トラブルシューティング](#トラブルシューティング)
+7. [バックアップ＆リカバリ](#バックアップリカバリ)
+8. [トラブルシューティング](#トラブルシューティング)
 
 ---
 
@@ -196,6 +197,116 @@ git remote set-url origin git@github.com:{USER}/{REPO}.git
 ```
 
 WebFetchでのアクセスには、プライベートリポジトリのraw URLに認証が必要になる場合があります。パブリックリポジトリの使用を推奨します（記憶は個人情報を含まないため）。
+
+---
+
+## バックアップ＆リカバリ
+
+長期記憶（Loop、全Digest、Essence）を安全に保護するためのガイドラインです。
+
+### バックアップ対象ファイル
+
+EpisodicRAGの長期記憶は以下の4層で構成されます：
+
+| カテゴリ | ファイル/ディレクトリ | 説明 | 優先度 |
+|----------|----------------------|------|--------|
+| **Loop** | `Loops/Loop*.txt` | 会話記録（原本） | **必須** |
+| **Provisional** | `Digests/0_Provisional/` | 個別Loop分析結果 | **必須** |
+| **階層Digest** | `Digests/1_Weekly/` 〜 `8_Centurial/` | 確定済み階層Digest | **必須** |
+| **Essence** | `Essences/GrandDigest.txt` | 統合ビュー（確定済み） | **必須** |
+| **Essence** | `Essences/ShadowGrandDigest.txt` | 統合ビュー（未確定） | **必須** |
+| 設定 | `.claude-plugin/config.json` | プラグイン設定 | 推奨 |
+| 設定 | `.claude-plugin/last_digest_times.json` | 最終処理日時 | 推奨 |
+
+### バックアップ戦略
+
+#### 方法1: Git連携（推奨）
+
+上記「GitHubセットアップ」を完了していれば、Gitが自動バックアップとして機能します：
+
+```bash
+cd {DATA_PATH}
+
+# 全長期記憶をバックアップ
+git add Loops/ Digests/ Essences/
+git commit -m "Backup: $(date +%Y-%m-%d)"
+git push
+```
+
+#### 方法2: 手動コピー
+
+```bash
+# バックアップディレクトリ作成
+BACKUP_DIR=~/episodicrag-backup/$(date +%Y%m%d)
+mkdir -p $BACKUP_DIR
+
+# 全長期記憶をコピー
+cp -r {DATA_PATH}/Loops $BACKUP_DIR/
+cp -r {DATA_PATH}/Digests $BACKUP_DIR/
+cp -r {DATA_PATH}/Essences $BACKUP_DIR/
+```
+
+#### 方法3: クラウドストレージ同期
+
+dataディレクトリ全体をクラウドストレージ（Google Drive, Dropbox等）と同期することで、自動バックアップを実現できます。
+
+### リカバリ手順
+
+#### Loopファイルが破損/紛失した場合
+
+Loopは原本のため、バックアップからの復元が必須です：
+
+```bash
+cp ~/episodicrag-backup/{DATE}/Loops/Loop*.txt {DATA_PATH}/Loops/
+```
+
+#### Digest（Provisional/階層）が破損した場合
+
+1. **バックアップから復元**（推奨）:
+   ```bash
+   cp -r ~/episodicrag-backup/{DATE}/Digests/ {DATA_PATH}/
+   ```
+
+2. **Loopから再生成**:
+   ```bash
+   # Loopが残っていれば再分析可能
+   /digest  # 未処理Loopを再検出・分析
+   ```
+
+#### GrandDigest/ShadowGrandDigestが破損した場合
+
+1. **バックアップから復元**:
+   ```bash
+   cp ~/episodicrag-backup/{DATE}/Essences/*.txt {DATA_PATH}/Essences/
+   ```
+
+2. **Git履歴から復元**（Git連携時）:
+   ```bash
+   cd {DATA_PATH}/Essences
+   git log --oneline  # コミット履歴確認
+   git checkout {COMMIT_SHA} -- GrandDigest.txt ShadowGrandDigest.txt
+   ```
+
+3. **テンプレートから再初期化**（最終手段）:
+   ```bash
+   @digest-setup
+   # セットアップウィザードでファイルを再作成
+   ```
+   **注意**: この場合、GrandDigest/ShadowGrandDigestの履歴は失われますが、Loop/Digestが残っていれば再構築可能です。
+
+#### last_digest_times.jsonが破損した場合
+
+1. 削除して `@digest-setup` を再実行
+2. `/digest` で未処理Loopを再検出
+
+### バックアップの推奨頻度
+
+| タイミング | アクション |
+|-----------|----------|
+| Loop追加後 | Loopファイルをバックアップ |
+| `/digest` 後 | Provisional/Shadow をバックアップ |
+| `/digest weekly` 後 | 全データをバックアップ |
+| 週1回 | 定期フルバックアップ |
 
 ---
 
