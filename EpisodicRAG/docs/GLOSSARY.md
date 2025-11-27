@@ -74,7 +74,7 @@ Digestには以下の種類があります：
 - **内容**: 各階層（Weekly〜Centurial）の最新確定Digest
 - **更新タイミング**: `/digest <type>` で階層を確定した時
 
-> 📖 詳細な形式は [ARCHITECTURE.md](ARCHITECTURE.md#granddigesttxt) を参照
+> 📖 詳細な形式は [ARCHITECTURE.md](dev/ARCHITECTURE.md#granddigesttxt) を参照
 
 ```json
 {
@@ -93,7 +93,7 @@ Digestには以下の種類があります：
 - **用途**: 新しいLoopの分析結果を一時保存し、threshold達成後にRegularに昇格
 - **更新タイミング**: `/digest` で新規Loopを検出・分析した時
 
-> 📖 詳細な形式は [ARCHITECTURE.md](ARCHITECTURE.md#shadowgranddigesttxt) を参照
+> 📖 詳細な形式は [ARCHITECTURE.md](dev/ARCHITECTURE.md#shadowgranddigesttxt) を参照
 
 ```json
 {
@@ -243,8 +243,8 @@ Monthly確定 → Quarterly Shadow に追加
 ## 関連ドキュメント
 
 - [README.md](../README.md) - プロジェクト概要
-- [QUICKSTART.md](QUICKSTART.md) - 5分チュートリアル
-- [GUIDE.md](GUIDE.md) - ユーザーガイド
-- [ARCHITECTURE.md](ARCHITECTURE.md) - 技術仕様
+- [QUICKSTART.md](user/QUICKSTART.md) - 5分チュートリアル
+- [GUIDE.md](user/GUIDE.md) - ユーザーガイド
+- [ARCHITECTURE.md](dev/ARCHITECTURE.md) - 技術仕様
 
 ---

@@ -23,7 +23,7 @@ scripts/
 ├── application/      # ユースケース
 ├── interfaces/       # エントリーポイント
 ├── config.py         # 設定管理クラス
-└── test/             # テスト（301テスト）
+└── test/             # テスト（407テスト）
 ```
 
 ### 依存関係ルール
@@ -133,7 +133,7 @@ print(config.get_threshold("weekly"))
 
 ## Tests
 
-`test/` ディレクトリにユニットテストがあります（**301テスト**）。
+`test/` ディレクトリにユニットテストがあります（**407テスト**）。
 
 ```bash
 # 全テスト実行
@@ -157,6 +157,5 @@ python -c "from interfaces import DigestFinalizerFromShadow; print('OK')"
 - [ARCHITECTURE.md](../docs/ARCHITECTURE.md) - 技術仕様
 - [API_REFERENCE.md](../docs/API_REFERENCE.md) - API リファレンス
 - [CONTRIBUTING.md](../CONTRIBUTING.md) - 開発参加ガイド
-- [HANDOFF.md](../HANDOFF.md) - リファクタリング引継ぎドキュメント
 
 ---

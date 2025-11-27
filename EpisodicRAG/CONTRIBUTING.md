@@ -219,7 +219,7 @@ scripts/
 ├── application/      # ユースケース（ビジネスロジック実装）
 ├── interfaces/       # エントリーポイント
 ├── config.py         # 設定管理クラス
-└── test/             # テスト（301テスト）
+└── test/             # テスト（407テスト）
 ```
 
 ### 依存関係ルール
@@ -287,7 +287,7 @@ from interfaces import DigestFinalizerFromShadow
 
 ## テスト
 
-### ユニット/統合テスト実行（301テスト）
+### ユニット/統合テスト実行（407テスト）
 
 ```bash
 cd plugins-weave/EpisodicRAG/scripts
@@ -303,6 +303,41 @@ python -c "from domain import LEVEL_CONFIG, __version__; print(__version__)"
 python -c "from infrastructure import load_json; print('OK')"
 python -c "from application import ShadowGrandDigestManager; print('OK')"
 python -c "from interfaces import DigestFinalizerFromShadow; print('OK')"
+```
+
+### テスト構成
+
+`scripts/test/` に407のユニット/インテグレーションテストがあります。
+
+#### ファイル命名規則
+
+| パターン | テスト対象 |
+|---------|-----------|
+| `test_{module}.py` | 単一モジュールのユニットテスト |
+| `test_{package}_{class}.py` | パッケージ内クラスのテスト |
+| `test_path_integration.py` | パス解決の統合テスト |
+
+#### 主要テストファイル（層別）
+
+| 層 | テストファイル |
+|----|---------------|
+| Domain | `test_validators.py`, `test_helpers.py` |
+| Infrastructure | `test_json_repository.py`, `test_file_scanner.py` |
+| Application | `test_shadow_*.py`, `test_grand_digest.py`, `test_digest_*.py`, `test_cascade_processor.py` |
+| Interfaces | `test_finalize_from_shadow.py`, `test_save_provisional_digest.py`, `test_interface_helpers.py` |
+| Config | `test_config.py`, `test_path_integration.py` |
+
+#### テスト実行（追加オプション）
+
+```bash
+cd scripts
+
+# 層別テスト
+python -m pytest test/test_validators.py test/test_helpers.py -v  # Domain
+python -m pytest test/test_shadow_*.py -v                         # Shadow関連
+
+# カバレッジ付き
+python -m pytest test/ --cov=. --cov-report=term-missing
 ```
 
 ### 手動テスト

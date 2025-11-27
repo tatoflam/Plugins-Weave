@@ -113,7 +113,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
    from interfaces.interface_helpers import sanitize_filename
    ```
 
-2. **詳細**: [HANDOFF.md](HANDOFF.md) を参照
+2. **詳細**: ARCHITECTURE.md および scripts/README.md を参照
 
 ---
 

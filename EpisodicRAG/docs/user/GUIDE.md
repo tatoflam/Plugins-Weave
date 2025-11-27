@@ -276,6 +276,32 @@ Plugin内に完全自己完結しており、プロジェクトルートをク�
 
 ---
 
+### 設定ファイル仕様（クイックリファレンス）
+
+`config.json` は `@digest-setup` で自動生成されますが、手動編集も可能です。
+
+#### JSONスキーマ
+
+| フィールド | 型 | 説明 | デフォルト |
+|-----------|-----|------|-----------|
+| `base_dir` | string | プラグインルートからの相対パス | `"."` |
+| `paths.loops_dir` | string | Loopファイル配置先（base_dirからの相対） | `"data/Loops"` |
+| `paths.digests_dir` | string | Digest出力先 | `"data/Digests"` |
+| `paths.essences_dir` | string | GrandDigest配置先 | `"data/Essences"` |
+| `paths.identity_file_path` | string\|null | アイデンティティファイルパス | `null` |
+| `levels.weekly_threshold` | int | Weekly確定に必要なLoop数 | `5` |
+| `levels.monthly_threshold` | int | Monthly確定に必要なWeekly数 | `5` |
+| `levels.quarterly_threshold` | int | Quarterly確定に必要なMonthly数 | `3` |
+| `levels.annual_threshold` | int | Annual確定に必要なQuarterly数 | `4` |
+| `levels.triennial_threshold` | int | Triennial確定に必要なAnnual数 | `3` |
+| `levels.decadal_threshold` | int | Decadal確定に必要なTriennial数 | `3` |
+| `levels.multi_decadal_threshold` | int | Multi-decadal確定に必要なDecadal数 | `3` |
+| `levels.centurial_threshold` | int | Centurial確定に必要なMulti-decadal数 | `4` |
+
+> 詳細な説明は以下の各セクションを参照してください。
+
+---
+
 ### 設定ファイルの構造
 
 #### 基本設定例（完全自己完結型）
