@@ -77,9 +77,14 @@ AI エージェントが参照すべき共通概念の Single Source of Truth:
 | [GLOSSARY.md](GLOSSARY.md) | 全員 | 用語集 |
 | [FAQ.md](user/FAQ.md) | 問題解決 | よくある質問 |
 | [TROUBLESHOOTING.md](user/TROUBLESHOOTING.md) | 問題解決 | 詳細トラブルシューティング |
-| [ARCHITECTURE.md](dev/ARCHITECTURE.md) | 開発者 | 技術仕様 |
 | [ADVANCED.md](user/ADVANCED.md) | 上級者 | GitHub 連携 |
-| [API_REFERENCE.md](dev/API_REFERENCE.md) | 開発者 | API リファレンス |
+
+## Developer Documentation
+
+| ドキュメント | 概要 |
+|-------------|------|
+| [ARCHITECTURE.md](dev/ARCHITECTURE.md) | 技術仕様 |
+| [API_REFERENCE.md](dev/API_REFERENCE.md) | API リファレンス |
 
 ---
 
