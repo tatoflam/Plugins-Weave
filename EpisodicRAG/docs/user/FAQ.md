@@ -70,6 +70,8 @@ EpisodicRAGプラグインに関するよくある質問と回答集です。
 
 `base_dir`の設定が正しいか確認してください。デフォルト（`.`）はプラグインルート自身を指します。
 
+> 📖 パス設定の詳細は [GLOSSARY.md](../GLOSSARY.md#基本概念) を参照してください。
+
 ---
 
 ## 日常的な使い方
@@ -102,7 +104,7 @@ Loop[連番]_[タイトル].txt
 
 **A**: AIがLoopの内容を記憶できていない（虫食い記憶）状態のことです。`Loop追加 → /digest`のサイクルを守ることで予防できます。
 
-> 📖 発生ケース・対策・記憶定着サイクルの詳細は [_common-concepts.md](../skills/shared/_common-concepts.md#まだらボケとは) を参照
+> 📖 発生ケース・対策・記憶定着サイクルの詳細は [_common-concepts.md](../../skills/shared/_common-concepts.md#まだらボケとは) を参照
 
 ### Q: threshold（閾値）を変更したい
 
@@ -151,7 +153,7 @@ Loop[連番]_[タイトル].txt
 
 **A**: はい、`config.json`に新しいthresholdを追加し、`scripts/generate_digest_auto.sh`を更新することで追加可能です。
 
-詳細は[ARCHITECTURE.md](ARCHITECTURE.md#拡張性)を参照してください。
+詳細は[ARCHITECTURE.md](../dev/ARCHITECTURE.md#拡張性)を参照してください。
 
 ### Q: カスタムエージェントを作成できますか？
 
@@ -170,7 +172,7 @@ cd scripts
 python -m pytest test/ -v
 ```
 
-詳細は[ARCHITECTURE.md](ARCHITECTURE.md#テスト)を参照してください。
+詳細は[ARCHITECTURE.md](../dev/ARCHITECTURE.md#テスト)を参照してください。
 
 ---
 
@@ -183,3 +185,4 @@ python -m pytest test/ -v
 - [ARCHITECTURE.md](../dev/ARCHITECTURE.md) - 技術仕様
 
 ---
+**EpisodicRAG** by Weave | [GitHub](https://github.com/Bizuayeu/Plugins-Weave) | [Issues](https://github.com/Bizuayeu/Plugins-Weave/issues)

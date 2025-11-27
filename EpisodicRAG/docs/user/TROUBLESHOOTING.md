@@ -37,7 +37,7 @@
    ls ~/.claude/plugins/EpisodicRAG-Plugin@Plugins-Weave/.claude-plugin/config.json
    ```
 
-2. **パス解決が正しいか**
+2. **パス解決が正しいか**（📖 [GLOSSARY.md](../GLOSSARY.md#基本概念) 参照）
    ```bash
    cd ~/.claude/plugins/EpisodicRAG-Plugin@Plugins-Weave
    python scripts/config.py --show-paths
@@ -505,7 +505,7 @@ https://github.com/Bizuayeu/Plugins-Weave/issues
 ## 環境情報
 - OS: [Windows 11 / macOS 14 / Ubuntu 22.04]
 - Claude環境: [Claude Code / VSCode Extension / WebChat]
-- プラグインバージョン: [1.1.0]
+- プラグインバージョン: [2.1.0]
 ```
 
 ---
@@ -517,3 +517,4 @@ https://github.com/Bizuayeu/Plugins-Weave/issues
 - 🔧 **GitHub連携**: [ADVANCED.md](ADVANCED.md)
 
 ---
+**EpisodicRAG** by Weave | [GitHub](https://github.com/Bizuayeu/Plugins-Weave) | [Issues](https://github.com/Bizuayeu/Plugins-Weave/issues)

@@ -282,6 +282,8 @@ Plugin内に完全自己完結しており、プロジェクトルートをク�
 
 `config.json` は `@digest-setup` で自動生成されますが、手動編集も可能です。
 
+> 📖 パス用語（plugin_root / base_dir / paths）の詳細は [GLOSSARY.md](../GLOSSARY.md#基本概念) を参照
+
 #### JSONスキーマ
 
 | フィールド | 型 | 説明 | デフォルト |
@@ -717,3 +719,4 @@ Identity File: /Users/username/DEV/homunculus/Weave/Identities/UserIdentity.md
 - 🛠️ **開発に参加したい**: [CONTRIBUTING.md](../../CONTRIBUTING.md)
 
 ---
+**EpisodicRAG** by Weave | [GitHub](https://github.com/Bizuayeu/Plugins-Weave) | [Issues](https://github.com/Bizuayeu/Plugins-Weave/issues)

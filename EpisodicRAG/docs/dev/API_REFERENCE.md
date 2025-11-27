@@ -413,12 +413,65 @@ def get_list_or_default(data: Any, default: Optional[List] = None) -> List[Any]
 
 ### Shadow管理（application/shadow/）
 
+#### CascadeProcessor
+
+ダイジェスト確定時のカスケード処理を担当。
+
+```python
+class CascadeProcessor:
+    def __init__(
+        self,
+        shadow_io: ShadowIO,
+        file_detector: FileDetector,
+        template: ShadowTemplate,
+        level_hierarchy: Dict[str, LevelHierarchyEntry],
+        file_appender: FileAppender
+    ): ...
+```
+
+| メソッド | 説明 |
+|---------|------|
+| `get_shadow_digest_for_level(level: str) -> Optional[OverallDigestData]` | 指定レベルのShadowダイジェストを取得 |
+| `promote_shadow_to_grand(level: str) -> None` | ShadowをGrandDigestに昇格（確認のみ） |
+| `clear_shadow_level(level: str) -> None` | 指定レベルのShadowを初期化 |
+| `cascade_update_on_digest_finalize(level: str) -> None` | ダイジェスト確定時のカスケード処理（処理3） |
+
+**cascade_update_on_digest_finalize処理フロー**:
+1. Shadow → Grand 昇格の確認
+2. 次のレベルの新しいファイルを検出
+3. 次のレベルのShadowに増分追加
+4. 現在のレベルのShadowをクリア
+
+#### PlaceholderManager
+
+PLACEHOLDER管理（更新・保持判定）を担当。
+
+```python
+class PlaceholderManager:
+    def update_or_preserve(
+        self,
+        overall_digest: OverallDigestData,
+        total_files: int
+    ) -> None
+```
+
+| メソッド | 説明 |
+|---------|------|
+| `update_or_preserve(overall_digest, total_files) -> None` | PLACEHOLDERの更新または既存分析の保持 |
+
+**動作**:
+- `abstract`がPLACEHOLDER（空または`<!-- PLACEHOLDER`を含む）の場合: 新規PLACEHOLDER生成
+- それ以外: 既存分析を保持し、再分析を促すログ出力
+
+#### その他のShadowクラス
+
 | クラス | 説明 |
 |--------|------|
 | `ShadowTemplate` | ShadowGrandDigestテンプレート生成 |
 | `FileDetector` | 新規ファイル検出 |
 | `ShadowIO` | Shadow読み書き |
 | `ShadowUpdater` | Shadow更新処理 |
+| `FileAppender` | Shadowへのファイル追加 |
 
 ### GrandDigest管理（application/grand/）
 
@@ -429,18 +482,129 @@ def get_list_or_default(data: Any, default: Optional[List] = None) -> List[Any]
 
 ### Finalize処理（application/finalize/）
 
-| クラス | 説明 |
-|--------|------|
-| `ShadowValidator` | Shadow内容検証 |
-| `ProvisionalLoader` | Provisionalファイル読込 |
-| `RegularDigestBuilder` | RegularDigest構築 |
-| `DigestPersistence` | 永続化処理 |
+#### ShadowValidator
+
+ShadowGrandDigestの内容を検証。
+
+```python
+class ShadowValidator:
+    def __init__(self, shadow_manager: ShadowGrandDigestManager): ...
+```
+
+| メソッド | 説明 | 例外 |
+|---------|------|------|
+| `validate_shadow_content(level: str, source_files: list) -> None` | source_filesの形式・連番を検証 | `ValidationError` |
+| `validate_and_get_shadow(level: str, weave_title: str) -> OverallDigestData` | Shadowの検証と取得（メイン） | `ValidationError`, `DigestError` |
+
+**validate_shadow_content検証項目**:
+- source_filesがlist型であること
+- source_filesが空でないこと
+- ファイル名がすべて文字列であること
+- ファイル名から番号が抽出できること
+- 連番チェック（警告のみ、ユーザー確認で継続可能）
+
+#### ProvisionalLoader
+
+ProvisionalDigestの読み込みまたはソースファイルからの自動生成。
+
+```python
+class ProvisionalLoader:
+    def __init__(self, config: DigestConfig, shadow_manager: ShadowGrandDigestManager): ...
+```
+
+| メソッド | 説明 | 戻り値 |
+|---------|------|--------|
+| `load_or_generate(level, shadow_digest, digest_num) -> Tuple[List[IndividualDigestData], Optional[Path]]` | Provisionalの読み込みまたは自動生成 | (individual_digests, provisional_file_to_delete) |
+| `generate_from_source(level, shadow_digest) -> List[IndividualDigestData]` | ソースファイルから自動生成（まだらボケ回避） | individual_digestsのリスト |
+
+**load_or_generate動作**:
+1. `{prefix}{digest_num}_Individual.txt`が存在すれば読み込み
+2. 存在しなければ`generate_from_source`で自動生成
+
+#### RegularDigestBuilder
+
+RegularDigest構造を構築。
+
+```python
+class RegularDigestBuilder:
+    @staticmethod
+    def build(
+        level: str,
+        new_digest_name: str,
+        digest_num: str,
+        shadow_digest: OverallDigestData,
+        individual_digests: List[IndividualDigestData]
+    ) -> RegularDigestData
+```
+
+**出力構造**:
+```python
+{
+    "metadata": {
+        "digest_level": level,
+        "digest_number": digest_num,
+        "last_updated": datetime.now().isoformat(),
+        "version": DIGEST_FORMAT_VERSION
+    },
+    "overall_digest": {
+        "name": new_digest_name,
+        "timestamp": datetime.now().isoformat(),
+        "source_files": source_files,
+        "digest_type": shadow_digest.get("digest_type", "統合"),
+        "keywords": shadow_digest.get("keywords", []),
+        "abstract": shadow_digest.get("abstract", ""),
+        "impression": shadow_digest.get("impression", "")
+    },
+    "individual_digests": individual_digests
+}
+```
+
+#### DigestPersistence
+
+RegularDigestの保存、GrandDigest更新、カスケード処理を担当。
+
+```python
+class DigestPersistence:
+    def __init__(
+        self,
+        config: DigestConfig,
+        grand_digest_manager: GrandDigestManager,
+        shadow_manager: ShadowGrandDigestManager,
+        times_tracker: DigestTimesTracker
+    ): ...
+```
+
+| メソッド | 説明 | 例外 |
+|---------|------|------|
+| `save_regular_digest(level, regular_digest, new_digest_name) -> Path` | RegularDigestをファイルに保存 | `FileIOError`, `ValidationError`（上書きキャンセル時） |
+| `update_grand_digest(level, regular_digest, new_digest_name) -> None` | GrandDigestを更新 | `DigestError` |
+| `process_cascade_and_cleanup(level, source_files, provisional_file_to_delete) -> None` | カスケード処理とProvisional削除 | - |
+
+**save_regular_digest動作**:
+1. 既存ファイルがあれば上書き確認（対話/非対話モード対応）
+2. `{digests_path}/{level_dir}/{new_digest_name}.txt`に保存
 
 ### 時間追跡（application/tracking/）
 
-| クラス | 説明 |
-|--------|------|
-| `DigestTimesTracker` | last_digest_times.json管理 |
+#### DigestTimesTracker
+
+last_digest_times.json管理クラス。
+
+```python
+class DigestTimesTracker:
+    def __init__(self, config: DigestConfig): ...
+```
+
+| メソッド | 説明 | 戻り値 |
+|---------|------|--------|
+| `load_or_create() -> DigestTimesData` | 最終ダイジェスト生成時刻を読み込み | DigestTimesData |
+| `extract_file_numbers(level, input_files) -> List[str]` | ファイル名から連番を抽出（ゼロ埋め維持） | プレフィックス付き連番リスト |
+| `save(level, input_files=None) -> None` | 最終生成時刻と処理済みファイル番号を保存 | - |
+
+**save動作**:
+1. 既存データを読み込み
+2. `input_files`から最後のファイル番号を抽出
+3. `{level: {timestamp: ISO8601, last_processed: "W0005"}}`形式で保存
 
 ---
 
@@ -509,6 +673,8 @@ class DigestConfig:
 ```
 
 #### プロパティ（パス関連）
+
+> 📖 パス用語の定義は [GLOSSARY.md](../GLOSSARY.md#基本概念) を参照
 
 | プロパティ | 型 | 説明 |
 |-----------|-----|------|
@@ -587,3 +753,4 @@ python -c "from interfaces import DigestFinalizerFromShadow; print('OK')"
 - [CONTRIBUTING.md](../../CONTRIBUTING.md) - 開発参加ガイド
 
 ---
+**EpisodicRAG** by Weave | [GitHub](https://github.com/Bizuayeu/Plugins-Weave) | [Issues](https://github.com/Bizuayeu/Plugins-Weave/issues)

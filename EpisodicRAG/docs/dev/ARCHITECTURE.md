@@ -53,7 +53,7 @@
 │   ├── application/                     # ユースケース
 │   ├── interfaces/                      # エントリーポイント
 │   ├── config.py                        # 設定管理クラス
-│   └── test/                            # テスト（496テスト）
+│   └── test/                            # テスト（556テスト）
 ├── data/                                # Plugin内データ（@digest-setupで作成）
 │   ├── Loops/                           # Loopファイル配置先
 │   ├── Digests/                         # Digest出力先
@@ -133,6 +133,27 @@ application/      ← domain/ + infrastructure/
 interfaces/       ← application/
 ```
 
+```mermaid
+graph BT
+    subgraph "Interfaces層"
+        I[interfaces/]
+    end
+    subgraph "Application層"
+        A[application/]
+    end
+    subgraph "Infrastructure層"
+        INF[infrastructure/]
+    end
+    subgraph "Domain層"
+        D[domain/]
+    end
+
+    I --> A
+    A --> INF
+    A --> D
+    INF --> D
+```
+
 ### 推奨インポートパス
 
 ```python
@@ -176,6 +197,16 @@ DigestAnalyzerで並列分析
 ShadowGrandDigest.txt更新（digestフィールド埋め込み）
   ↓ (short版)
 Provisional Digest保存（次階層用individual）
+```
+
+```mermaid
+flowchart TD
+    A[新しいLoopファイル配置] --> B["/digest コマンド実行"]
+    B --> C["ShadowGrandDigest.weeklyに<br/>プレースホルダー追加"]
+    C --> D[DigestAnalyzer並列起動]
+    D --> E{出力タイプ}
+    E -->|long版| F[ShadowGrandDigest.txt更新]
+    E -->|short版| G[Provisional Digest保存]
 ```
 
 ### 2. Digest確定フロー
@@ -230,9 +261,23 @@ Decadal (3個) → Multi-decadal Digest
 Multi-decadal (4個) → Centurial Digest
 ```
 
+```mermaid
+flowchart LR
+    L["Loop x5"] --> W[Weekly]
+    W --> |x5| M[Monthly]
+    M --> |x3| Q[Quarterly]
+    Q --> |x4| A[Annual]
+    A --> |x3| T[Triennial]
+    T --> |x3| D[Decadal]
+    D --> |x3| MD[Multi-decadal]
+    MD --> |x4| C[Centurial]
+```
+
 ---
 
 ## パス解決の仕組み
+
+> 📖 パス用語の定義は [GLOSSARY.md](../GLOSSARY.md#基本概念) を参照。ここでは実装詳細を説明します。
 
 ### config.pyの役割
 
@@ -357,7 +402,7 @@ python -m unittest discover -s test -v
 | Interfaces層 | 3 | 40+ |
 | Integration | 2 | 60+ |
 
-**合計**: **496テスト**
+**合計**: **556テスト**
 
 ---
 
@@ -399,3 +444,4 @@ DigestAnalyzerエージェントをベースに、カスタム分析ロジック
 - **API リファレンス**: [API_REFERENCE.md](API_REFERENCE.md)
 
 ---
+**EpisodicRAG** by Weave | [GitHub](https://github.com/Bizuayeu/Plugins-Weave) | [Issues](https://github.com/Bizuayeu/Plugins-Weave/issues)
