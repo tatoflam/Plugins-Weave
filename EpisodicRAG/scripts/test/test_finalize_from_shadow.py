@@ -18,6 +18,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from finalize_from_shadow import DigestFinalizerFromShadow
 from utils import get_next_digest_number
+from exceptions import ValidationError, DigestError
 
 
 class TestGetNextDigestNumber(unittest.TestCase):
@@ -124,36 +125,36 @@ class TestDigestFinalizerFromShadow(unittest.TestCase):
         shutil.rmtree(self.temp_dir)
 
     def test_validate_shadow_content_valid(self):
-        """正常なsource_filesの検証"""
+        """正常なsource_filesの検証（例外なしで成功）"""
         source_files = ["Loop0001_test.txt", "Loop0002_test.txt"]
-        result = self.finalizer.validate_shadow_content("weekly", source_files)
-        self.assertTrue(result)
+        # 例外が発生しなければ成功
+        self.finalizer.validate_shadow_content("weekly", source_files)
 
     def test_validate_shadow_content_empty(self):
-        """空のsource_filesでFalse"""
-        result = self.finalizer.validate_shadow_content("weekly", [])
-        self.assertFalse(result)
+        """空のsource_filesでValidationError"""
+        with self.assertRaises(ValidationError):
+            self.finalizer.validate_shadow_content("weekly", [])
 
     def test_validate_shadow_content_not_list(self):
-        """リストでない場合False"""
-        result = self.finalizer.validate_shadow_content("weekly", "not a list")
-        self.assertFalse(result)
+        """リストでない場合ValidationError"""
+        with self.assertRaises(ValidationError):
+            self.finalizer.validate_shadow_content("weekly", "not a list")
 
     def test_validate_shadow_content_invalid_filename(self):
-        """無効なファイル名形式でFalse"""
+        """無効なファイル名形式でValidationError"""
         source_files = ["invalid_file.txt"]
-        result = self.finalizer.validate_shadow_content("weekly", source_files)
-        self.assertFalse(result)
+        with self.assertRaises(ValidationError):
+            self.finalizer.validate_shadow_content("weekly", source_files)
 
     def test_finalize_empty_title(self):
-        """空タイトルでFalse"""
-        result = self.finalizer.finalize_from_shadow("weekly", "")
-        self.assertFalse(result)
+        """空タイトルでValidationError"""
+        with self.assertRaises(ValidationError):
+            self.finalizer.finalize_from_shadow("weekly", "")
 
     def test_finalize_no_shadow(self):
-        """Shadowがない場合False"""
-        result = self.finalizer.finalize_from_shadow("weekly", "Test Title")
-        self.assertFalse(result)
+        """ShadowがないでDigestError"""
+        with self.assertRaises(DigestError):
+            self.finalizer.finalize_from_shadow("weekly", "Test Title")
 
 
 class TestDigestFinalizerIntegration(unittest.TestCase):
@@ -298,10 +299,8 @@ class TestDigestFinalizerIntegration(unittest.TestCase):
         """finalize_from_shadowがRegularDigestファイルを作成する"""
         finalizer = self._create_finalizer()
 
-        # Shadowから取得したデータでfinalize
-        result = finalizer.finalize_from_shadow("weekly", "TestDigest")
-
-        self.assertTrue(result)
+        # Shadowから取得したデータでfinalize（例外なしで成功）
+        finalizer.finalize_from_shadow("weekly", "TestDigest")
 
         # RegularDigestファイルが作成されたことを確認
         weekly_dir = self.digests_path / "1_Weekly"
@@ -319,8 +318,8 @@ class TestDigestFinalizerIntegration(unittest.TestCase):
         """finalize_from_shadowがGrandDigestを更新する"""
         finalizer = self._create_finalizer()
 
-        result = finalizer.finalize_from_shadow("weekly", "TestDigest")
-        self.assertTrue(result)
+        # 例外なしで成功
+        finalizer.finalize_from_shadow("weekly", "TestDigest")
 
         # GrandDigest.txtが更新されたことを確認
         with open(self.essences_path / "GrandDigest.txt", 'r', encoding='utf-8') as f:
@@ -334,8 +333,8 @@ class TestDigestFinalizerIntegration(unittest.TestCase):
         """finalize_from_shadowがlast_digest_timesを更新する"""
         finalizer = self._create_finalizer()
 
-        result = finalizer.finalize_from_shadow("weekly", "TestDigest")
-        self.assertTrue(result)
+        # 例外なしで成功
+        finalizer.finalize_from_shadow("weekly", "TestDigest")
 
         # last_digest_times.jsonが更新されたことを確認（.claude-pluginディレクトリ）
         with open(self.config_dir / "last_digest_times.json", 'r', encoding='utf-8') as f:
@@ -348,8 +347,8 @@ class TestDigestFinalizerIntegration(unittest.TestCase):
         """finalize_from_shadowがShadowカスケード更新を実行する"""
         finalizer = self._create_finalizer()
 
-        result = finalizer.finalize_from_shadow("weekly", "TestDigest")
-        self.assertTrue(result)
+        # 例外なしで成功
+        finalizer.finalize_from_shadow("weekly", "TestDigest")
 
         # ShadowGrandDigest.txtが更新されたことを確認
         with open(self.essences_path / "ShadowGrandDigest.txt", 'r', encoding='utf-8') as f:
@@ -365,9 +364,8 @@ class TestDigestFinalizerIntegration(unittest.TestCase):
         finalizer = self._create_finalizer()
 
         # Provisionalファイルは作成しない（setUpで作成されていない）
-        result = finalizer.finalize_from_shadow("weekly", "AutoGenTest")
-
-        self.assertTrue(result)
+        # 例外なしで成功
+        finalizer.finalize_from_shadow("weekly", "AutoGenTest")
 
         # RegularDigestが作成されたことを確認
         weekly_dir = self.digests_path / "1_Weekly"

@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.4] - 2025-11-27
+
+### Changed
+- **リファクタリング Phase 3**: 例外処理の完全移行
+  - `exceptions.py` の例外クラス（`ValidationError`, `DigestError`, `FileIOError`）を実際に使用開始
+  - `grand_digest.py`: 3箇所の `log_error()` → `raise DigestError()` に置換
+  - `finalize_from_shadow.py`: 12箇所の `log_error()` → 適切な例外に置換、`main()` に例外ハンドラ追加
+  - `save_provisional_digest.py`: 2箇所の `log_error()` → `raise FileIOError()` に置換、`EpisodicRAGError` ハンドラ追加
+  - 各メソッドの戻り値を `bool`/`Optional` から例外ベースに変更
+  - 関連テストを `assertFalse()` → `assertRaises()` に更新
+
+### Notes
+- Phase 4（finalize_from_shadow.py のFacade分割）は今後のリリースで実施予定
+
+---
+
 ## [1.1.3] - 2025-11-27
 
 ### Added
@@ -23,7 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `finalize_from_shadow.py`: 4箇所の `isinstance()` → `is_valid_dict()`/`is_valid_list()` に置換
 
 ### Notes
-- Phase 3（例外処理の完全移行）、Phase 4（Facade分割）は今後のリリースで実施予定
+- Phase 3, Phase 4 は v1.1.4 で実施
 
 ---
 

@@ -32,6 +32,7 @@ from config import DigestConfig, LEVEL_CONFIG, extract_file_number, format_diges
 from utils import log_info, log_error, log_warning, save_json, get_next_digest_number
 from __version__ import DIGEST_FORMAT_VERSION
 from validators import is_valid_dict, is_valid_list
+from exceptions import EpisodicRAGError, FileIOError
 
 
 class ProvisionalDigestSaver:
@@ -106,11 +107,9 @@ class ProvisionalDigestSaver:
             with open(file_path, 'r', encoding='utf-8') as f:
                 return json.load(f)
         except json.JSONDecodeError as e:
-            log_error(f"Invalid JSON in {file_path}: {e}")
-            raise
+            raise FileIOError(f"Invalid JSON in {file_path}: {e}")
         except IOError as e:
-            log_error(f"Failed to read {file_path}: {e}")
-            raise
+            raise FileIOError(f"Failed to read {file_path}: {e}")
 
     def merge_individual_digests(
         self,
@@ -334,6 +333,8 @@ Examples:
     except json.JSONDecodeError as e:
         log_error(f"Invalid JSON format: {e}", exit_code=1)
     except ValueError as e:
+        log_error(str(e), exit_code=1)
+    except EpisodicRAGError as e:
         log_error(str(e), exit_code=1)
     except OSError as e:
         log_error(f"File I/O error: {e}", exit_code=1)

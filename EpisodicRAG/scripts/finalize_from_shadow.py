@@ -53,6 +53,7 @@ from utils import sanitize_filename, log_info, log_error, log_warning, save_json
 from shadow_grand_digest import ShadowGrandDigestManager
 from __version__ import DIGEST_FORMAT_VERSION
 from validators import is_valid_dict, is_valid_list
+from exceptions import EpisodicRAGError, ValidationError, DigestError, FileIOError
 
 
 class DigestFinalizerFromShadow:
@@ -91,28 +92,28 @@ class DigestFinalizerFromShadow:
         self.level_config = LEVEL_CONFIG
 
 
-    def validate_shadow_content(self, level: str, source_files: list) -> bool:
+    def validate_shadow_content(self, level: str, source_files: list) -> None:
         """
         ShadowGrandDigestの内容が妥当かチェック
 
         - source_filesがlist型であること
         - source_filesが空でないこと
         - ファイル名が連番になっていること（警告のみ、継続可能）
+
+        Raises:
+            ValidationError: source_filesの形式が不正な場合
         """
         # 型チェック
         if not is_valid_list(source_files):
-            log_error(f"source_files must be a list, got {type(source_files).__name__}")
-            return False
+            raise ValidationError(f"source_files must be a list, got {type(source_files).__name__}")
 
         if not source_files:
-            log_error(f"Shadow digest for level '{level}' has no source files")
-            return False
+            raise ValidationError(f"Shadow digest for level '{level}' has no source files")
 
         # ファイル名の型チェック
         for i, filename in enumerate(source_files):
             if not isinstance(filename, str):
-                log_error(f"Invalid filename at index {i}: expected str, got {type(filename).__name__}")
-                return False
+                raise ValidationError(f"Invalid filename at index {i}: expected str, got {type(filename).__name__}")
 
         # ファイル名から番号を抽出（共通関数を使用）
         numbers = []
@@ -121,8 +122,7 @@ class DigestFinalizerFromShadow:
             if result:
                 numbers.append(result[1])
             else:
-                log_error(f"Invalid filename format: {filename}")
-                return False
+                raise ValidationError(f"Invalid filename format: {filename}")
 
         # 連番チェック
         numbers.sort()
@@ -133,13 +133,12 @@ class DigestFinalizerFromShadow:
                 print(f"  Numbers: {numbers}")
                 response = input("Continue anyway? (y/n): ")
                 if response.lower() != 'y':
-                    return False
+                    raise ValidationError("User cancelled due to non-consecutive files")
                 break
 
         log_info(f"Shadow validation passed: {len(source_files)} file(s), range: {numbers[0]}-{numbers[-1]}")
-        return True
 
-    def _validate_and_get_shadow(self, level: str, weave_title: str) -> Optional[Dict[str, Any]]:
+    def _validate_and_get_shadow(self, level: str, weave_title: str) -> Dict[str, Any]:
         """
         Shadowデータの検証と取得
 
@@ -148,30 +147,30 @@ class DigestFinalizerFromShadow:
             weave_title: タイトル
 
         Returns:
-            検証済みのshadow_digest、失敗時はNone
+            検証済みのshadow_digest
+
+        Raises:
+            ValidationError: weave_titleが空、またはshadow_digestの形式が不正な場合
+            DigestError: shadow_digestが見つからない場合
         """
         # 空文字列チェック
         if not weave_title or not weave_title.strip():
-            log_error("weave_title cannot be empty")
-            return None
+            raise ValidationError("weave_title cannot be empty")
 
         # Shadowからダイジェスト内容を取得
         shadow_digest = self.shadow_manager.get_shadow_digest_for_level(level)
 
         if shadow_digest is None:
-            log_error(f"No shadow digest found for level: {level}")
             log_info("Run 'python shadow_grand_digest.py' to update shadow first")
-            return None
+            raise DigestError(f"No shadow digest found for level: {level}")
 
         if not is_valid_dict(shadow_digest):
-            log_error(f"Invalid shadow digest format: expected dict, got {type(shadow_digest).__name__}")
-            return None
+            raise ValidationError(f"Invalid shadow digest format: expected dict, got {type(shadow_digest).__name__}")
 
         source_files = shadow_digest.get("source_files", [])
 
-        # Shadow内容のバリデーション
-        if not self.validate_shadow_content(level, source_files):
-            return None
+        # Shadow内容のバリデーション（例外を投げる）
+        self.validate_shadow_content(level, source_files)
 
         log_info(f"Shadow digest contains {len(source_files)} source file(s)")
         return shadow_digest
@@ -189,6 +188,10 @@ class DigestFinalizerFromShadow:
 
         Returns:
             (individual_digests, provisional_file_to_delete) のタプル
+
+        Raises:
+            DigestError: Provisionalファイルのフォーマットが不正な場合
+            FileIOError: Provisionalファイルの読み込みに失敗した場合
         """
         level_cfg = self.level_config[level]
         provisional_dir = self.config.get_provisional_dir(level)
@@ -202,17 +205,14 @@ class DigestFinalizerFromShadow:
                 with open(provisional_path, 'r', encoding='utf-8') as f:
                     provisional_data = json.load(f)
                     if not is_valid_dict(provisional_data):
-                        log_error(f"Invalid format in {provisional_path.name}: expected dict")
-                        return [], None
+                        raise DigestError(f"Invalid format in {provisional_path.name}: expected dict")
                     individual_digests = provisional_data.get("individual_digests", [])
                 log_info(f"Loaded {len(individual_digests)} individual digests from {provisional_path.name}")
                 provisional_file_to_delete = provisional_path
             except json.JSONDecodeError as e:
-                log_error(f"Invalid JSON in {provisional_path.name}: {e}")
-                return [], None
+                raise FileIOError(f"Invalid JSON in {provisional_path.name}: {e}")
             except IOError as e:
-                log_error(f"Failed to read {provisional_path}: {e}")
-                return [], None
+                raise FileIOError(f"Failed to read {provisional_path}: {e}")
         else:
             # Provisionalファイルが存在しない場合、source_filesから自動生成
             log_info("No Provisional digest found, generating from source files...")
@@ -308,7 +308,7 @@ class DigestFinalizerFromShadow:
 
     def _save_regular_digest(
         self, level: str, regular_digest: Dict[str, Any], new_digest_name: str
-    ) -> Optional[Path]:
+    ) -> Path:
         """
         RegularDigestをファイルに保存
 
@@ -318,7 +318,11 @@ class DigestFinalizerFromShadow:
             new_digest_name: 新しいダイジェスト名
 
         Returns:
-            保存先のPath、失敗時はNone
+            保存先のPath
+
+        Raises:
+            FileIOError: ファイルの保存に失敗した場合
+            ValidationError: ユーザーが上書きをキャンセルした場合
         """
         config = self.level_config[level]
         target_dir = self.digests_path / config["dir"]
@@ -332,7 +336,7 @@ class DigestFinalizerFromShadow:
             try:
                 response = input("Overwrite? (y/n): ")
                 if response.lower() != 'y':
-                    return None
+                    raise ValidationError("User cancelled overwrite")
             except EOFError:
                 log_info("Non-interactive mode: overwriting existing file")
 
@@ -340,13 +344,12 @@ class DigestFinalizerFromShadow:
         try:
             save_json(final_path, regular_digest)
         except IOError as e:
-            log_error(f"Failed to save RegularDigest: {e}")
-            return None
+            raise FileIOError(f"Failed to save RegularDigest: {e}")
 
         log_info(f"RegularDigest saved: {final_path}")
         return final_path
 
-    def _update_grand_digest(self, level: str, regular_digest: Dict[str, Any], new_digest_name: str) -> bool:
+    def _update_grand_digest(self, level: str, regular_digest: Dict[str, Any], new_digest_name: str) -> None:
         """
         GrandDigestを更新
 
@@ -355,16 +358,15 @@ class DigestFinalizerFromShadow:
             regular_digest: RegularDigest構造体
             new_digest_name: 新しいダイジェスト名
 
-        Returns:
-            成功時True
+        Raises:
+            DigestError: overall_digestが無効な場合、またはGrandDigest更新に失敗した場合
         """
         print(f"\n[処理2] Updating GrandDigest.txt for {level}")
         overall_digest = regular_digest.get("overall_digest")
         if not overall_digest or not is_valid_dict(overall_digest):
-            log_error("RegularDigest has no valid overall_digest")
-            return False
+            raise DigestError("RegularDigest has no valid overall_digest")
+        # GrandDigestManager.update_digestは例外を投げる（失敗時）
         self.grand_digest_manager.update_digest(level, new_digest_name, overall_digest)
-        return True
 
     def _process_cascade_and_cleanup(
         self, level: str, source_files: list, provisional_file_to_delete: Optional[Path]
@@ -396,7 +398,7 @@ class DigestFinalizerFromShadow:
             except OSError as e:
                 log_warning(f"Failed to remove Provisional digest: {e}")
 
-    def finalize_from_shadow(self, level: str, weave_title: str) -> bool:
+    def finalize_from_shadow(self, level: str, weave_title: str) -> None:
         """
         ShadowGrandDigestからRegularDigestを作成
 
@@ -405,6 +407,11 @@ class DigestFinalizerFromShadow:
         処理3: ShadowGrandDigest更新
         処理4: last_digest_times更新
         処理5: ProvisionalDigest削除
+
+        Raises:
+            ValidationError: 入力データが不正な場合
+            DigestError: ダイジェスト処理に失敗した場合
+            FileIOError: ファイルI/Oに失敗した場合
         """
         print(f"\n{'='*60}")
         print(f"Finalize Digest from Shadow: {level.upper()}")
@@ -413,10 +420,8 @@ class DigestFinalizerFromShadow:
         # ===== 処理1: RegularDigest作成 =====
         print(f"[処理1] Creating RegularDigest from Shadow...")
 
-        # Shadowデータの検証と取得
+        # Shadowデータの検証と取得（例外を投げる）
         shadow_digest = self._validate_and_get_shadow(level, weave_title)
-        if shadow_digest is None:
-            return False
 
         # ダイジェスト番号とファイル名を生成（format_digest_number を使用）
         config = self.level_config[level]
@@ -426,7 +431,7 @@ class DigestFinalizerFromShadow:
         sanitized_title = sanitize_filename(weave_title)
         new_digest_name = f"{formatted_num}_{sanitized_title}"
 
-        # Provisionalの読み込みまたは自動生成
+        # Provisionalの読み込みまたは自動生成（例外を投げる）
         individual_digests, provisional_file_to_delete = self._load_provisional_or_generate(
             level, shadow_digest, digest_num
         )
@@ -436,14 +441,11 @@ class DigestFinalizerFromShadow:
             level, new_digest_name, digest_num, shadow_digest, individual_digests
         )
 
-        # ファイル保存
-        final_path = self._save_regular_digest(level, regular_digest, new_digest_name)
-        if final_path is None:
-            return False
+        # ファイル保存（例外を投げる）
+        self._save_regular_digest(level, regular_digest, new_digest_name)
 
-        # ===== 処理2: GrandDigest更新 =====
-        if not self._update_grand_digest(level, regular_digest, new_digest_name):
-            return False
+        # ===== 処理2: GrandDigest更新（例外を投げる） =====
+        self._update_grand_digest(level, regular_digest, new_digest_name)
 
         # ===== 処理3-5: カスケードとクリーンアップ =====
         source_files = shadow_digest.get("source_files", [])
@@ -452,8 +454,6 @@ class DigestFinalizerFromShadow:
         print(f"\n{'='*60}")
         log_info("Digest finalization completed!")
         print(f"{'='*60}")
-
-        return True
 
 
 def main():
@@ -484,11 +484,12 @@ Example:
 
     args = parser.parse_args()
 
-    # ファイナライザー実行
-    finalizer = DigestFinalizerFromShadow()
-    success = finalizer.finalize_from_shadow(args.level, args.weave_title)
-
-    if not success:
+    try:
+        # ファイナライザー実行
+        finalizer = DigestFinalizerFromShadow()
+        finalizer.finalize_from_shadow(args.level, args.weave_title)
+    except EpisodicRAGError as e:
+        log_error(str(e))
         sys.exit(1)
 
 

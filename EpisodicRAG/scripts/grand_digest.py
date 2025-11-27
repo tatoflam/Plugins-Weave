@@ -12,9 +12,10 @@ from typing import Dict, Any
 
 from config import DigestConfig, LEVEL_NAMES
 from digest_types import OverallDigestData, GrandDigestData
-from utils import log_info, log_error, load_json_with_template, save_json
+from utils import log_info, load_json_with_template, save_json
 from __version__ import DIGEST_FORMAT_VERSION
 from validators import is_valid_dict
+from exceptions import DigestError
 
 
 class GrandDigestManager:
@@ -49,22 +50,29 @@ class GrandDigestManager:
         """GrandDigest.txtを保存"""
         save_json(self.grand_digest_file, data)
 
-    def update_digest(self, level: str, digest_name: str, overall_digest: OverallDigestData) -> bool:
-        """指定レベルのダイジェストを更新"""
+    def update_digest(self, level: str, digest_name: str, overall_digest: OverallDigestData) -> None:
+        """
+        指定レベルのダイジェストを更新
+
+        Args:
+            level: ダイジェストレベル
+            digest_name: ダイジェスト名
+            overall_digest: overall_digestデータ
+
+        Raises:
+            DigestError: GrandDigest.txtのフォーマットが不正、またはレベルが無効な場合
+        """
         grand_data = self.load_or_create()
 
         # 型チェック
         if not is_valid_dict(grand_data):
-            log_error("GrandDigest.txt has invalid format: expected dict")
-            return False
+            raise DigestError("GrandDigest.txt has invalid format: expected dict")
 
         if "major_digests" not in grand_data:
-            log_error("GrandDigest.txt missing 'major_digests' section")
-            return False
+            raise DigestError("GrandDigest.txt missing 'major_digests' section")
 
         if level not in grand_data["major_digests"]:
-            log_error(f"Unknown level: {level}")
-            return False
+            raise DigestError(f"Unknown level: {level}")
 
         # overall_digestを更新（完全なオブジェクトとして保存）
         grand_data["major_digests"][level]["overall_digest"] = overall_digest
@@ -75,4 +83,3 @@ class GrandDigestManager:
         # 保存
         self.save(grand_data)
         log_info(f"Updated GrandDigest.txt for level: {level}")
-        return True

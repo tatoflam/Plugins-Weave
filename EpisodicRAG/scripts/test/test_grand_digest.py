@@ -18,6 +18,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from config import LEVEL_NAMES
 from grand_digest import GrandDigestManager
+from exceptions import DigestError
 
 
 class TestGrandDigestManager(unittest.TestCase):
@@ -65,11 +66,10 @@ class TestGrandDigestManager(unittest.TestCase):
         self.assertEqual(loaded, test_data)
 
     def test_update_digest(self):
-        """ダイジェスト更新"""
+        """ダイジェスト更新（例外なしで成功）"""
         overall = {"digest_type": "test", "keywords": ["a", "b"]}
-        result = self.manager.update_digest("weekly", "W0001_Test", overall)
-
-        self.assertTrue(result)
+        # 例外が発生しなければ成功
+        self.manager.update_digest("weekly", "W0001_Test", overall)
 
         data = self.manager.load_or_create()
         self.assertEqual(
@@ -78,9 +78,9 @@ class TestGrandDigestManager(unittest.TestCase):
         )
 
     def test_update_digest_invalid_level(self):
-        """無効なレベルへの更新"""
-        result = self.manager.update_digest("invalid", "name", {})
-        self.assertFalse(result)
+        """無効なレベルへの更新でDigestError"""
+        with self.assertRaises(DigestError):
+            self.manager.update_digest("invalid", "name", {})
 
 
 if __name__ == "__main__":
