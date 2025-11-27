@@ -45,7 +45,7 @@ description: EpisodicRAG階層的ダイジェスト生成（8層100年）
 - `triennial` `decadal` `multi_decadal` `centurial`
 
 **実行内容**:
-1. ShadowGrandDigest.&lt;type&gt; の内容確認
+1. ShadowGrandDigest.<type> の内容確認
 2. DigestAnalyzerでoverall分析（long版）
 3. Provisional保存（次階層用individual、short版）
 4. タイトル提案とユーザー承認

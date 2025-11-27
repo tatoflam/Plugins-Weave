@@ -1,0 +1,61 @@
+[project]
+name = "episodicrag"
+version = "0.1.0"
+description = "EpisodicRAG - Hierarchical digest generation for long-term memory"
+requires-python = ">=3.10"
+
+# Runtime dependencies (none - uses Python standard library only)
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+]
+
+[tool.pytest.ini_options]
+# テストディレクトリ
+testpaths = ["scripts/test"]
+
+# テストファイルのパターン
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
+# カスタムマーカー
+markers = [
+    "unit: 単体テスト（高速、外部依存なし）",
+    "integration: 統合テスト（ファイルI/O）",
+    "slow: 時間のかかるテスト",
+]
+
+# デフォルトオプション
+addopts = [
+    "-v",
+    "--strict-markers",
+    "--tb=short",
+    "--cov=scripts",
+    "--cov-report=term-missing",
+]
+
+# 非推奨警告を無視
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+]
+
+[tool.coverage.run]
+source = ["scripts"]
+omit = [
+    "scripts/test/*",
+    "*/__pycache__/*",
+    "scripts/conftest.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+]

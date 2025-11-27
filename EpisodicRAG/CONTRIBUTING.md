@@ -221,7 +221,7 @@ scripts/
 ├── application/      # ユースケース（ビジネスロジック実装）
 ├── interfaces/       # エントリーポイント
 ├── config.py         # 設定管理クラス
-└── test/             # テスト（407テスト）
+└── test/             # テスト（556テスト）
 ```
 
 ### 依存関係ルール
@@ -289,7 +289,7 @@ from interfaces import DigestFinalizerFromShadow
 
 ## テスト
 
-### ユニット/統合テスト実行（407テスト）
+### ユニット/統合テスト実行（556テスト）
 
 ```bash
 cd plugins-weave/EpisodicRAG/scripts
@@ -309,7 +309,7 @@ python -c "from interfaces import DigestFinalizerFromShadow; print('OK')"
 
 ### テスト構成
 
-`scripts/test/` に407のユニット/インテグレーションテストがあります。
+`scripts/test/` に536のユニット/インテグレーションテストがあります。
 
 #### ファイル命名規則
 
@@ -396,3 +396,4 @@ git status
 ご協力ありがとうございます！
 
 ---
+**EpisodicRAG** by Weave | [GitHub](https://github.com/Bizuayeu/Plugins-Weave) | [Issues](https://github.com/Bizuayeu/Plugins-Weave/issues)

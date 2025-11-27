@@ -316,4 +316,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-*For more details, see [ARCHITECTURE.md](docs/ARCHITECTURE.md)*
+*For more details, see [ARCHITECTURE.md](docs/dev/ARCHITECTURE.md)*

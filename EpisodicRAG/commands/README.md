@@ -33,7 +33,8 @@
 
 ## See Also
 
-- [GUIDE.md](../docs/GUIDE.md) - コマンドの詳しい使い方
+- [GUIDE.md](../docs/user/GUIDE.md) - コマンドの詳しい使い方
 - [GLOSSARY.md](../docs/GLOSSARY.md) - 用語集
 
 ---
+**EpisodicRAG** by Weave | [GitHub](https://github.com/Bizuayeu/Plugins-Weave) | [Issues](https://github.com/Bizuayeu/Plugins-Weave/issues)
