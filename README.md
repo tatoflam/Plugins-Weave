@@ -29,6 +29,8 @@ EpisodicRAG は、会話ログ（Loop ファイル）を階層的にダイジェ
 |------------|---------------------|
 | 🚀 **初めて使う** | [QUICKSTART](EpisodicRAG/docs/user/QUICKSTART.md) → [GLOSSARY](EpisodicRAG/docs/GLOSSARY.md) |
 | 📘 **日常的に使う** | [GUIDE](EpisodicRAG/docs/user/GUIDE.md) |
+| 🔧 **設定をカスタマイズしたい** | [digest-config](EpisodicRAG/skills/digest-config/SKILL.md) |
+| 📊 **統計・状態を確認したい** | [digest-auto](EpisodicRAG/skills/digest-auto/SKILL.md) |
 | ❓ **問題が発生した** | [FAQ](EpisodicRAG/docs/user/FAQ.md) → [TROUBLESHOOTING](EpisodicRAG/docs/user/TROUBLESHOOTING.md) |
 | 🛠️ **開発に参加する** | [CONTRIBUTING](EpisodicRAG/CONTRIBUTING.md) → [ARCHITECTURE](EpisodicRAG/docs/dev/ARCHITECTURE.md) |
 | 🤖 **AI/Claude 仕様** | [AI Spec Hub](EpisodicRAG/docs/README.md) |
