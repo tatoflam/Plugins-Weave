@@ -8,6 +8,7 @@ pytestスタイルに移行済み
 """
 
 import sys
+from datetime import datetime
 from pathlib import Path
 from unittest.mock import MagicMock
 
@@ -99,5 +100,9 @@ class TestDigestTimesTracker:
 
         data = tracker.load_or_create()
 
-        assert data["weekly"]["timestamp"] != ""
-        assert data["weekly"]["timestamp"] is not None
+        timestamp_str = data["weekly"]["timestamp"]
+        assert timestamp_str is not None
+        assert timestamp_str != ""
+        # ISO形式であることを検証（無効な形式は例外を発生）
+        timestamp = datetime.fromisoformat(timestamp_str)
+        assert timestamp is not None

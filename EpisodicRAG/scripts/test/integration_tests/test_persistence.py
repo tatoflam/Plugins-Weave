@@ -199,7 +199,9 @@ class TestDigestPersistenceProcessCascadeAndCleanup:
 
         # times_trackerを確認
         times_data = times_tracker.load_or_create()
-        assert times_data["weekly"]["last_processed"] is not None
+        # last_processed は整数で、処理されたLoop番号を表す
+        assert isinstance(times_data["weekly"]["last_processed"], int)
+        assert times_data["weekly"]["last_processed"] == 2  # Loop0002が最後
 
     @pytest.mark.integration
     def test_removes_provisional_file(self, persistence, config):

@@ -370,7 +370,9 @@ class TestE2EFullWorkflow:
 
         # last_digest_timesが更新された
         times_data = times_tracker.load_or_create()
-        assert times_data["weekly"]["last_processed"] is not None
+        # last_processed は整数で、処理されたLoop番号を表す
+        assert isinstance(times_data["weekly"]["last_processed"], int)
+        assert times_data["weekly"]["last_processed"] == 5  # Loop0001-Loop0005を処理
 
     @pytest.mark.integration
     def test_multiple_weekly_cycles(self, full_env):
