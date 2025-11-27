@@ -8,15 +8,16 @@ ShadowGrandDigest.txtの読み書きを担当
 
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, Any, Callable
+from typing import Callable
 
+from domain.types import ShadowDigestData
 from infrastructure import load_json_with_template, save_json
 
 
 class ShadowIO:
     """ShadowGrandDigest I/Oクラス"""
 
-    def __init__(self, shadow_digest_file: Path, template_factory: Callable[[], Dict[str, Any]]):
+    def __init__(self, shadow_digest_file: Path, template_factory: Callable[[], ShadowDigestData]):
         """
         初期化
 
@@ -27,7 +28,7 @@ class ShadowIO:
         self.shadow_digest_file = shadow_digest_file
         self.template_factory = template_factory
 
-    def load_or_create(self) -> Dict[str, Any]:
+    def load_or_create(self) -> ShadowDigestData:
         """
         ShadowGrandDigestを読み込む。存在しなければ作成
 
@@ -40,7 +41,7 @@ class ShadowIO:
             log_message="ShadowGrandDigest.txt not found. Creating new file."
         )
 
-    def save(self, data: Dict[str, Any]) -> None:
+    def save(self, data: ShadowDigestData) -> None:
         """
         ShadowGrandDigestを保存
 

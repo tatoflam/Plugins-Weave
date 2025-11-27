@@ -1,4 +1,4 @@
-[Home](../../README.md) > [Docs](../README.md) > QUICKSTART
+[Docs](../README.md) > QUICKSTART
 
 # 5分クイックスタート
 

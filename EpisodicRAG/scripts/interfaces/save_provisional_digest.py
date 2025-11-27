@@ -21,7 +21,7 @@ import io
 import argparse
 from pathlib import Path
 from datetime import datetime
-from typing import List, Dict, Any, Optional
+from typing import List, Optional
 
 # Windows環境でUTF-8出力を有効化（CLI実行時のみ）
 if sys.platform == 'win32' and __name__ == "__main__":
@@ -32,6 +32,7 @@ if sys.platform == 'win32' and __name__ == "__main__":
 from domain.constants import LEVEL_CONFIG
 from domain.version import DIGEST_FORMAT_VERSION
 from domain.exceptions import EpisodicRAGError, FileIOError
+from domain.types import IndividualDigestData, ProvisionalDigestFile
 
 # Infrastructure層
 from infrastructure import log_info, log_error, log_warning, save_json, load_json
@@ -91,7 +92,7 @@ class ProvisionalDigestSaver:
 
         return max_num if max_num > 0 else None
 
-    def load_existing_provisional(self, level: str, digest_num: int) -> Optional[Dict[str, Any]]:
+    def load_existing_provisional(self, level: str, digest_num: int) -> Optional[ProvisionalDigestFile]:
         """
         既存のProvisionalDigestファイルを読み込み
 
@@ -118,9 +119,9 @@ class ProvisionalDigestSaver:
 
     def merge_individual_digests(
         self,
-        existing_digests: List[Dict[str, Any]],
-        new_digests: List[Dict[str, Any]]
-    ) -> List[Dict[str, Any]]:
+        existing_digests: List[IndividualDigestData],
+        new_digests: List[IndividualDigestData]
+    ) -> List[IndividualDigestData]:
         """
         既存と新規のindividual_digestsをマージ（重複はsource_fileで判定し上書き）
 
@@ -158,7 +159,7 @@ class ProvisionalDigestSaver:
     def save_provisional(
         self,
         level: str,
-        individual_digests: List[Dict[str, Any]],
+        individual_digests: List[IndividualDigestData],
         append: bool = False
     ) -> Path:
         """
@@ -231,7 +232,7 @@ class ProvisionalDigestSaver:
 
         return file_path
 
-    def load_individual_digests(self, input_data: str) -> List[Dict[str, Any]]:
+    def load_individual_digests(self, input_data: str) -> List[IndividualDigestData]:
         """
         individual_digestsをJSONファイルまたはJSON文字列から読み込む
 
@@ -316,22 +317,18 @@ Examples:
         # ProvisionalDigestを保存
         saved_path = saver.save_provisional(args.level, individual_digests, append=args.append)
 
-        print("")
-        print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-        print("✅ ProvisionalDigest保存完了")
-        print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-        print("")
-        print(f"保存先: {saved_path}")
-        print(f"個別ダイジェスト数: {len(individual_digests)}")
+        log_info("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+        log_info("ProvisionalDigest saved successfully")
+        log_info("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+        log_info(f"Path: {saved_path}")
+        log_info(f"Individual digests: {len(individual_digests)}")
         if args.append:
-            print(f"モード: 追加モード（既存ファイルにマージ）")
+            log_info("Mode: Append (merged with existing file)")
         else:
-            print(f"モード: 新規作成")
-        print("")
-        print("次のステップ:")
-        print(f"  python finalize_from_shadow.py {args.level} \"タイトル\"")
-        print("")
-        print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+            log_info("Mode: New file")
+        log_info("Next step:")
+        log_info(f'  python finalize_from_shadow.py {args.level} "TITLE"')
+        log_info("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
 
     except FileNotFoundError as e:
         log_error(f"File not found: {e}", exit_code=1)

@@ -101,10 +101,10 @@ class FileAppender:
                 overall = {}
 
             log_info(f"Read digest content from {file_path.name}")
-            print(f"      - digest_type: {overall.get('digest_type', 'N/A')}")
-            print(f"      - keywords: {len(overall.get('keywords', []))} items")
-            print(f"      - abstract: {len(overall.get('abstract', ''))} chars")
-            print(f"      - impression: {len(overall.get('impression', ''))} chars")
+            log_info(f"      - digest_type: {overall.get('digest_type', 'N/A')}")
+            log_info(f"      - keywords: {len(overall.get('keywords', []))} items")
+            log_info(f"      - abstract: {len(overall.get('abstract', ''))} chars")
+            log_info(f"      - impression: {len(overall.get('impression', ''))} chars")
 
         except json.JSONDecodeError:
             log_warning(f"Failed to parse {file_path.name} as JSON")
@@ -132,7 +132,7 @@ class FileAppender:
         for file_path in new_files:
             if file_path.name not in existing_files:
                 overall_digest["source_files"].append(file_path.name)
-                print(f"  + {file_path.name}")
+                log_info(f"  + {file_path.name}")
 
                 # Monthly以上: Digestファイルの内容を読み込んでログ出力
                 if source_type != "loops":

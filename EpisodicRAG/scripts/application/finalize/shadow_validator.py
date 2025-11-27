@@ -6,10 +6,9 @@ Shadow Validator
 ShadowGrandDigestの内容を検証するクラス
 """
 
-from typing import Dict, Any
-
 from config import extract_file_number
 from application.validators import is_valid_dict, is_valid_list
+from domain.types import OverallDigestData
 from domain.exceptions import ValidationError, DigestError
 from infrastructure import log_info, log_warning
 from application.grand import ShadowGrandDigestManager
@@ -62,8 +61,8 @@ class ShadowValidator:
         for i in range(len(numbers) - 1):
             if numbers[i + 1] != numbers[i] + 1:
                 log_warning("Non-consecutive files detected:")
-                print(f"  Files: {source_files}")
-                print(f"  Numbers: {numbers}")
+                log_warning(f"  Files: {source_files}")
+                log_warning(f"  Numbers: {numbers}")
                 response = input("Continue anyway? (y/n): ")
                 if response.lower() != 'y':
                     raise ValidationError("User cancelled due to non-consecutive files")
@@ -71,7 +70,7 @@ class ShadowValidator:
 
         log_info(f"Shadow validation passed: {len(source_files)} file(s), range: {numbers[0]}-{numbers[-1]}")
 
-    def validate_and_get_shadow(self, level: str, weave_title: str) -> Dict[str, Any]:
+    def validate_and_get_shadow(self, level: str, weave_title: str) -> OverallDigestData:
         """
         Shadowデータの検証と取得
 

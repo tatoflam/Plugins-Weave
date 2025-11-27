@@ -1,3 +1,5 @@
+[EpisodicRAG](../docs/README.md) > Skills
+
 # Skills
 
 AIスキル仕様書

@@ -9,6 +9,7 @@ from typing import Dict, Optional, TYPE_CHECKING
 
 from domain.types import LevelHierarchyEntry, OverallDigestData
 from infrastructure import log_info
+from application.validators import is_valid_dict
 
 from .template import ShadowTemplate
 from .file_detector import FileDetector
@@ -60,7 +61,7 @@ class CascadeProcessor:
         shadow_data = self.shadow_io.load_or_create()
         overall_digest = shadow_data["latest_digests"][level]["overall_digest"]
 
-        if not overall_digest or not overall_digest.get("source_files"):
+        if not is_valid_dict(overall_digest) or not overall_digest.get("source_files"):
             log_info(f"No shadow digest for level: {level}")
             return None
 
@@ -114,7 +115,7 @@ class CascadeProcessor:
         Args:
             level: レベル名
         """
-        print(f"\n[処理3] ShadowGrandDigest cascade for level: {level}")
+        log_info(f"[Step 3] ShadowGrandDigest cascade for level: {level}")
 
         # 1. Shadow → Grand 昇格の確認
         self.promote_shadow_to_grand(level)
@@ -135,4 +136,4 @@ class CascadeProcessor:
         # 4. 現在のレベルのShadowをクリア
         self.clear_shadow_level(level)
 
-        print(f"[処理3] Cascade completed for level: {level}")
+        log_info(f"[Step 3] Cascade completed for level: {level}")

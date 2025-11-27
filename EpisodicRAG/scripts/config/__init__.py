@@ -198,17 +198,18 @@ class DigestConfig:
 
     def show_paths(self):
         """パス設定を表示（デバッグ用）"""
-        print(f"Plugin Root: {self.plugin_root}")
-        print(f"Config File: {self.config_file}")
-        print(f"Base Dir (setting): {self.config.get('base_dir', '.')}")
-        print(f"Base Dir (resolved): {self.base_dir}")
-        print(f"Loops Path: {self.loops_path}")
-        print(f"Digests Path: {self.digests_path}")
-        print(f"Essences Path: {self.essences_path}")
+        from infrastructure import log_info
+        log_info(f"Plugin Root: {self.plugin_root}")
+        log_info(f"Config File: {self.config_file}")
+        log_info(f"Base Dir (setting): {self.config.get('base_dir', '.')}")
+        log_info(f"Base Dir (resolved): {self.base_dir}")
+        log_info(f"Loops Path: {self.loops_path}")
+        log_info(f"Digests Path: {self.digests_path}")
+        log_info(f"Essences Path: {self.essences_path}")
 
         identity_file = self.get_identity_file_path()
         if identity_file:
-            print(f"Identity File: {identity_file}")
+            log_info(f"Identity File: {identity_file}")
 
 
 def main():

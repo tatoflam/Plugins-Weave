@@ -37,6 +37,21 @@ class DigestMetadata(BaseMetadata, total=False):
     source_count: int
 
 
+class DigestMetadataComplete(BaseMetadata, total=False):
+    """
+    ダイジェストファイルの完全なメタデータ
+
+    すべてのダイジェストファイルで使用される統一メタデータ型。
+    Dict[str, Any] の置き換え用。
+    """
+    version: str
+    last_updated: str
+    digest_level: str
+    digest_number: str
+    source_count: int
+    description: str
+
+
 # =============================================================================
 # レベル設定の型定義
 # =============================================================================
@@ -111,7 +126,7 @@ class ShadowDigestData(TypedDict):
     """
     ShadowGrandDigest.txt の全体構造
     """
-    metadata: Dict[str, Any]
+    metadata: DigestMetadataComplete
     latest_digests: Dict[str, ShadowLevelData]
 
 
@@ -126,7 +141,7 @@ class GrandDigestData(TypedDict):
     """
     GrandDigest.txt の全体構造
     """
-    metadata: Dict[str, Any]
+    metadata: DigestMetadataComplete
     major_digests: Dict[str, GrandDigestLevelData]
 
 
@@ -134,7 +149,7 @@ class RegularDigestData(TypedDict):
     """
     Regular Digest ファイル（確定済みDigest）の構造
     """
-    metadata: Dict[str, Any]
+    metadata: DigestMetadataComplete
     overall_digest: OverallDigestData
     individual_digests: List[IndividualDigestData]
 
@@ -204,3 +219,11 @@ class ProvisionalDigestEntry(TypedDict):
     keywords: List[str]
     abstract: str
     impression: str
+
+
+class ProvisionalDigestFile(TypedDict):
+    """
+    Provisional Digest ファイル（_Individual.txt）の全体構造
+    """
+    metadata: DigestMetadataComplete
+    individual_digests: List[IndividualDigestData]

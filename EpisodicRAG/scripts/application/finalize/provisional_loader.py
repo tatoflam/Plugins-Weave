@@ -8,10 +8,11 @@ ProvisionalDigestの読み込みまたはソースファイルからの自動生
 
 import json
 from pathlib import Path
-from typing import Dict, Any, Optional, Tuple, List
+from typing import Optional, Tuple, List
 
 from config import DigestConfig, LEVEL_CONFIG
 from application.validators import is_valid_dict
+from domain.types import OverallDigestData, IndividualDigestData
 from domain.exceptions import DigestError, FileIOError
 from infrastructure import log_info, log_warning, load_json
 from application.grand import ShadowGrandDigestManager
@@ -30,9 +31,27 @@ class ProvisionalLoader:
         self.shadow_manager = shadow_manager
         self.level_config = LEVEL_CONFIG
 
+    def _get_source_path_for_level(self, level: str) -> Path:
+        """
+        指定レベルのソースファイルディレクトリを取得
+
+        Args:
+            level: ダイジェストレベル
+
+        Returns:
+            ソースファイルのディレクトリパス
+        """
+        source_type = self.level_config[level]["source"]
+        if source_type == "loops":
+            return self.config.loops_path
+        else:
+            # 下位レベルのDigestディレクトリ
+            source_level_config = self.level_config[source_type]
+            return self.config.digests_path / source_level_config["dir"]
+
     def load_or_generate(
-        self, level: str, shadow_digest: Dict[str, Any], digest_num: str
-    ) -> Tuple[List[Dict[str, Any]], Optional[Path]]:
+        self, level: str, shadow_digest: OverallDigestData, digest_num: str
+    ) -> Tuple[List[IndividualDigestData], Optional[Path]]:
         """
         Provisionalの読み込みまたはソースから自動生成
 
@@ -52,7 +71,7 @@ class ProvisionalLoader:
         provisional_dir = self.config.get_provisional_dir(level)
         provisional_path = provisional_dir / f"{level_cfg['prefix']}{digest_num}_Individual.txt"
 
-        individual_digests: List[Dict[str, Any]] = []
+        individual_digests: List[IndividualDigestData] = []
         provisional_file_to_delete: Optional[Path] = None
 
         if provisional_path.exists():
@@ -70,8 +89,8 @@ class ProvisionalLoader:
         return individual_digests, provisional_file_to_delete
 
     def generate_from_source(
-        self, level: str, shadow_digest: Dict[str, Any]
-    ) -> List[Dict[str, Any]]:
+        self, level: str, shadow_digest: OverallDigestData
+    ) -> List[IndividualDigestData]:
         """
         ソースファイルからindividual_digestsを自動生成（まだらボケ回避）
 
@@ -82,12 +101,12 @@ class ProvisionalLoader:
         Returns:
             individual_digestsのリスト
         """
-        individual_digests: List[Dict[str, Any]] = []
+        individual_digests: List[IndividualDigestData] = []
         source_files = shadow_digest.get("source_files", [])
 
         for source_file in source_files:
             try:
-                source_dir = self.shadow_manager._get_source_path(level)
+                source_dir = self._get_source_path_for_level(level)
                 source_path = source_dir / source_file
 
                 if source_path.exists() and source_path.suffix == '.txt':

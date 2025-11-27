@@ -129,12 +129,12 @@ class DigestFinalizerFromShadow:
             DigestError: ダイジェスト処理に失敗した場合
             FileIOError: ファイルI/Oに失敗した場合
         """
-        print(f"\n{'='*60}")
-        print(f"Finalize Digest from Shadow: {level.upper()}")
-        print(f"{'='*60}\n")
+        log_info("=" * 60)
+        log_info(f"Finalize Digest from Shadow: {level.upper()}")
+        log_info("=" * 60)
 
         # ===== 処理1: RegularDigest作成 =====
-        print(f"[処理1] Creating RegularDigest from Shadow...")
+        log_info("[Step 1] Creating RegularDigest from Shadow...")
 
         # Shadowデータの検証と取得（例外を投げる）
         shadow_digest = self._validator.validate_and_get_shadow(level, weave_title)
@@ -167,9 +167,9 @@ class DigestFinalizerFromShadow:
         source_files = shadow_digest.get("source_files", [])
         self._persistence.process_cascade_and_cleanup(level, source_files, provisional_file_to_delete)
 
-        print(f"\n{'='*60}")
+        log_info("=" * 60)
         log_info("Digest finalization completed!")
-        print(f"{'='*60}")
+        log_info("=" * 60)
 
 
 def main():

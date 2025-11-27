@@ -213,3 +213,72 @@ class TestShadowValidatorNonConsecutiveFiles:
 
         # エラーなく完了
         validator.validate_shadow_content("weekly", source_files)
+
+
+# =============================================================================
+# エッジケーステスト（追加）
+# =============================================================================
+
+class TestShadowValidatorEdgeCases:
+    """ShadowValidator のエッジケーステスト"""
+
+    @pytest.mark.unit
+    def test_different_file_prefixes_weekly(self, validator):
+        """Weekly用: Loopプレフィックスのファイル"""
+        source_files = ["Loop0001_test.txt", "Loop0002_another.txt"]
+        validator.validate_shadow_content("weekly", source_files)
+
+    @pytest.mark.unit
+    def test_different_file_prefixes_monthly(self, validator):
+        """Monthly用: Wプレフィックスのファイル"""
+        source_files = ["W0001_digest1.txt", "W0002_digest2.txt"]
+        validator.validate_shadow_content("monthly", source_files)
+
+    @pytest.mark.unit
+    def test_different_file_prefixes_quarterly(self, validator):
+        """Quarterly用: Mプレフィックスのファイル"""
+        source_files = ["M001_digest1.txt", "M002_digest2.txt"]
+        validator.validate_shadow_content("quarterly", source_files)
+
+    @pytest.mark.unit
+    def test_large_file_numbers(self, validator):
+        """大きなファイル番号を処理"""
+        source_files = ["Loop9998_test.txt", "Loop9999_final.txt"]
+        validator.validate_shadow_content("weekly", source_files)
+
+    @pytest.mark.unit
+    def test_source_files_with_none_raises(self, validator):
+        """source_filesにNoneが含まれる場合はValidationError"""
+        with pytest.raises(ValidationError) as exc_info:
+            validator.validate_shadow_content("weekly", [None, "Loop0001.txt"])
+        assert "expected str" in str(exc_info.value)
+
+    @pytest.mark.unit
+    def test_mixed_valid_invalid_filenames(self, validator):
+        """有効と無効のファイル名が混在する場合"""
+        with pytest.raises(ValidationError) as exc_info:
+            validator.validate_shadow_content("weekly", ["Loop0001_test.txt", "bad.txt"])
+        assert "Invalid filename format" in str(exc_info.value)
+
+    @pytest.mark.unit
+    def test_unicode_in_filename_suffix(self, validator):
+        """ファイル名に日本語が含まれる場合"""
+        source_files = ["Loop0001_テスト会話.txt", "Loop0002_別の会話.txt"]
+        validator.validate_shadow_content("weekly", source_files)
+
+    @pytest.mark.integration
+    def test_validate_and_get_shadow_with_multiple_files(
+        self, validator, shadow_manager, temp_plugin_env
+    ):
+        """複数ファイルを含むshadow_digestを検証"""
+        from test_helpers import create_test_loop_file
+
+        # 複数のLoopファイルを作成
+        for i in range(1, 4):
+            create_test_loop_file(temp_plugin_env.loops_path, i, f"test_{i}")
+        shadow_manager.update_shadow_for_new_loops()
+
+        result = validator.validate_and_get_shadow("weekly", "Test Title")
+
+        assert result is not None
+        assert len(result["source_files"]) == 3

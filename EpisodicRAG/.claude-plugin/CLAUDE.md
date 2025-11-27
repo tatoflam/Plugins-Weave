@@ -8,7 +8,7 @@
 
 EpisodicRAGは、会話ログ（Loopファイル）を階層的にダイジェスト化し、長期記憶として構造化・継承するシステムです。8階層（Weekly → Centurial、約108年分）の記憶を自動管理します。
 
-**バージョン**: 1.1.7+
+**バージョン**: 2.0.0+
 **ファイルフォーマット**: 1.0
 
 ---
@@ -100,6 +100,30 @@ EpisodicRAG/
 
 ---
 
+## Clean Architecture (v2.0.0+)
+
+スクリプトは4層アーキテクチャで構成されています：
+
+| 層 | ディレクトリ | 役割 |
+|----|-------------|------|
+| Domain | `scripts/domain/` | コアビジネスロジック（定数、型、例外） |
+| Infrastructure | `scripts/infrastructure/` | 外部関心事（JSON操作、ファイルスキャン） |
+| Application | `scripts/application/` | ユースケース（Shadow管理、GrandDigest管理） |
+| Interfaces | `scripts/interfaces/` | エントリーポイント |
+
+### 推奨インポートパス
+
+```python
+from domain import LEVEL_CONFIG, __version__
+from application.validators import validate_dict
+from interfaces import DigestFinalizerFromShadow
+```
+
+> ⚠️ v2.0.0でClean Architecture移行に伴い、旧インポートパス（`from validators import ...`等）は動作しません。
+> 📖 詳細は [ARCHITECTURE.md](../docs/dev/ARCHITECTURE.md) を参照
+
+---
+
 ## 主要ファイル参照
 
 | 目的 | ファイル |
@@ -128,4 +152,4 @@ EpisodicRAG/
 
 ---
 
-*このファイルは EpisodicRAG Plugin v1.1.7+ に対応しています。*
+*このファイルは EpisodicRAG Plugin v2.0.0+ に対応しています。*

@@ -63,21 +63,9 @@ class TestShadowGrandDigestManager(unittest.TestCase):
         """一時ディレクトリを削除"""
         shutil.rmtree(self.temp_dir)
 
-    def test_get_template_structure(self):
-        """テンプレートの構造確認"""
-        template = self.manager.get_template()
-
-        self.assertIn("metadata", template)
-        self.assertIn("latest_digests", template)
-        self.assertEqual(set(template["latest_digests"].keys()), set(LEVEL_NAMES))
-
-        # 各レベルにoverall_digestがある
-        for level in LEVEL_NAMES:
-            self.assertIn("overall_digest", template["latest_digests"][level])
-
     def test_load_or_create_new_file(self):
         """新規作成時の動作"""
-        data = self.manager.load_or_create()
+        data = self.manager._io.load_or_create()
 
         self.assertTrue(self.manager.shadow_digest_file.exists())
         self.assertIn("metadata", data)
@@ -93,26 +81,14 @@ class TestShadowGrandDigestManager(unittest.TestCase):
         with open(self.manager.shadow_digest_file, 'w', encoding='utf-8') as f:
             json.dump(test_data, f)
 
-        data = self.manager.load_or_create()
+        data = self.manager._io.load_or_create()
 
         self.assertEqual(data["metadata"]["version"], "test")
-
-    def test_create_empty_overall_digest(self):
-        """プレースホルダー付きoverall_digest生成"""
-        overall = self.manager._create_empty_overall_digest()
-
-        self.assertIn("timestamp", overall)
-        self.assertIn("source_files", overall)
-        self.assertIn("keywords", overall)
-        self.assertIn("abstract", overall)
-        self.assertIn("impression", overall)
-        self.assertEqual(overall["source_files"], [])
-        self.assertTrue("PLACEHOLDER" in overall["abstract"])
 
     def test_find_new_files_no_new(self):
         """新しいファイルがない場合"""
         self.mock_tracker.load_or_create.return_value = {}
-        new_files = self.manager.find_new_files("weekly")
+        new_files = self.manager._detector.find_new_files("weekly")
         self.assertEqual(new_files, [])
 
     def test_find_new_files_with_new(self):
@@ -122,7 +98,7 @@ class TestShadowGrandDigestManager(unittest.TestCase):
         (self.loops_path / "Loop0002_test.txt").write_text("{}")
 
         self.mock_tracker.load_or_create.return_value = {}
-        new_files = self.manager.find_new_files("weekly")
+        new_files = self.manager._detector.find_new_files("weekly")
 
         self.assertEqual(len(new_files), 2)
         self.assertTrue(any("Loop0001" in f.name for f in new_files))
@@ -130,13 +106,13 @@ class TestShadowGrandDigestManager(unittest.TestCase):
     def test_clear_shadow_level(self):
         """Shadowレベルのクリア"""
         # まずデータを作成
-        self.manager.load_or_create()
+        self.manager._io.load_or_create()
 
         # クリア
         self.manager.clear_shadow_level("weekly")
 
         # 確認
-        data = self.manager.load_or_create()
+        data = self.manager._io.load_or_create()
         overall = data["latest_digests"]["weekly"]["overall_digest"]
 
         self.assertEqual(overall["source_files"], [])
@@ -144,7 +120,7 @@ class TestShadowGrandDigestManager(unittest.TestCase):
 
     def test_get_shadow_digest_for_level_empty(self):
         """空のShadowダイジェスト取得"""
-        self.manager.load_or_create()
+        self.manager._io.load_or_create()
 
         result = self.manager.get_shadow_digest_for_level("weekly")
 
@@ -153,9 +129,9 @@ class TestShadowGrandDigestManager(unittest.TestCase):
     def test_get_shadow_digest_for_level_with_files(self):
         """ファイルがあるShadowダイジェスト取得"""
         # テストデータを作成
-        data = self.manager.load_or_create()
+        data = self.manager._io.load_or_create()
         data["latest_digests"]["weekly"]["overall_digest"]["source_files"] = ["Loop0001.txt"]
-        self.manager.save(data)
+        self.manager._io.save(data)
 
         result = self.manager.get_shadow_digest_for_level("weekly")
 

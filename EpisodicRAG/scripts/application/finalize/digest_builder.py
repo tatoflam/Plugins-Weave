@@ -7,8 +7,9 @@ RegularDigest構造を構築するクラス
 """
 
 from datetime import datetime
-from typing import Dict, Any, List
+from typing import List
 
+from domain.types import OverallDigestData, IndividualDigestData, RegularDigestData
 from domain.version import DIGEST_FORMAT_VERSION
 
 
@@ -20,9 +21,9 @@ class RegularDigestBuilder:
         level: str,
         new_digest_name: str,
         digest_num: str,
-        shadow_digest: Dict[str, Any],
-        individual_digests: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        shadow_digest: OverallDigestData,
+        individual_digests: List[IndividualDigestData]
+    ) -> RegularDigestData:
         """
         RegularDigest構造を作成
 

@@ -9,6 +9,7 @@ ShadowGrandDigestのテンプレートとプレースホルダー生成を担当
 from datetime import datetime
 from typing import Dict, Any, List
 
+from domain.types import OverallDigestData, ShadowDigestData
 from domain.constants import (
     PLACEHOLDER_LIMITS,
     PLACEHOLDER_MARKER,
@@ -30,12 +31,16 @@ class ShadowTemplate:
         """
         self.levels = levels
 
-    def create_empty_overall_digest(self) -> Dict[str, Any]:
+    def create_empty_overall_digest(self) -> OverallDigestData:
         """
         プレースホルダー付きoverall_digestを生成（Single Source of Truth）
 
         Returns:
             プレースホルダーを含むoverall_digest構造体
+
+        Note:
+            戻り値の型はOverallDigestDataですが、実際にはプレースホルダー文字列が含まれます。
+            Claudeによる分析後に正しい値に置き換えられます。
         """
         limits = PLACEHOLDER_LIMITS
         return {
@@ -50,7 +55,7 @@ class ShadowTemplate:
             "impression": f"{PLACEHOLDER_MARKER}: 所感・展望 ({limits['impression_chars']}文字程度){PLACEHOLDER_END}"
         }
 
-    def get_template(self) -> Dict[str, Any]:
+    def get_template(self) -> ShadowDigestData:
         """
         ShadowGrandDigest.txtのテンプレートを返す
 

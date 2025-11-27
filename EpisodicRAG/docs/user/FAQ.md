@@ -1,4 +1,4 @@
-[Home](../../README.md) > [Docs](../README.md) > FAQ
+[Docs](../README.md) > FAQ
 
 # よくある質問 (FAQ)
 

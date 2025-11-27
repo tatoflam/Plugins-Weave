@@ -380,7 +380,7 @@ class TestLogDigestContent:
     """_log_digest_content メソッドのテスト"""
 
     @pytest.mark.integration
-    def test_log_digest_content_valid_json(self, updater, temp_plugin_env, capsys):
+    def test_log_digest_content_valid_json(self, updater, temp_plugin_env, caplog):
         """有効なJSONファイルの内容をログ出力"""
         # Weekly Digestファイルを作成
         weekly_dir = temp_plugin_env.digests_path / "1_Weekly"
@@ -399,9 +399,8 @@ class TestLogDigestContent:
         # _log_digest_contentを呼び出し（monthlyレベルでweeklyファイルを読む）
         updater._log_digest_content(weekly_file, "monthly")
 
-        # 出力を検証
-        captured = capsys.readouterr()
-        assert "digest_type" in captured.out or "Read digest content" in captured.out
+        # ログ出力を検証（print→log_infoに変更されたため、caplogを使用）
+        assert "digest_type" in caplog.text or "Read digest content" in caplog.text
 
     @pytest.mark.integration
     def test_log_digest_content_json_decode_error(self, updater, temp_plugin_env, capsys):

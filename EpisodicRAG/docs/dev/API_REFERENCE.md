@@ -1,4 +1,4 @@
-[Home](../../README.md) > [Docs](../README.md) > API_REFERENCE
+[Docs](../README.md) > API_REFERENCE
 
 # API リファレンス
 
