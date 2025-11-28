@@ -3,7 +3,42 @@
 Shadow I/O Handler
 ==================
 
-ShadowGrandDigest.txtの読み書きを担当
+ShadowGrandDigest.txt のファイルI/O操作を担当するアプリケーション層モジュール。
+
+ShadowGrandDigest.txt は作業中のダイジェスト情報を保持する一時ファイル。
+各階層レベルの「まだ確定されていない」ダイジェスト情報を管理し、
+finalize時にGrandDigest.txtへ昇格される。
+
+Usage:
+    from application.shadow import ShadowIO, ShadowTemplate
+    from config import DigestConfig
+
+    config = DigestConfig()
+    template = ShadowTemplate()
+
+    shadow_io = ShadowIO(
+        shadow_digest_file=config.essences_path / "ShadowGrandDigest.txt",
+        template_factory=template.create_shadow_template
+    )
+
+    # 読み込み（存在しなければ自動作成）
+    data = shadow_io.load_or_create()
+
+    # 保存（タイムスタンプ自動更新）
+    shadow_io.save(data)
+
+Design Pattern:
+    - Repository Pattern: ファイルI/Oの抽象化
+    - Factory Pattern: テンプレート生成の遅延評価
+
+Related Modules:
+    - application.shadow.shadow_updater: Shadowの更新ロジック
+    - application.shadow.template: テンプレート生成
+    - infrastructure.json_repository: JSON I/O操作
+
+Note:
+    テンプレート生成は template_factory 経由で遅延評価される。
+    これにより循環参照を回避しつつ、必要時にのみテンプレートを生成。
 """
 
 from datetime import datetime
@@ -16,7 +51,25 @@ from infrastructure import load_json_with_template, log_debug, save_json
 
 
 class ShadowIO:
-    """ShadowGrandDigest I/Oクラス"""
+    """
+    ShadowGrandDigest.txt の読み込み・保存を担当するI/Oクラス。
+
+    このクラスはRepository Patternを採用し、ShadowGrandDigest.txtへの
+    すべてのファイルI/O操作を一元管理する。
+
+    Attributes:
+        shadow_digest_file: ShadowGrandDigest.txt のパス
+        template_factory: テンプレート生成関数（遅延評価用）
+
+    Example:
+        >>> shadow_io = ShadowIO(path, template_factory)
+        >>> data = shadow_io.load_or_create()
+        >>> data["latest_digests"]["weekly"]["source_files"].append("new_file.txt")
+        >>> shadow_io.save(data)
+
+    Note:
+        save()時にmetadata.last_updatedが自動更新される。
+    """
 
     def __init__(self, shadow_digest_file: Path, template_factory: Callable[[], ShadowDigestData]):
         """

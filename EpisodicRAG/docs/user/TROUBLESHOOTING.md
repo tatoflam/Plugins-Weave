@@ -16,9 +16,11 @@
 
 > 💡 まず下の「クイック診断フローチャート」で問題を切り分け、該当セクションへ進んでください。
 
-> **対応バージョン**: EpisodicRAG Plugin v2.0.0+ / ファイルフォーマット 1.0
+> **対応バージョン**: EpisodicRAG Plugin v3.0.0+ / ファイルフォーマット 1.0
 >
-> **Note**: v2.0.0以降はClean Architecture（4層構造）を採用しています。旧パス（`scripts/shadow_grand_digest.py`等）は使用できません。[ARCHITECTURE.md](../dev/ARCHITECTURE.md#clean-architecture)を参照してください。
+> **Note**: v2.0.0以降（最新v3.0.0）はClean Architecture（4層構造）を採用しています。旧パス（`scripts/shadow_grand_digest.py`等）は使用できません。[ARCHITECTURE.md](../dev/ARCHITECTURE.md#clean-architecture)を参照してください。
+>
+> **v3.0.0変更点**: Loop ID形式が4桁→5桁に変更されました（Loop0001→L00001）。既存ファイルの移行については[Loop ID移行](#loop-id移行v300)を参照してください。
 
 ---
 
@@ -31,6 +33,7 @@
    - [階層的カスケードが動作しない](#階層的カスケードが動作しない)
    - [Digest生成時のJSON形式エラー](#digest生成時のjson形式エラー)
    - [開発環境とインストール環境の混在](#開発環境とインストール環境の混在)
+   - [Loop ID移行（v3.0.0）](#loop-id移行v300)
 2. [システム状態の詳細診断](#システム状態の詳細診断)
 3. [デバッグモード](#デバッグモード)
 4. [サポート](#サポート)
@@ -387,6 +390,81 @@ git status
 - **データディレクトリ**: base_dirからの相対パスで別の場所に配置
 
 **参考**: この問題は開発者が新規インストールをテストする際の特殊ケースです。通常のユーザーは遭遇しません。
+
+---
+
+### Loop ID移行（v3.0.0）
+
+**症状**: v3.0.0へのアップグレード後、既存のLoopファイルが認識されない
+
+**原因**: v3.0.0でLoop ID形式が変更されました（Loop0001→L00001、プレフィックス変更+5桁化）
+
+**確認ポイント**:
+
+1. **現在のLoopファイル名を確認**:
+   ```bash
+   ls {loops_dir}
+   ```
+
+   旧形式: `Loop0001_タイトル.txt`, `Loop0186_タイトル.txt`
+   新形式: `L00001_タイトル.txt`, `L00186_タイトル.txt`
+
+2. **エラーメッセージの確認**:
+   ```text
+   # 典型的なエラー
+   "Loop file not found" または "Invalid Loop ID format"
+   ```
+
+**解決方法**:
+
+**方法1: 一括リネーム（推奨）**
+
+```bash
+cd {loops_dir}
+
+# PowerShell (Windows) - Loop0001 → L00001
+Get-ChildItem -Filter "Loop???_*.txt" | Rename-Item -NewName { $_.Name -replace '^Loop(\d{3})_', 'L00$1_' }
+Get-ChildItem -Filter "Loop????_*.txt" | Rename-Item -NewName { $_.Name -replace '^Loop(\d{4})_', 'L0$1_' }
+
+# Bash (macOS/Linux) - Loop0001 → L00001
+for f in Loop???_*.txt; do mv "$f" "L00${f#Loop}"; done
+for f in Loop????_*.txt; do mv "$f" "L0${f#Loop}"; done
+```
+
+**方法2: 手動リネーム**
+
+小規模な場合は手動でリネーム:
+```text
+Loop0001_xxx.txt → L00001_xxx.txt
+Loop0186_xxx.txt → L00186_xxx.txt
+```
+
+**方法3: ShadowGrandDigest再構築**
+
+Loopファイルリネーム後、ShadowGrandDigestを再構築:
+```bash
+# ShadowGrandDigest.txtをバックアップして削除
+python scripts/config.py --show-paths  # essences_dirを確認
+cp {essences_dir}/ShadowGrandDigest.txt {essences_dir}/ShadowGrandDigest.txt.v2.bak
+rm {essences_dir}/ShadowGrandDigest.txt
+
+# 再検出
+/digest
+```
+
+**移行後の確認**:
+
+```bash
+# Loopファイルが正しく検出されるか確認
+@digest-auto
+```
+
+期待される出力:
+```text
+✅ 検出されたLoopファイル: N件
+```
+
+**注意**: v3.0.0以前に生成されたDigestファイル（W0001_xxx.txt等）はそのまま使用できます。移行が必要なのはLoopファイル（Lxxxx形式）のみです。
 
 ---
 

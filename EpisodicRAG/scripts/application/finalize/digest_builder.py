@@ -3,7 +3,40 @@
 Digest Builder
 ==============
 
-RegularDigest構造を構築するクラス
+RegularDigest（確定済みダイジェスト）の構造を構築するアプリケーション層モジュール。
+
+RegularDigestは、ShadowGrandDigestからfinalize（確定）されたダイジェストファイル。
+各階層レベル（Weekly, Monthly等）のDigestsディレクトリに保存される永続的な記録。
+
+Usage:
+    from application.finalize import RegularDigestBuilder
+
+    # RegularDigest構造を構築
+    regular_digest = RegularDigestBuilder.build(
+        level="weekly",
+        new_digest_name="2025年11月第4週",
+        digest_num="0042",
+        shadow_digest=shadow_overall_digest,
+        individual_digests=individual_list
+    )
+
+    # ファイルに保存
+    save_json(digests_path / "1_Weekly" / "W0042_2025年11月第4週.txt", regular_digest)
+
+Design Pattern:
+    - Builder Pattern: 複雑なRegularDigest構造の組み立て
+    - Static Factory: インスタンス不要の構築メソッド
+
+Related Modules:
+    - interfaces.finalize_from_shadow: このBuilderを使用
+    - domain.types: RegularDigestData型定義
+    - application.shadow: Shadow側のデータ提供
+
+Note:
+    RegularDigestは以下の構造を持つ：
+    - metadata: level, number, timestamp, version
+    - overall_digest: 統合要約（name, type, keywords, abstract, impression）
+    - individual_digests: 個別要約のリスト
 """
 
 from datetime import datetime
@@ -14,7 +47,29 @@ from domain.version import DIGEST_FORMAT_VERSION
 
 
 class RegularDigestBuilder:
-    """RegularDigest構造の構築を担当"""
+    """
+    RegularDigest（確定済みダイジェスト）構造を構築するBuilderクラス。
+
+    このクラスはBuilder Patternを採用し、ShadowGrandDigestの
+    overall_digestとindividual_digestsから、保存可能な
+    RegularDigest構造を組み立てる。
+
+    全メソッドがstaticmethodのため、インスタンス化不要。
+
+    Example:
+        >>> digest = RegularDigestBuilder.build(
+        ...     level="weekly",
+        ...     new_digest_name="2025年11月第4週",
+        ...     digest_num="0042",
+        ...     shadow_digest=shadow_data,
+        ...     individual_digests=individuals
+        ... )
+        >>> digest["metadata"]["digest_level"]
+        'weekly'
+
+    Note:
+        build()はmetadata.last_updatedを現在時刻で自動設定する。
+    """
 
     @staticmethod
     def build(

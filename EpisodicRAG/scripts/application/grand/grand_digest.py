@@ -3,8 +3,37 @@
 GrandDigest Manager
 ===================
 
-GrandDigest.txt の管理を担当するモジュール。
-finalize_from_shadow.py から分離。
+GrandDigest.txt の管理を担当するアプリケーション層モジュール。
+
+GrandDigest.txtは全8階層のダイジェスト要約を統合する最上位ファイル。
+各階層（Weekly〜Centurial）のoverall_digestを保持し、
+長期記憶の集約ポイントとして機能する。
+
+Usage:
+    from application.grand import GrandDigestManager
+    from config import DigestConfig
+
+    config = DigestConfig()
+    manager = GrandDigestManager(config)
+
+    # 読み込み（存在しなければ自動作成）
+    data = manager.load_or_create()
+
+    # 特定レベルの更新
+    manager.update_digest("weekly", "W0001", overall_digest_data)
+
+Design Pattern:
+    - Repository Pattern: ファイルI/Oを抽象化
+    - Template Method: テンプレート生成の標準化
+
+Related Modules:
+    - application.grand.shadow_grand_digest: Shadow版の管理
+    - infrastructure.json_repository: JSON I/O操作
+    - domain.types: GrandDigestData型定義
+
+Note:
+    finalize_from_shadow.py から分離された管理クラス。
+    ファイル構造の詳細は docs/dev/ARCHITECTURE.md を参照。
 """
 
 from datetime import datetime
@@ -24,7 +53,27 @@ from infrastructure import load_json_with_template, log_debug, log_info, save_js
 
 
 class GrandDigestManager:
-    """GrandDigest.txt管理クラス"""
+    """
+    GrandDigest.txt の読み込み・保存・更新を担当する管理クラス。
+
+    このクラスはRepository Patternを採用し、GrandDigest.txtへの
+    すべてのファイルI/O操作を一元管理する。
+
+    Attributes:
+        config: DigestConfig インスタンス
+        grand_digest_file: GrandDigest.txt のパス
+
+    Example:
+        >>> from application.grand import GrandDigestManager
+        >>> from config import DigestConfig
+        >>> manager = GrandDigestManager(DigestConfig())
+        >>> data = manager.load_or_create()
+        >>> manager.update_digest("weekly", "W0001", overall_digest)
+
+    Note:
+        GrandDigest.txtが存在しない場合、get_template()で
+        自動的にテンプレートが作成される。
+    """
 
     def __init__(self, config: DigestConfig):
         self.config = config

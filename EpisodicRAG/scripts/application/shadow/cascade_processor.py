@@ -3,7 +3,42 @@
 Cascade Processor
 =================
 
-ダイジェスト確定時のカスケード処理
+ダイジェスト確定時の階層的カスケード処理を担当するアプリケーション層モジュール。
+
+ダイジェストがfinalize（確定）された際、次の階層レベルへの
+自動的な伝播処理を実行する。これにより8階層メモリシステム
+（Weekly→Monthly→...→Centurial）の階層的な情報集約が実現される。
+
+Usage:
+    from application.shadow import CascadeProcessor
+
+    processor = CascadeProcessor(
+        shadow_io=shadow_io,
+        file_detector=file_detector,
+        template=template,
+        level_hierarchy=LEVEL_HIERARCHY,
+        file_appender=file_appender
+    )
+
+    # ダイジェスト確定後にカスケード処理を実行
+    processor.cascade_update_on_digest_finalize("weekly")
+
+Design Pattern:
+    - Chain of Responsibility: レベル間の連鎖的な処理
+    - Dependency Injection: 各コンポーネントを注入して構成
+
+Related Modules:
+    - application.shadow.shadow_io: ShadowGrandDigestのI/O
+    - application.shadow.file_detector: 新規ファイル検出
+    - application.shadow.file_appender: ファイル追加処理
+    - interfaces.finalize_from_shadow: 確定処理の起点
+
+Note:
+    カスケード処理は以下の順序で実行される：
+    1. 現在レベルのShadow→Grand昇格確認
+    2. 次レベルの新規ファイル検出
+    3. 次レベルのShadowに増分追加
+    4. 現在レベルのShadowをクリア
 """
 
 from typing import TYPE_CHECKING, Dict, Optional
@@ -26,7 +61,27 @@ if TYPE_CHECKING:
 
 
 class CascadeProcessor:
-    """カスケード処理クラス"""
+    """
+    ダイジェスト確定時のカスケード処理を実行するクラス。
+
+    このクラスはChain of Responsibilityパターンを採用し、
+    あるレベルのダイジェストが確定した際に、次のレベルへの
+    自動的な更新処理を連鎖的に実行する。
+
+    Attributes:
+        shadow_io: ShadowGrandDigestの読み書きを担当
+        file_detector: 新規ファイル検出を担当
+        template: テンプレート生成を担当
+        level_hierarchy: レベル間の階層関係情報
+        file_appender: ファイル追加処理を担当
+
+    Example:
+        >>> processor = CascadeProcessor(
+        ...     shadow_io, file_detector, template, hierarchy, appender
+        ... )
+        >>> processor.cascade_update_on_digest_finalize("weekly")
+        # weekly確定 → monthlyのShadowに新規ファイル追加
+    """
 
     def __init__(
         self,
