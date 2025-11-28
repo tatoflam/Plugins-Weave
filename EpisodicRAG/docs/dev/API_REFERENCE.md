@@ -11,12 +11,31 @@ EpisodicRAGプラグインのPython API仕様書です。
 ## 目次
 
 1. [Domain層](#domain層)
+   - [定数 (constants.py)](#定数)
+   - [例外 (exceptions.py)](#例外domainexceptionspy)
+   - [型定義 (types.py)](#型定義domaintypespy)
+   - [ファイル命名 (file_naming.py)](#関数domainfile_namingpy)
+   - [レベルレジストリ (level_registry.py)](#レベルレジストリdomainlevel_registrypy)
 2. [Infrastructure層](#infrastructure層)
+   - [JSON操作 (json_repository.py)](#json操作infrastructurejson_repositorypy)
+   - [ファイルスキャン (file_scanner.py)](#ファイルスキャンinfrastructurefile_scannerpy)
+   - [ロギング (logging_config.py)](#ロギングinfrastructurelogging_configpy)
+   - [ユーザーインタラクション (user_interaction.py)](#ユーザーインタラクションinfrastructureuser_interactionpy)
 3. [Application層](#application層)
+   - [バリデーション (validators.py)](#バリデーションapplicationvalidatorspy)
+   - [Shadow管理 (shadow/)](#shadow管理applicationshadow)
+   - [GrandDigest管理 (grand/)](#granddigest管理applicationgrand)
+   - [Finalize処理 (finalize/)](#finalize処理applicationfinalize)
+   - [時間追跡 (tracking/)](#時間追跡applicationtracking)
 4. [Interfaces層](#interfaces層)
-5. [config.json 詳細仕様](#configjson-詳細仕様)
-6. [設定（config/__init__.py）](#設定configinitpy)
-7. [CLI使用方法](#cli使用方法)
+   - [DigestFinalizerFromShadow](#digestfinalizerfromshadow)
+   - [ProvisionalDigestSaver](#provisionaldigestsaver)
+   - [Provisionalサブパッケージ (provisional/)](#provisionalサブパッケージinterfacesprovisional)
+   - [ヘルパー関数](#ヘルパー関数interfacesinterface_helperspy)
+5. [デザインパターン](#デザインパターン)
+6. [config.json 詳細仕様](#configjson-詳細仕様)
+7. [設定（config/__init__.py）](#設定configinitpy)
+8. [CLI使用方法](#cli使用方法)
 
 ---
 
@@ -197,6 +216,136 @@ format_digest_number("weekly", 1)         # "W0001"
 format_digest_number("multi_decadal", 3)  # "MD03"
 ```
 
+#### find_max_number()
+
+```python
+def find_max_number(files: List[Union[Path, str]], prefix: str) -> Optional[int]
+```
+
+指定プレフィックスを持つファイル群から最大番号を取得。
+
+```python
+find_max_number(["W0001.txt", "W0005.txt", "W0003.txt"], "W")  # 5
+find_max_number([], "W")  # None
+```
+
+#### filter_files_after()
+
+```python
+def filter_files_after(files: List[Path], threshold: int) -> List[Path]
+```
+
+指定番号より大きいファイルのみをフィルタ。
+
+#### extract_numbers_formatted()
+
+```python
+def extract_numbers_formatted(files: List[Union[str, None]]) -> List[str]
+```
+
+ファイル名リストからプレフィックス付き番号を抽出（ゼロ埋め維持）。
+
+```python
+extract_numbers_formatted(["Loop0001.txt", "Loop0005.txt"])  # ["Loop0001", "Loop0005"]
+```
+
+### レベルレジストリ（domain/level_registry.py）
+
+階層設定の一元管理（Singletonパターン）。
+
+#### LevelMetadata
+
+```python
+@dataclass(frozen=True)
+class LevelMetadata:
+    name: str           # レベル名（"weekly", "monthly"等）
+    prefix: str         # プレフィックス（"W", "M"等）
+    digits: int         # 番号の桁数
+    dir: str            # ディレクトリ名（"1_Weekly"等）
+    source: str         # 入力元レベル
+    next_level: Optional[str]  # カスケード先（None=最上位）
+```
+
+#### LevelBehavior（抽象基底クラス）
+
+```python
+class LevelBehavior(ABC):
+    @abstractmethod
+    def format_number(self, number: int) -> str: ...
+
+    @abstractmethod
+    def should_cascade(self) -> bool: ...
+```
+
+| 実装クラス | 説明 |
+|-----------|------|
+| `StandardLevelBehavior` | 通常階層（weekly〜centurial） |
+| `LoopLevelBehavior` | Loopファイル用（4桁、カスケードなし） |
+
+#### LevelRegistry
+
+```python
+class LevelRegistry:
+    """階層設定の一元管理（Singleton）"""
+
+    def get_behavior(self, level: str) -> LevelBehavior
+    def get_metadata(self, level: str) -> LevelMetadata
+
+    @staticmethod
+    def get_level_names() -> List[str]      # ["weekly", "monthly", ...]
+    @staticmethod
+    def get_all_prefixes() -> List[str]     # ["W", "M", "Q", ...]
+    @staticmethod
+    def get_level_by_prefix(prefix: str) -> Optional[str]
+    @staticmethod
+    def should_cascade(level: str) -> bool
+    @staticmethod
+    def build_prefix_pattern() -> str       # 正規表現パターン生成
+```
+
+#### ファクトリ関数
+
+```python
+def get_level_registry() -> LevelRegistry   # Singletonインスタンス取得
+def reset_level_registry() -> None          # テスト用リセット
+```
+
+### 定数ユーティリティ関数（domain/constants.py）
+
+#### create_placeholder_text()
+
+```python
+def create_placeholder_text(content_type: str, char_limit: int) -> str
+```
+
+プレースホルダーテキストを生成。
+
+```python
+create_placeholder_text("abstract", 2400)
+# "<!-- PLACEHOLDER: abstract (max 2400 chars) -->"
+```
+
+#### create_placeholder_keywords()
+
+```python
+def create_placeholder_keywords(count: int) -> List[str]
+```
+
+プレースホルダーキーワードリストを生成。
+
+```python
+create_placeholder_keywords(5)
+# ["<!-- PLACEHOLDER -->", "<!-- PLACEHOLDER -->", ...]
+```
+
+#### build_level_hierarchy()
+
+```python
+def build_level_hierarchy() -> Dict[str, Dict[str, object]]
+```
+
+LEVEL_CONFIGから階層関係（source/next）を抽出した辞書を構築。
+
 ---
 
 ## Infrastructure層
@@ -355,6 +504,60 @@ def log_error(message: str, exit_code: Optional[int] = None) -> None
 - `EPISODIC_RAG_LOG_LEVEL`: ログレベル (DEBUG, INFO, WARNING, ERROR)
 - `EPISODIC_RAG_LOG_FORMAT`: ログフォーマット (simple, detailed)
 
+### 追加のJSON操作関数
+
+#### try_load_json()
+
+```python
+def try_load_json(file_path: Path) -> Optional[Dict[str, Any]]
+```
+
+JSONファイル読み込みを試行。失敗時は例外を投げずに`None`を返す。
+
+#### try_read_json_from_file()
+
+```python
+def try_read_json_from_file(file_path: Path) -> Optional[Dict[str, Any]]
+```
+
+ファイルからJSON読み込みを試行（`try_load_json`のエイリアス）。
+
+#### confirm_file_overwrite()
+
+```python
+def confirm_file_overwrite(
+    file_path: Path,
+    confirm_callback: Callable[[str], bool]
+) -> bool
+```
+
+ファイル上書き確認。コールバック関数でユーザーに確認を求める。
+
+```python
+# 使用例
+def my_confirm(message: str) -> bool:
+    return input(f"{message} (y/n): ").lower() == 'y'
+
+if confirm_file_overwrite(Path("output.txt"), my_confirm):
+    # 上書き実行
+```
+
+### ユーザーインタラクション（infrastructure/user_interaction.py）
+
+#### get_default_confirm_callback()
+
+```python
+def get_default_confirm_callback() -> Callable[[str], bool]
+```
+
+標準入力を使用したデフォルトの確認コールバックを取得。
+
+```python
+callback = get_default_confirm_callback()
+if callback("ファイルを上書きしますか？"):
+    # 上書き実行
+```
+
 ---
 
 ## Application層
@@ -464,15 +667,98 @@ class PlaceholderManager:
 - `abstract`がPLACEHOLDER（空または`<!-- PLACEHOLDER`を含む）の場合: 新規PLACEHOLDER生成
 - それ以外: 既存分析を保持し、再分析を促すログ出力
 
-#### その他のShadowクラス
+#### FileAppender
 
-| クラス | 説明 |
-|--------|------|
-| `ShadowTemplate` | ShadowGrandDigestテンプレート生成 |
-| `FileDetector` | 新規ファイル検出 |
-| `ShadowIO` | Shadow読み書き |
-| `ShadowUpdater` | Shadow更新処理 |
-| `FileAppender` | Shadowへのファイル追加 |
+Shadowへのファイル追加を担当。
+
+```python
+class FileAppender:
+    def __init__(
+        self,
+        shadow_io: ShadowIO,
+        placeholder_manager: PlaceholderManager,
+        level_hierarchy: Dict[str, LevelHierarchyEntry]
+    ): ...
+
+    def append_files_to_level(self, level: str, files: List[Path]) -> None
+```
+
+| メソッド | 説明 |
+|---------|------|
+| `append_files_to_level(level, files) -> None` | 指定レベルのShadowに新規ファイルを追加 |
+
+**動作**:
+1. 現在のShadowデータを読み込み
+2. 既存の`source_files`に新規ファイルを追加
+3. PlaceholderManagerで`overall_digest`を更新
+4. Shadowファイルに保存
+
+#### ShadowTemplate
+
+ShadowGrandDigestのテンプレート生成。
+
+```python
+class ShadowTemplate:
+    def __init__(self, levels: List[str]): ...
+
+    def create_empty_overall_digest(self) -> OverallDigestData
+    def get_template(self) -> ShadowDigestData
+```
+
+#### FileDetector
+
+新規ファイルの検出。
+
+```python
+class FileDetector:
+    def __init__(self, config: DigestConfig, times_tracker: DigestTimesTracker): ...
+
+    def get_max_file_number(self, level: str) -> Optional[int]
+    def get_source_path(self, level: str) -> Path
+    def find_new_files(self, level: str) -> List[Path]
+```
+
+| メソッド | 説明 |
+|---------|------|
+| `find_new_files(level) -> List[Path]` | 最後の処理以降に追加されたファイルを検出 |
+| `get_source_path(level) -> Path` | レベルの入力元ディレクトリを取得 |
+
+#### ShadowIO
+
+Shadow読み書き操作。
+
+```python
+class ShadowIO:
+    def __init__(
+        self,
+        shadow_digest_file: Path,
+        template_factory: Callable[[], ShadowDigestData]
+    ): ...
+
+    def load_or_create(self) -> ShadowDigestData
+    def save(self, data: ShadowDigestData) -> None
+```
+
+#### ShadowUpdater
+
+Shadow更新処理のFacade。
+
+```python
+class ShadowUpdater:
+    def __init__(
+        self,
+        shadow_io: ShadowIO,
+        file_detector: FileDetector,
+        template: ShadowTemplate,
+        level_hierarchy: Dict[str, LevelHierarchyEntry]
+    ): ...
+
+    def add_files_to_shadow(self, level: str, new_files: List[Path]) -> None
+    def clear_shadow_level(self, level: str) -> None
+    def get_shadow_digest_for_level(self, level: str) -> Optional[OverallDigestData]
+    def promote_shadow_to_grand(self, level: str) -> None
+    def update_shadow_for_new_loops(self) -> None
+```
 
 ### GrandDigest管理（application/grand/）
 
