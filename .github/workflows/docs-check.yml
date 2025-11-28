@@ -24,6 +24,7 @@ jobs:
             --verbose
             --no-progress
             --exclude-mail
+            --include-fragments
             --exclude 'https://github.com/Bizuayeu/Plugins-Weave/compare/*'
             --exclude 'https://github.com/Bizuayeu/Plugins-Weave/releases/*'
             '**/*.md'
