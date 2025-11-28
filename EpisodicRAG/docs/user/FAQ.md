@@ -19,18 +19,17 @@ EpisodicRAGプラグインに関するよくある質問と回答集です。
 
 ### Q: EpisodicRAGとは何ですか？
 
-**A**: EpisodicRAGは、AI（Claude）との会話履歴を階層的に構造化・保存し、セッション間で記憶を引き継ぐためのプラグインです。8階層（Weekly〜Centurial、約108年分）の記憶構造で、長期的な知識管理を実現します。
+**A**: AI会話履歴を8階層で構造化し、セッション間で記憶を引き継ぐプラグインです。
+
+> 📖 詳細: [メインREADME](../../../README.md)
 
 ### Q: 無料で使えますか？
 
-**A**: はい、個人・非商用利用はMITライセンスの範囲で自由に利用できます。商用利用については、特許権（特願2025-198943）との関係で事前相談が必要です。
+**A**: 個人・非商用利用はMITライセンスで自由に利用可能。商用利用は特許権の関係で事前相談が必要です。
 
 ### Q: どのAI環境で動作しますか？
 
-**A**: 以下の環境で動作します：
-- Claude Code（CLI）
-- Claude VSCode Extension
-- Claude WebChat（一部機能制限あり）
+**A**: Claude Code（CLI）、Claude VSCode Extension、Claude WebChat（一部制限）で動作します。
 
 ---
 
@@ -38,39 +37,19 @@ EpisodicRAGプラグインに関するよくある質問と回答集です。
 
 ### Q: インストールに失敗します
 
-**A**: 以下を確認してください：
+**A**: マーケットプレイス追加（`/marketplace list`で確認）→ プラグイン名確認（`EpisodicRAG-Plugin@Plugins-Weave`）→ ネットワーク確認の順でチェック。
 
-1. マーケットプレイスが追加されているか
-   ```bash
-   /marketplace list
-   ```
-
-2. 正しいプラグイン名でインストールしているか
-   ```bash
-   /plugin install EpisodicRAG-Plugin@Plugins-Weave
-   ```
-
-3. ネットワーク接続に問題がないか
+> 📖 詳細: [QUICKSTART.md](QUICKSTART.md)
 
 ### Q: 設定ファイルが見つかりません
 
-**A**: `@digest-setup`を実行して初期セットアップを完了してください。設定ファイルは自動的に作成されます。
-
-```bash
-@digest-setup
-```
+**A**: `@digest-setup` を実行。設定ファイルは自動作成されます。
 
 ### Q: パスが正しく解決されません
 
-**A**: `@digest-config`で設定を確認・修正してください：
+**A**: `@digest-config` で設定を確認・修正。`base_dir`がプラグインルート基準であることを確認。
 
-```bash
-@digest-config
-```
-
-`base_dir`の設定が正しいか確認してください。デフォルト（`.`）はプラグインルート自身を指します。
-
-> 📖 パス設定の詳細は [用語集](../../README.md#基本概念) および [API_REFERENCE.md](../dev/API_REFERENCE.md#config.json-詳細仕様) を参照してください。
+> 📖 詳細: [用語集](../../README.md#基本概念)、[API_REFERENCE.md](../dev/API_REFERENCE.md#config.json-詳細仕様)
 
 ---
 
@@ -100,14 +79,9 @@ EpisodicRAGプラグインに関するよくある質問と回答集です。
 
 ### Q: threshold（閾値）を変更したい
 
-**A**: `@digest-config`で対話的に変更できます：
+**A**: `@digest-config` → [4] Thresholds を選択。
 
-```bash
-@digest-config
-→ [4] Thresholds（生成条件）を選択
-```
-
-> 📖 Thresholdの詳細は [API_REFERENCE.md](../dev/API_REFERENCE.md#config.json-詳細仕様) を参照してください。
+> 📖 詳細: [API_REFERENCE.md](../dev/API_REFERENCE.md#config.json-詳細仕様)
 
 ---
 
@@ -130,28 +104,19 @@ EpisodicRAGプラグインに関するよくある質問と回答集です。
 
 ### Q: 新しい階層を追加できますか？
 
-**A**: はい、`config.json`に新しいthresholdを追加し、`scripts/generate_digest_auto.sh`を更新することで追加可能です。
+**A**: はい。`config.json`にthreshold追加 + `domain/constants.py`のLEVEL_CONFIG更新で可能。
 
-詳細は[ARCHITECTURE.md](../dev/ARCHITECTURE.md#拡張性)を参照してください。
+> 📖 詳細: [ARCHITECTURE.md](../dev/ARCHITECTURE.md#拡張性)
 
 ### Q: カスタムエージェントを作成できますか？
 
-**A**: はい、DigestAnalyzerエージェントをベースにカスタム分析ロジックを実装できます。
-
-例：
-- 特定ドメイン専用の分析エージェント
-- 多言語対応分析エージェント
-- 感情分析専門エージェント
+**A**: はい。DigestAnalyzerをベースにカスタム分析ロジックを実装可能（ドメイン専用、多言語対応、感情分析など）。
 
 ### Q: テストの実行方法は？
 
-**A**:
-```bash
-cd scripts
-python -m pytest test/ -v
-```
+**A**: `cd scripts && python -m pytest test/ -v`
 
-詳細は[ARCHITECTURE.md](../dev/ARCHITECTURE.md#テスト)を参照してください。
+> 📖 詳細: [ARCHITECTURE.md](../dev/ARCHITECTURE.md#テスト)、[CONTRIBUTING.md](../../CONTRIBUTING.md#テスト)
 
 ---
 

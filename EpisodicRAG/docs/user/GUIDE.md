@@ -22,6 +22,16 @@
 
 **基本原則**: Loopファイルを追加したら都度 `/digest` を実行
 
+```mermaid
+flowchart LR
+    A[Loop追加] --> B["/digest"]
+    B --> C[記憶定着]
+    C --> A
+
+    style B fill:#90EE90,stroke:#228B22
+    style C fill:#87CEEB,stroke:#4169E1
+```
+
 ---
 
 ### Provisional vs Regular Digest
@@ -326,6 +336,32 @@ python scripts/config.py --show-paths
 
 ### 完全フロー: 未処理Loop → Provisional → Regular
 
+```mermaid
+flowchart TD
+    subgraph Phase1["Phase 1: Loop追加と即時分析"]
+        L1[Loop追加] --> D1["/digest"]
+        D1 --> S1[Shadow更新]
+        S1 --> P1[Provisional蓄積]
+    end
+
+    subgraph Phase2["Phase 2: Weekly確定"]
+        P1 --> |5個揃ったら| DW["/digest weekly"]
+        DW --> R1[Regular Digest作成]
+        R1 --> G1[GrandDigest更新]
+        G1 --> C1[次階層カスケード]
+    end
+
+    subgraph Phase3["Phase 3: Monthly確定"]
+        C1 --> |5 Weekly揃ったら| DM["/digest monthly"]
+        DM --> R2[Regular Digest作成]
+        R2 --> G2[GrandDigest更新]
+    end
+
+    style D1 fill:#90EE90,stroke:#228B22
+    style DW fill:#FFD700,stroke:#DAA520
+    style DM fill:#FF6347,stroke:#DC143C
+```
+
 #### Phase 1: Loop追加と即時分析（まだらボケ回避）
 
 ```
@@ -405,6 +441,21 @@ python scripts/config.py --show-paths
 ---
 
 ### 週次運用パターン
+
+```mermaid
+flowchart LR
+    subgraph Daily["毎日（1日1-2回）"]
+        A[Loop追加] --> B["/digest"]
+    end
+    subgraph Weekend["週末"]
+        B --> |5個揃ったら| C["@digest-auto"]
+        C --> D["/digest weekly"]
+    end
+    D --> |次週| A
+
+    style B fill:#90EE90
+    style D fill:#FFD700
+```
 
 **毎日（1日1-2回）:**
 ```bash

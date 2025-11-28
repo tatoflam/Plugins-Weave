@@ -357,6 +357,46 @@ git status
 - CONTRIBUTING.md - このファイル
 - docs/ - 詳細ドキュメント
 
+### バージョン管理
+
+#### Single Source of Truth (SSoT)
+
+バージョン情報は `scripts/domain/version.py` の `__version__` が唯一の真実です。
+
+```python
+# scripts/domain/version.py
+__version__ = "2.3.0"  # ← ここを更新
+```
+
+#### バージョン同期対象
+
+| ファイル | フィールド | 備考 |
+|---------|-----------|------|
+| `scripts/domain/version.py` | `__version__` | SSoT（ここを更新） |
+| `.claude-plugin/plugin.json` | `version` | 手動同期 |
+| `pyproject.toml` | `version` | 手動同期 |
+
+#### pre-commitによる自動チェック
+
+コミット時に `check_version.py` が自動実行され、3箇所のバージョンが一致しているか検証されます。
+
+```bash
+# 手動でチェック
+python scripts/check_version.py
+```
+
+不一致がある場合はコミットがブロックされます。
+
+#### ドキュメントヘッダーのバージョン
+
+一部ドキュメント（ARCHITECTURE.md, API_REFERENCE.md, TROUBLESHOOTING.md）にはバージョンヘッダーがあります：
+
+```markdown
+> **対応バージョン**: EpisodicRAG Plugin v2.x.x+ / ファイルフォーマット 1.0
+```
+
+これらは**メジャー/マイナーバージョン変更時のみ更新**してください（パッチバージョンは更新不要）。
+
 ---
 
 ## サポート

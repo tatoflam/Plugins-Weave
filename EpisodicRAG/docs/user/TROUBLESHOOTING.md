@@ -9,6 +9,8 @@
 - **用語・命名規則**（ID桁数、ファイル形式）→ [用語集](../../README.md)
 
 > **対応バージョン**: EpisodicRAG Plugin v2.0.0+ / ファイルフォーマット 1.0
+>
+> **Note**: v2.0.0以降はClean Architecture（4層構造）を採用しています。旧パス（`scripts/shadow_grand_digest.py`等）は使用できません。[ARCHITECTURE.md](../dev/ARCHITECTURE.md#clean-architecture)を参照してください。
 
 ---
 
@@ -133,9 +135,10 @@ cat {digests_dir}/1_Weekly/Provisional/W0001_Individual.txt
 
 `/digest weekly` 実行時のエラーログを確認:
 ```bash
-# 手動で finalize_from_shadow.py を実行してエラー詳細を確認
-cd ~/.claude/plugins/EpisodicRAG-Plugin@Plugins-Weave
-python scripts/finalize_from_shadow.py weekly "テストタイトル"
+# 手動で DigestFinalizerFromShadow を実行してエラー詳細を確認
+# v2.0.0+: interfaces層からインポート
+cd ~/.claude/plugins/EpisodicRAG-Plugin@Plugins-Weave/scripts
+python -c "from interfaces import DigestFinalizerFromShadow; from config import DigestConfig; f = DigestFinalizerFromShadow(DigestConfig()); f.finalize('weekly', 'テストタイトル')"
 ```
 
 ---
@@ -189,8 +192,9 @@ python scripts/finalize_from_shadow.py weekly "テストタイトル"
    rm {essences_dir}/ShadowGrandDigest.txt
 
    # 再実行（テンプレートから自動再作成されます）
-   cd ~/.claude/plugins/EpisodicRAG-Plugin@Plugins-Weave
-   python scripts/shadow_grand_digest.py
+   # v2.0.0+: ShadowGrandDigestManagerを使用
+   cd ~/.claude/plugins/EpisodicRAG-Plugin@Plugins-Weave/scripts
+   python -c "from application.grand import ShadowGrandDigestManager; from config import DigestConfig; m = ShadowGrandDigestManager(DigestConfig()); m.load_or_create(); print('OK')"
    ```
 
 ---
@@ -442,16 +446,16 @@ bash -x scripts/generate_digest_auto.sh
 ### Pythonスクリプトのデバッグ
 
 ```bash
-cd ~/.claude/plugins/EpisodicRAG-Plugin@Plugins-Weave
+cd ~/.claude/plugins/EpisodicRAG-Plugin@Plugins-Weave/scripts
 
 # config.pyのデバッグ
-python -v scripts/config.py --show-paths
+python -v -m config --show-paths
 
-# shadow_grand_digest.pyのデバッグ
-python scripts/shadow_grand_digest.py --help
-
-# finalize_from_shadow.pyのデバッグ
-python scripts/finalize_from_shadow.py --help
+# v2.0.0+: Clean Architecture層別インポート確認
+python -c "from domain import LEVEL_CONFIG, __version__; print(f'Version: {__version__}')"
+python -c "from infrastructure import load_json; print('infrastructure OK')"
+python -c "from application.grand import ShadowGrandDigestManager; print('application OK')"
+python -c "from interfaces import DigestFinalizerFromShadow; print('interfaces OK')"
 ```
 
 ---
