@@ -71,6 +71,16 @@ AI/Claudeエージェント向けの技術仕様ハブです。
 | 実装パターン | [_implementation-notes.md](../skills/shared/_implementation-notes.md) | スキル・コマンド・エージェント実装の共通ガイドライン |
 | エラーリカバリー | [ERROR_RECOVERY_PATTERNS.md](dev/ERROR_RECOVERY_PATTERNS.md) | エラーハンドリングパターン |
 
+### Layer API Details
+
+| Layer | Document | 概要 |
+|-------|----------|------|
+| Domain | [domain.md](dev/api/domain.md) | 定数・型・例外・ファイル命名 |
+| Infrastructure | [infrastructure.md](dev/api/infrastructure.md) | JSON操作・ファイルスキャン・ロギング |
+| Application | [application.md](dev/api/application.md) | Shadow管理・GrandDigest・Finalize処理 |
+| Interfaces | [interfaces.md](dev/api/interfaces.md) | DigestFinalizer・ProvisionalSaver |
+| Config | [config.md](dev/api/config.md) | config.json仕様・DigestConfigクラス |
+
 ---
 
 ## Related Links

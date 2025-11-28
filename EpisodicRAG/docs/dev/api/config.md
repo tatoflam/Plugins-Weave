@@ -8,8 +8,6 @@ config.json仕様とDigestConfigクラス。
 
 ## config.json 詳細仕様
 
-> 📖 クイックリファレンスは [GUIDE.md](../../user/GUIDE.md#設定ファイル仕様クイックリファレンス) を参照
-
 ### 設定ファイルの場所
 
 `~/.claude/plugins/EpisodicRAG-Plugin@Plugins-Weave/.claude-plugin/config.json`
