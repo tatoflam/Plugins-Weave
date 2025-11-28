@@ -1,3 +1,5 @@
+[EpisodicRAG](../README.md) > [Agents](README.md) > DigestAnalyzer
+
 ---
 name: DigestAnalyzer
 description: EpisodicRAG深層分析専門エージェント

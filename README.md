@@ -1,3 +1,7 @@
+<!--
+  このファイルはGitHubリポジトリのランディングページ表示用です。
+  詳細なドキュメントは EpisodicRAG/ 配下を参照してください。
+-->
 [English](README.en.md) | 日本語
 
 # EpisodicRAG Plugin

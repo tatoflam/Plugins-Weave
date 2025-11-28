@@ -3,6 +3,8 @@ name: digest-config
 description: EpisodicRAG設定変更（対話的）
 ---
 
+[EpisodicRAG](../../README.md) > [Skills](../README.md) > digest-config
+
 # digest-config - 設定変更スキル
 
 EpisodicRAG プラグインの設定を対話的に変更するスキルです。

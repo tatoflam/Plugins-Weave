@@ -1,4 +1,4 @@
-[EpisodicRAG](../docs/README.md) > Skills
+[EpisodicRAG](../README.md) > [Docs](../docs/README.md) > Skills
 
 # Skills
 

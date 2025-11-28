@@ -4,6 +4,8 @@
 
 config.json仕様とDigestConfigクラス。
 
+> 📖 用語・共通概念は [用語集](../../../README.md) を参照
+
 ---
 
 ## config.json 詳細仕様

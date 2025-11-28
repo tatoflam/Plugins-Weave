@@ -1,4 +1,4 @@
-[EpisodicRAG](../docs/README.md) > Commands
+[EpisodicRAG](../README.md) > [Docs](../docs/README.md) > Commands
 
 # Commands
 
@@ -33,8 +33,9 @@
 
 ## See Also
 
+> 📖 用語・共通概念は [用語集](../README.md) を参照
+
 - [GUIDE.md](../docs/user/GUIDE.md) - コマンドの詳しい使い方
-- [用語集](../README.md) - 用語・共通概念
 - [_implementation-notes.md](../skills/shared/_implementation-notes.md) - 実装時の共通ガイドライン
 
 ---

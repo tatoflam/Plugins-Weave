@@ -1,4 +1,4 @@
-[EpisodicRAG](../docs/README.md) > Agents
+[EpisodicRAG](../README.md) > [Docs](../docs/README.md) > Agents
 
 # Agents
 

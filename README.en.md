@@ -1,3 +1,7 @@
+<!--
+  This file is for GitHub repository landing page display.
+  See EpisodicRAG/ directory for detailed documentation.
+-->
 English | [日本語](README.md)
 
 # EpisodicRAG Plugin

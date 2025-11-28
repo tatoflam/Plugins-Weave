@@ -1,3 +1,5 @@
+[EpisodicRAG](../README.md) > Docs
+
 # EpisodicRAG AI Specification Hub
 
 [![Version](https://img.shields.io/badge/version-3.0.0-blue.svg)](https://github.com/Bizuayeu/Plugins-Weave)

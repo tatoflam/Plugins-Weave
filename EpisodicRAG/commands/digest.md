@@ -1,9 +1,13 @@
+[EpisodicRAG](../README.md) > [Commands](README.md) > digest
+
 ---
 name: digest
 description: EpisodicRAG階層的ダイジェスト生成（8層100年）
 ---
 
 # /digest - EpisodicRAG階層的ダイジェスト生成
+
+> 📖 用語・共通概念は [用語集](../README.md) を参照
 
 ## 目次
 

@@ -1,3 +1,5 @@
+[EpisodicRAG](../../README.md) > [Skills](../README.md) > Implementation Notes
+
 # 実装ノート（Implementation Notes）
 
 このファイルは、スキル・コマンド実装時の共通ガイドラインを含みます。
