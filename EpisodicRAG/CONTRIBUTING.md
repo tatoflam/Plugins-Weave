@@ -361,18 +361,26 @@ git status
 - CONTRIBUTING.md - このファイル
 - docs/ - 詳細ドキュメント
 
-### バージョン管理
+### Single Source of Truth (SSoT) 原則
 
-#### Single Source of Truth (SSoT)
+**SSoT（Single Source of Truth）** とは、同じ情報を複数箇所に書かず、正規の定義場所を1つに定めて参照する原則です。変更時のメンテナンス負荷を軽減し、不整合を防止します。
+
+#### ドキュメントのSSoT
+
+| 情報 | SSoT（正規の定義場所） | 参照方法 |
+|------|----------------------|----------|
+| 用語・概念定義 | [README.md](README.md)（用語集） | `> 📖 詳細: [用語集](../../README.md#セクション名)` |
+| フッター | `_footer.md` | 各ドキュメント末尾で統一 |
+| 設定仕様 | [api/config.md](docs/dev/api/config.md) | リンクで参照 |
+
+#### バージョンのSSoT
 
 バージョン情報は `scripts/domain/version.py` の `__version__` が唯一の真実です。
 
 ```python
 # scripts/domain/version.py
-__version__ = "2.3.0"  # ← ここを更新
+__version__ = "3.0.0"  # ← ここを更新
 ```
-
-#### バージョン同期対象
 
 | ファイル | フィールド | 備考 |
 |---------|-----------|------|
@@ -380,18 +388,14 @@ __version__ = "2.3.0"  # ← ここを更新
 | `.claude-plugin/plugin.json` | `version` | 手動同期 |
 | `pyproject.toml` | `version` | 手動同期 |
 
-#### pre-commitによる自動チェック
-
-コミット時に `check_version.py` が自動実行され、3箇所のバージョンが一致しているか検証されます。
+**pre-commitによる自動チェック**: コミット時に `check_version.py` が自動実行され、3箇所のバージョンが一致しているか検証されます。不一致がある場合はコミットがブロックされます。
 
 ```bash
 # 手動でチェック
 python scripts/check_version.py
 ```
 
-不一致がある場合はコミットがブロックされます。
-
-#### ドキュメントヘッダーのバージョン
+### ドキュメントヘッダーのバージョン
 
 一部ドキュメント（ARCHITECTURE.md, API_REFERENCE.md, TROUBLESHOOTING.md）にはバージョンヘッダーがあります：
 
