@@ -487,7 +487,7 @@ class TestDigestConfigContextManager:
     def test_context_manager_exit_does_not_suppress_exception(self, context_env):
         """__exit__が例外を抑制しない"""
         with pytest.raises(ValueError):
-            with DigestConfig(plugin_root=context_env.plugin_root) as config:
+            with DigestConfig(plugin_root=context_env.plugin_root) as _:
                 raise ValueError("Test exception")
 
     @pytest.mark.unit

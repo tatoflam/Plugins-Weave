@@ -20,7 +20,7 @@ from typing import Any, List, Optional
 
 from domain.error_formatter import get_error_formatter
 from domain.exceptions import ConfigError
-from domain.types import ConfigData, as_dict
+from domain.types import ConfigData, as_dict, is_config_data
 
 from .config_constants import REQUIRED_CONFIG_KEYS
 
@@ -100,9 +100,18 @@ class ConfigLoader:
 
         try:
             with open(self.config_file, "r", encoding="utf-8") as f:
-                return json.load(f)
+                data = json.load(f)
         except json.JSONDecodeError as e:
             raise ConfigError(formatter.invalid_json(self.config_file, e)) from e
+
+        # 構造検証（TypeGuard）
+        if not is_config_data(data):
+            raise ConfigError(
+                f"Invalid config structure in {self.config_file}: "
+                "'paths' and 'levels' must be dict if present"
+            )
+
+        return data
 
     def get_config(self) -> ConfigData:
         """

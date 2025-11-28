@@ -290,6 +290,8 @@ def is_config_data(data: Any) -> TypeGuard[ConfigData]:
     """
     ConfigData型かどうかを判定（型ガード）
 
+    構造検証を行い、ネストされた型も確認する。
+
     Args:
         data: 判定対象のデータ
 
@@ -304,6 +306,15 @@ def is_config_data(data: Any) -> TypeGuard[ConfigData]:
     """
     if not isinstance(data, dict):
         return False
+
+    # pathsキーが存在する場合、dictであることを確認
+    if "paths" in data and not isinstance(data["paths"], dict):
+        return False
+
+    # levelsキーが存在する場合、dictであることを確認
+    if "levels" in data and not isinstance(data["levels"], dict):
+        return False
+
     return True
 
 

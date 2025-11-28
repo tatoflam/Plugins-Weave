@@ -438,3 +438,111 @@ class TestConfigLoaderEdgeCases:
         # キーが存在しない
         assert loader.has_key("nonexistent") is False
         assert loader.get("nonexistent", default="default") == "default"
+
+
+# =============================================================================
+# TestConfigLoaderStructureValidation - 構造検証テスト
+# =============================================================================
+
+
+class TestConfigLoaderStructureValidation:
+    """config_loaderの構造検証テスト（Phase 4で追加したTypeGuard検証）"""
+
+    @pytest.mark.unit
+    def test_load_invalid_paths_structure_raises_config_error(self, config_file):
+        """pathsが無効な構造の場合ConfigError"""
+        invalid_config = {"paths": "not_a_dict"}
+        with open(config_file, "w", encoding="utf-8") as f:
+            json.dump(invalid_config, f)
+
+        loader = ConfigLoader(config_file)
+
+        with pytest.raises(ConfigError) as exc_info:
+            loader.load()
+
+        assert "Invalid config structure" in str(exc_info.value)
+
+    @pytest.mark.unit
+    def test_load_invalid_levels_structure_raises_config_error(self, config_file):
+        """levelsが無効な構造の場合ConfigError"""
+        invalid_config = {"levels": [1, 2, 3]}
+        with open(config_file, "w", encoding="utf-8") as f:
+            json.dump(invalid_config, f)
+
+        loader = ConfigLoader(config_file)
+
+        with pytest.raises(ConfigError) as exc_info:
+            loader.load()
+
+        assert "Invalid config structure" in str(exc_info.value)
+
+    @pytest.mark.unit
+    def test_load_valid_paths_and_levels_succeeds(self, config_file):
+        """有効なpathsとlevelsの場合は成功"""
+        valid_config = {"paths": {"loops_dir": "data"}, "levels": {"threshold": 5}}
+        with open(config_file, "w", encoding="utf-8") as f:
+            json.dump(valid_config, f)
+
+        loader = ConfigLoader(config_file)
+        config = loader.load()
+
+        assert config["paths"]["loops_dir"] == "data"
+        assert config["levels"]["threshold"] == 5
+
+    @pytest.mark.unit
+    def test_error_message_includes_file_path(self, config_file):
+        """エラーメッセージにファイルパスが含まれる"""
+        invalid_config = {"paths": "invalid"}
+        with open(config_file, "w", encoding="utf-8") as f:
+            json.dump(invalid_config, f)
+
+        loader = ConfigLoader(config_file)
+
+        with pytest.raises(ConfigError) as exc_info:
+            loader.load()
+
+        # ファイルパスがエラーメッセージに含まれる
+        assert str(config_file) in str(exc_info.value)
+
+    @pytest.mark.unit
+    def test_error_message_includes_structure_hint(self, config_file):
+        """エラーメッセージに構造ヒントが含まれる"""
+        invalid_config = {"levels": None}
+        with open(config_file, "w", encoding="utf-8") as f:
+            json.dump(invalid_config, f)
+
+        loader = ConfigLoader(config_file)
+
+        with pytest.raises(ConfigError) as exc_info:
+            loader.load()
+
+        # 構造ヒントがエラーメッセージに含まれる
+        assert "'paths' and 'levels' must be dict" in str(exc_info.value)
+
+    @pytest.mark.unit
+    def test_load_paths_none_raises_config_error(self, config_file):
+        """pathsがNoneの場合ConfigError"""
+        invalid_config = {"paths": None}
+        with open(config_file, "w", encoding="utf-8") as f:
+            json.dump(invalid_config, f)
+
+        loader = ConfigLoader(config_file)
+
+        with pytest.raises(ConfigError) as exc_info:
+            loader.load()
+
+        assert "Invalid config structure" in str(exc_info.value)
+
+    @pytest.mark.unit
+    def test_load_both_invalid_raises_config_error(self, config_file):
+        """pathsとlevels両方が無効な場合ConfigError"""
+        invalid_config = {"paths": "string", "levels": [1, 2, 3]}
+        with open(config_file, "w", encoding="utf-8") as f:
+            json.dump(invalid_config, f)
+
+        loader = ConfigLoader(config_file)
+
+        with pytest.raises(ConfigError) as exc_info:
+            loader.load()
+
+        assert "Invalid config structure" in str(exc_info.value)

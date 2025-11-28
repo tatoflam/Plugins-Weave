@@ -589,3 +589,122 @@ class TestTypeGuards:
         assert is_shadow_digest_data("not a dict") is False
         assert is_shadow_digest_data(None) is False
         assert is_shadow_digest_data([]) is False
+
+
+# =============================================================================
+# is_config_data 構造検証テスト（強化版TypeGuard）
+# =============================================================================
+
+
+class TestIsConfigDataStructure:
+    """is_config_data の構造検証テスト（Phase 2で追加した検証ロジック）"""
+
+    # -------------------------------------------------------------------------
+    # 無効なpaths構造
+    # -------------------------------------------------------------------------
+
+    @pytest.mark.unit
+    def test_is_config_data_paths_not_dict_returns_false(self):
+        """pathsが文字列の場合はFalse"""
+        data = {"paths": "not_a_dict"}
+        assert is_config_data(data) is False
+
+    @pytest.mark.unit
+    def test_is_config_data_paths_list_returns_false(self):
+        """pathsがリストの場合はFalse"""
+        data = {"paths": ["item1", "item2"]}
+        assert is_config_data(data) is False
+
+    @pytest.mark.unit
+    def test_is_config_data_paths_none_returns_false(self):
+        """pathsがNoneの場合はFalse"""
+        data = {"paths": None}
+        assert is_config_data(data) is False
+
+    @pytest.mark.unit
+    def test_is_config_data_paths_int_returns_false(self):
+        """pathsが整数の場合はFalse"""
+        data = {"paths": 123}
+        assert is_config_data(data) is False
+
+    # -------------------------------------------------------------------------
+    # 無効なlevels構造
+    # -------------------------------------------------------------------------
+
+    @pytest.mark.unit
+    def test_is_config_data_levels_not_dict_returns_false(self):
+        """levelsが文字列の場合はFalse"""
+        data = {"levels": "not_a_dict"}
+        assert is_config_data(data) is False
+
+    @pytest.mark.unit
+    def test_is_config_data_levels_list_returns_false(self):
+        """levelsがリストの場合はFalse"""
+        data = {"levels": [1, 2, 3]}
+        assert is_config_data(data) is False
+
+    @pytest.mark.unit
+    def test_is_config_data_levels_int_returns_false(self):
+        """levelsが整数の場合はFalse"""
+        data = {"levels": 123}
+        assert is_config_data(data) is False
+
+    @pytest.mark.unit
+    def test_is_config_data_levels_none_returns_false(self):
+        """levelsがNoneの場合はFalse"""
+        data = {"levels": None}
+        assert is_config_data(data) is False
+
+    # -------------------------------------------------------------------------
+    # 有効なケース
+    # -------------------------------------------------------------------------
+
+    @pytest.mark.unit
+    def test_is_config_data_with_valid_paths_dict(self):
+        """pathsが有効なdictの場合はTrue"""
+        data = {"paths": {"loops_dir": "data/Loops"}}
+        assert is_config_data(data) is True
+
+    @pytest.mark.unit
+    def test_is_config_data_with_valid_levels_dict(self):
+        """levelsが有効なdictの場合はTrue"""
+        data = {"levels": {"weekly_threshold": 5}}
+        assert is_config_data(data) is True
+
+    @pytest.mark.unit
+    def test_is_config_data_with_both_valid(self):
+        """pathsとlevels両方が有効なdictの場合はTrue"""
+        data = {
+            "base_dir": ".",
+            "paths": {"loops_dir": "data/Loops"},
+            "levels": {"weekly_threshold": 5},
+        }
+        assert is_config_data(data) is True
+
+    @pytest.mark.unit
+    def test_is_config_data_with_empty_paths_dict(self):
+        """空のpaths dictも有効"""
+        data = {"paths": {}}
+        assert is_config_data(data) is True
+
+    @pytest.mark.unit
+    def test_is_config_data_with_empty_levels_dict(self):
+        """空のlevels dictも有効"""
+        data = {"levels": {}}
+        assert is_config_data(data) is True
+
+    # -------------------------------------------------------------------------
+    # 複合ケース
+    # -------------------------------------------------------------------------
+
+    @pytest.mark.unit
+    def test_is_config_data_invalid_paths_valid_levels(self):
+        """pathsが無効でlevelsが有効でもFalse"""
+        data = {"paths": "invalid", "levels": {"threshold": 5}}
+        assert is_config_data(data) is False
+
+    @pytest.mark.unit
+    def test_is_config_data_valid_paths_invalid_levels(self):
+        """pathsが有効でlevelsが無効でもFalse"""
+        data = {"paths": {"dir": "x"}, "levels": "invalid"}
+        assert is_config_data(data) is False

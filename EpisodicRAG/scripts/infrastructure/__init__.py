@@ -59,6 +59,12 @@ from infrastructure.logging_config import (
     setup_logging,
 )
 
+# Structured Logging
+from infrastructure.structured_logging import (
+    StructuredLogger,
+    get_structured_logger,
+)
+
 # User Interaction
 from infrastructure.user_interaction import get_default_confirm_callback
 
@@ -85,6 +91,9 @@ __all__ = [
     "log_warning",
     "log_error",
     "log_debug",
+    # Structured Logging
+    "StructuredLogger",
+    "get_structured_logger",
     # User Interaction
     "get_default_confirm_callback",
 ]

@@ -70,6 +70,9 @@ from domain.file_naming import (
     format_digest_number,
 )
 
+# Domain validators (digest validation, runtime checks)
+from domain.validators import ensure_not_none, is_valid_overall_digest
+
 # Level registry (Strategy pattern for OCP)
 from domain.level_registry import (
     LevelBehavior,
@@ -165,4 +168,7 @@ __all__ = [
     "LevelRegistry",
     "get_level_registry",
     "reset_level_registry",
+    # Domain validators
+    "is_valid_overall_digest",
+    "ensure_not_none",
 ]

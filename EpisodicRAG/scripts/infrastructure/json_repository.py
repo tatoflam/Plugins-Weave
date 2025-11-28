@@ -233,16 +233,19 @@ def load_json_with_template(
     logger.debug(f"load_json_with_template called: target={target_file}, template={template_file}")
 
     # 既存ファイルから読み込み
-    if (existing := _try_load_existing(target_file)) is not None:
+    existing = _try_load_existing(target_file)
+    if existing is not None:
         return cast(T, existing)
 
     # テンプレートから初期化
-    if (from_template := _try_load_from_template(target_file, template_file, save_on_create)) is not None:
+    from_template = _try_load_from_template(target_file, template_file, save_on_create)
+    if from_template is not None:
         logger.info(log_message or f"Initialized {target_file.name} from template")
         return cast(T, from_template)
 
     # ファクトリから作成
-    if (from_factory := _create_from_factory(target_file, default_factory, save_on_create)) is not None:
+    from_factory = _create_from_factory(target_file, default_factory, save_on_create)
+    if from_factory is not None:
         logger.info(log_message or f"Created {target_file.name} with default template")
         return from_factory
 
