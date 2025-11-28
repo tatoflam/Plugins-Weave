@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Any, Callable, Dict, cast
 
 from domain.types import ShadowDigestData, as_dict
-from infrastructure import load_json_with_template, save_json
+from infrastructure import load_json_with_template, log_debug, save_json
 
 
 class ShadowIO:
@@ -35,6 +35,9 @@ class ShadowIO:
         Returns:
             ShadowGrandDigestのデータ構造
         """
+        log_debug(f"[FILE] load_or_create: {self.shadow_digest_file}")
+        log_debug(f"[FILE] file_exists: {self.shadow_digest_file.exists()}")
+
         # Cast factory to Dict[str, Any] for infrastructure compatibility
         factory = cast(Callable[[], Dict[str, Any]], self.template_factory)
         result = load_json_with_template(
@@ -42,6 +45,8 @@ class ShadowIO:
             default_factory=factory,
             log_message="ShadowGrandDigest.txt not found. Creating new file.",
         )
+
+        log_debug(f"[VALIDATE] loaded_data: keys={list(result.keys())}")
         return cast(ShadowDigestData, result)
 
     def save(self, data: ShadowDigestData) -> None:
@@ -51,6 +56,11 @@ class ShadowIO:
         Args:
             data: 保存するデータ
         """
+        log_debug(f"[FILE] save: {self.shadow_digest_file}")
+        log_debug(f"[VALIDATE] data_keys: {list(data.keys())}")
+
         data["metadata"]["last_updated"] = datetime.now().isoformat()
+        log_debug(f"[STATE] updated_timestamp: {data['metadata']['last_updated']}")
+
         # Cast TypedDict to Dict for infrastructure compatibility
         save_json(self.shadow_digest_file, as_dict(data))

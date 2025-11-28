@@ -15,7 +15,7 @@ from config import DigestConfig
 from domain.constants import LEVEL_CONFIG
 from domain.exceptions import DigestError
 from domain.types import IndividualDigestData, OverallDigestData
-from infrastructure import load_json, log_info, log_warning, try_read_json_from_file
+from infrastructure import load_json, log_debug, log_info, log_warning, try_read_json_from_file
 
 
 class ProvisionalLoader:
@@ -66,20 +66,26 @@ class ProvisionalLoader:
         provisional_dir = self.config.get_provisional_dir(level)
         provisional_path = provisional_dir / f"{level_cfg['prefix']}{digest_num}_Individual.txt"
 
+        log_debug(f"[FILE] load_or_generate: checking {provisional_path}")
+        log_debug(f"[FILE] file_exists: {provisional_path.exists()}")
+
         individual_digests: List[IndividualDigestData] = []
         provisional_file_to_delete: Optional[Path] = None
 
         if provisional_path.exists():
             provisional_data = load_json(provisional_path)
+            log_debug(f"[VALIDATE] provisional_data: is_valid={is_valid_dict(provisional_data)}")
             if not is_valid_dict(provisional_data):
                 raise DigestError(f"Invalid format in {provisional_path.name}: expected dict")
             individual_digests = provisional_data.get("individual_digests", [])
+            log_debug(f"[STATE] loaded_digests_count: {len(individual_digests)}")
             log_info(
                 f"Loaded {len(individual_digests)} individual digests from {provisional_path.name}"
             )
             provisional_file_to_delete = provisional_path
         else:
             # Provisionalファイルが存在しない場合、source_filesから自動生成
+            log_debug("[DECISION] provisional_not_found: generating from source files")
             log_info("No Provisional digest found, generating from source files...")
             individual_digests = self.generate_from_source(level, shadow_digest)
 
@@ -125,11 +131,16 @@ class ProvisionalLoader:
         skipped_count = 0
         source_dir = self._get_source_path_for_level(level)
 
+        log_debug(f"[STATE] generate_from_source: level={level}, source_count={len(source_files)}")
+        log_debug(f"[FILE] source_dir: {source_dir}")
+
         for source_file in source_files:
             source_path = source_dir / source_file
+            log_debug(f"[FILE] processing: {source_path}")
             source_data = try_read_json_from_file(source_path)
 
             if source_data is None:
+                log_debug(f"[FILE] skipped (read failed): {source_file}")
                 skipped_count += 1
                 continue
 

@@ -38,7 +38,7 @@ from .plugin_root_resolver import find_plugin_root
 from .threshold_provider import ThresholdProvider
 
 # Infrastructure層からログ関数をインポート（show_paths用）
-from infrastructure import log_info
+from infrastructure import log_debug, log_info
 
 # 後方互換性のため config_repository からも load_config をエクスポート
 from .config_repository import load_config
@@ -84,14 +84,21 @@ class DigestConfig:
             self.plugin_root = plugin_root
             self.config_file = self.plugin_root / ".claude-plugin" / "config.json"
 
+            log_debug(f"[STATE] DigestConfig init: plugin_root={plugin_root}")
+            log_debug(f"[FILE] config_file: {self.config_file}")
+            log_debug(f"[FILE] config_file_exists: {self.config_file.exists()}")
+
             # ConfigLoader を使用して設定を読み込み
             self._config_loader = ConfigLoader(self.config_file)
             self.config = self._config_loader.load()
+            log_debug(f"[VALIDATE] config_keys: {list(self.config.keys())}")
 
             # 各コンポーネントを即時初期化（軽量オブジェクトのため遅延不要）
             self._path_resolver = PathResolver(self.plugin_root, self.config)
             self._threshold_provider = ThresholdProvider(self.config)
             self._level_path_service = LevelPathService(self._path_resolver.digests_path)
+
+            log_debug(f"[STATE] paths: loops={self._path_resolver.loops_path}, digests={self._path_resolver.digests_path}")
 
             # ConfigValidator を使用（DirectoryValidator を統合）
             self._config_validator = ConfigValidator(

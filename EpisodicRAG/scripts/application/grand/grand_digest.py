@@ -16,7 +16,7 @@ from domain.constants import LEVEL_NAMES
 from domain.exceptions import DigestError
 from domain.types import GrandDigestData, OverallDigestData, as_dict
 from domain.version import DIGEST_FORMAT_VERSION
-from infrastructure import load_json_with_template, log_info, save_json
+from infrastructure import load_json_with_template, log_debug, log_info, save_json
 
 
 class GrandDigestManager:
@@ -67,6 +67,9 @@ class GrandDigestManager:
         """
         grand_data = self.load_or_create()
 
+        log_debug(f"[STATE] update_digest: level={level}, digest_name={digest_name}")
+        log_debug(f"[VALIDATE] grand_data: is_valid={is_valid_dict(grand_data)}")
+
         # 型チェック
         if not is_valid_dict(grand_data):
             raise DigestError("GrandDigest.txt has invalid format: expected dict")
@@ -74,14 +77,20 @@ class GrandDigestManager:
         if "major_digests" not in grand_data:
             raise DigestError("GrandDigest.txt missing 'major_digests' section")
 
+        available_levels = list(grand_data["major_digests"].keys())
+        log_debug(f"[VALIDATE] available_levels: {available_levels}")
+
         if level not in grand_data["major_digests"]:
             raise DigestError(f"Unknown level: {level}")
 
         # overall_digestを更新（完全なオブジェクトとして保存）
+        log_debug(f"[STATE] updating overall_digest for level={level}")
+        log_debug(f"[VALIDATE] overall_digest_keys: {list(overall_digest.keys())}")
         grand_data["major_digests"][level]["overall_digest"] = overall_digest
 
         # メタデータを更新
         grand_data["metadata"]["last_updated"] = datetime.now().isoformat()
+        log_debug(f"[STATE] updated_timestamp: {grand_data['metadata']['last_updated']}")
 
         # 保存
         self.save(grand_data)

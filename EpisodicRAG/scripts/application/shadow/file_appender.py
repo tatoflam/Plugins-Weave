@@ -12,7 +12,7 @@ from typing import Dict, List
 from application.validators import is_valid_dict
 from domain.constants import SOURCE_TYPE_LOOPS
 from domain.types import LevelHierarchyEntry, OverallDigestData, ShadowDigestData
-from infrastructure import log_info, log_warning, try_read_json_from_file
+from infrastructure import log_debug, log_info, log_warning, try_read_json_from_file
 
 from .file_detector import FileDetector
 from .placeholder_manager import PlaceholderManager
@@ -62,13 +62,18 @@ class FileAppender:
         """
         overall_digest = shadow_data["latest_digests"][level]["overall_digest"]
 
+        log_debug(f"[STATE] _ensure_overall_digest_initialized: level={level}")
+        log_debug(f"[VALIDATE] overall_digest: is_none={overall_digest is None}, is_valid={is_valid_dict(overall_digest) if overall_digest else False}")
+
         # overall_digestがnullまたは非dict型の場合、初期化
         if overall_digest is None or not is_valid_dict(overall_digest):
+            log_debug("[DECISION] reinitializing overall_digest (null or invalid)")
             overall_digest = self.template.create_empty_overall_digest()
             shadow_data["latest_digests"][level]["overall_digest"] = overall_digest
 
         # source_filesがoverall_digest内に存在しない場合、初期化
         if "source_files" not in overall_digest:
+            log_debug("[DECISION] initializing source_files (not present)")
             overall_digest["source_files"] = []
 
         return overall_digest
@@ -118,18 +123,29 @@ class FileAppender:
         existing_files = set(overall_digest["source_files"])
         source_type = self.level_hierarchy[level]["source"]
 
+        log_debug(f"[STATE] add_files_to_shadow: level={level}, new_files_count={len(new_files)}")
+        log_debug(f"[STATE] existing_files_count: {len(existing_files)}")
+        log_debug(f"[STATE] source_type: {source_type}")
+
         # 新しいファイルだけをsource_filesに追加
+        added_count = 0
         for file_path in new_files:
             if file_path.name not in existing_files:
                 overall_digest["source_files"].append(file_path.name)
+                added_count += 1
                 log_info(f"  + {file_path.name}")
 
                 # Monthly以上: Digestファイルの内容を読み込んでログ出力
                 if source_type != SOURCE_TYPE_LOOPS:
                     self._log_digest_content(file_path, level)
+            else:
+                log_debug(f"[FILE] skipped (already exists): {file_path.name}")
+
+        log_debug(f"[STATE] files_added: {added_count}")
 
         # PLACEHOLDERの更新または既存分析の保持
         total_files = len(overall_digest["source_files"])
+        log_debug(f"[STATE] total_files_after_add: {total_files}")
         self.placeholder_manager.update_or_preserve(overall_digest, total_files)
 
         self.shadow_io.save(shadow_data)

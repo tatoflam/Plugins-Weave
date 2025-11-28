@@ -41,6 +41,7 @@ markers = [
     "integration: 統合テスト（ファイルI/O）",
     "slow: 時間のかかるテスト",
     "property: Property-based tests using hypothesis",
+    "performance: パフォーマンス・ベンチマークテスト",
 ]
 
 # デフォルトオプション
