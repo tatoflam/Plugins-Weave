@@ -233,18 +233,18 @@ def load_json_with_template(
     logger.debug(f"load_json_with_template called: target={target_file}, template={template_file}")
 
     # 既存ファイルから読み込み
-    if (result := _try_load_existing(target_file)) is not None:
-        return cast(T, result)
+    if (existing := _try_load_existing(target_file)) is not None:
+        return cast(T, existing)
 
     # テンプレートから初期化
-    if (result := _try_load_from_template(target_file, template_file, save_on_create)) is not None:
+    if (from_template := _try_load_from_template(target_file, template_file, save_on_create)) is not None:
         logger.info(log_message or f"Initialized {target_file.name} from template")
-        return cast(T, result)
+        return cast(T, from_template)
 
     # ファクトリから作成
-    if (result := _create_from_factory(target_file, default_factory, save_on_create)) is not None:
+    if (from_factory := _create_from_factory(target_file, default_factory, save_on_create)) is not None:
         logger.info(log_message or f"Created {target_file.name} with default template")
-        return result
+        return from_factory
 
     # どちらもない場合は空のdictを返す
     logger.debug("No template or factory provided, returning empty dict")

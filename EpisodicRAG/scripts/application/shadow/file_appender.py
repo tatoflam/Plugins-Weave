@@ -93,9 +93,13 @@ class FileAppender:
             log_debug(
                 f"{LOG_PREFIX_DECISION} reinitializing overall_digest (invalid or missing source_files)"
             )
-            overall_digest = self.template.create_empty_overall_digest()
-            shadow_data["latest_digests"][level]["overall_digest"] = overall_digest
+            initialized = self.template.create_empty_overall_digest()
+            shadow_data["latest_digests"][level]["overall_digest"] = initialized
+            return initialized
 
+        # overall_digestが有効な場合（_is_valid_overall_digestがTrue）
+        # この時点でoverall_digestはNoneではなくOverallDigestData型
+        assert overall_digest is not None
         return overall_digest
 
     def _add_new_files_to_digest(

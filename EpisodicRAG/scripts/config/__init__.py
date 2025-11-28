@@ -22,7 +22,7 @@ Usage:
 
 import logging
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Literal, Optional
 
 # Domain層からインポート
 from domain.error_formatter import get_error_formatter
@@ -138,7 +138,7 @@ class DigestConfig:
         exc_type: Optional[type],
         exc_val: Optional[BaseException],
         exc_tb: Optional[object],
-    ) -> bool:
+    ) -> Literal[False]:
         """
         Context Manager終了
 

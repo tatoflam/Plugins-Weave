@@ -48,7 +48,6 @@ jobs:
       - name: Run mypy
         working-directory: EpisodicRAG
         run: mypy scripts/
-        continue-on-error: true
 
   test:
     runs-on: ubuntu-latest

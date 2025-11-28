@@ -97,7 +97,9 @@ class CascadeProcessor:
             log_info(f"No shadow digest for level: {level}")
             return None
 
-        # 検証済み: source_filesへの直接アクセスが安全
+        # 検証済み: overall_digestは有効（_is_valid_overall_digestがTrue）
+        # この時点でNoneではないことが保証される
+        assert overall_digest is not None
         log_debug(
             f"{LOG_PREFIX_VALIDATE} source_files: count={len(overall_digest['source_files'])}"
         )
