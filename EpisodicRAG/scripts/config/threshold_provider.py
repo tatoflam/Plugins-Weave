@@ -7,6 +7,7 @@ Threshold Provider
 """
 
 from domain.constants import DEFAULT_THRESHOLDS, LEVEL_CONFIG, LEVEL_NAMES
+from domain.error_formatter import get_error_formatter
 from domain.exceptions import ConfigError
 from domain.types import ConfigData, as_dict
 
@@ -50,7 +51,8 @@ class ThresholdProvider:
             ConfigError: 不正なレベル名の場合
         """
         if level not in LEVEL_CONFIG:
-            raise ConfigError(f"Invalid level: {level}. Valid levels: {LEVEL_NAMES}")
+            formatter = get_error_formatter()
+            raise ConfigError(formatter.invalid_level(level, list(LEVEL_NAMES)))
 
         key = f"{level}_threshold"
         default = DEFAULT_THRESHOLDS.get(level, 5)

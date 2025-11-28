@@ -441,3 +441,58 @@ class TestDigestConfigShowPaths:
 
         result = config.show_paths()
         assert result is None
+
+
+# =============================================================================
+# Context Manager テスト
+# =============================================================================
+
+
+class TestDigestConfigContextManager:
+    """DigestConfig の Context Manager テスト"""
+
+    @pytest.fixture
+    def context_env(self, temp_plugin_env):
+        """Context Manager テスト用の設定環境を構築"""
+        config_data = {
+            "base_dir": ".",
+            "paths": {
+                "loops_dir": "data/Loops",
+                "digests_dir": "data/Digests",
+                "essences_dir": "data/Essences",
+            },
+        }
+        config_file = temp_plugin_env.config_dir / "config.json"
+        with open(config_file, "w", encoding="utf-8") as f:
+            json.dump(config_data, f)
+        return temp_plugin_env
+
+    @pytest.mark.unit
+    def test_context_manager_enter_returns_self(self, context_env):
+        """__enter__がselfを返す"""
+        config = DigestConfig(plugin_root=context_env.plugin_root)
+
+        with config as ctx:
+            assert ctx is config
+
+    @pytest.mark.unit
+    def test_context_manager_basic_usage(self, context_env):
+        """Context Managerの基本的な使用"""
+        with DigestConfig(plugin_root=context_env.plugin_root) as config:
+            # スコープ内でconfigが使用可能
+            assert config.plugin_root == context_env.plugin_root
+            assert config.loops_path.name == "Loops"
+
+    @pytest.mark.unit
+    def test_context_manager_exit_does_not_suppress_exception(self, context_env):
+        """__exit__が例外を抑制しない"""
+        with pytest.raises(ValueError):
+            with DigestConfig(plugin_root=context_env.plugin_root) as config:
+                raise ValueError("Test exception")
+
+    @pytest.mark.unit
+    def test_context_manager_nested_usage(self, context_env):
+        """ネストしたContext Managerの使用"""
+        with DigestConfig(plugin_root=context_env.plugin_root) as outer:
+            with DigestConfig(plugin_root=context_env.plugin_root) as inner:
+                assert outer.plugin_root == inner.plugin_root

@@ -276,6 +276,48 @@ class ErrorFormatter:
         """
         return f"Cascade failed from '{from_level}' to '{to_level}': {reason}"
 
+    # =========================================================================
+    # Directory/Path Errors
+    # =========================================================================
+
+    def directory_creation_failed(self, path: Path, error: Exception) -> str:
+        """
+        ディレクトリ作成失敗エラーメッセージ
+
+        Args:
+            path: 作成に失敗したディレクトリパス
+            error: 発生した例外
+
+        Returns:
+            フォーマットされたエラーメッセージ
+        """
+        return f"Failed to create directory {self.format_path(path)}: {error}"
+
+    def config_section_missing(self, section: str) -> str:
+        """
+        設定セクション欠落エラーメッセージ
+
+        Args:
+            section: 欠落しているセクション名
+
+        Returns:
+            フォーマットされたエラーメッセージ
+        """
+        return f"'{section}' section missing in config.json"
+
+    def initialization_failed(self, component: str, error: Exception) -> str:
+        """
+        初期化失敗エラーメッセージ
+
+        Args:
+            component: 初期化に失敗したコンポーネント名
+            error: 発生した例外
+
+        Returns:
+            フォーマットされたエラーメッセージ
+        """
+        return f"Failed to initialize {component}: {error}"
+
 
 # =============================================================================
 # Module-level convenience functions

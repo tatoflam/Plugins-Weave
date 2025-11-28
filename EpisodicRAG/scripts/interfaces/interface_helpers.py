@@ -13,6 +13,7 @@ import re
 from pathlib import Path
 from typing import List, Union
 
+from domain.error_formatter import get_error_formatter
 from domain.exceptions import ConfigError, ValidationError
 
 
@@ -32,10 +33,11 @@ def sanitize_filename(title: str, max_length: int = 50) -> str:
         ValueError: max_lengthが正の整数でない場合
     """
     # 型チェック
+    formatter = get_error_formatter()
     if not isinstance(title, str):
-        raise ValidationError(f"title must be str, got {type(title).__name__}")
+        raise ValidationError(formatter.invalid_type("title", "str", title))
     if max_length <= 0:
-        raise ValidationError(f"max_length must be positive, got {max_length}")
+        raise ValidationError(formatter.validation_error("max_length", "must be positive", max_length))
 
     # 危険な文字を削除
     sanitized = re.sub(r'[<>:"/\\|?*]', '', title)
@@ -78,7 +80,8 @@ def get_next_digest_number(digests_path: Path, level: str) -> int:
 
     config = LEVEL_CONFIG.get(level)
     if not config:
-        raise ConfigError(f"Invalid level: {level}")
+        formatter = get_error_formatter()
+        raise ConfigError(formatter.invalid_level(level, list(LEVEL_CONFIG.keys())))
 
     prefix = str(config["prefix"])
     level_dir = digests_path / str(config["dir"])

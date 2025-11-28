@@ -10,6 +10,7 @@ from typing import Any, Callable, List, Optional, Tuple
 
 from application.grand import ShadowGrandDigestManager
 from application.validators import is_valid_dict, is_valid_list
+from domain.error_formatter import get_error_formatter
 from domain.exceptions import DigestError, ValidationError
 from domain.file_naming import extract_file_number
 from domain.types import OverallDigestData
@@ -53,20 +54,21 @@ class ShadowValidator:
         numbers: List[int] = []
 
         # 型チェック
+        formatter = get_error_formatter()
         if not is_valid_list(source_files):
-            fatal_errors.append(f"source_files must be a list, got {type(source_files).__name__}")
+            fatal_errors.append(formatter.invalid_type("source_files", "list", source_files))
             return fatal_errors, warnings, numbers
 
         # 空チェック
         if not source_files:
-            fatal_errors.append(f"Shadow digest for level '{level}' has no source files")
+            fatal_errors.append(formatter.empty_collection(f"Shadow digest for level '{level}'"))
             return fatal_errors, warnings, numbers
 
         # ファイル名検証と番号抽出を1ループで実行
         for i, filename in enumerate(source_files):
             if not isinstance(filename, str):
                 fatal_errors.append(
-                    f"Invalid filename at index {i}: expected str, got {type(filename).__name__}"
+                    formatter.invalid_type(f"filename at index {i}", "str", filename)
                 )
                 continue
 
@@ -139,7 +141,8 @@ class ShadowValidator:
             ValidationError: タイトルが空の場合
         """
         if not weave_title or not weave_title.strip():
-            raise ValidationError("weave_title cannot be empty")
+            formatter = get_error_formatter()
+            raise ValidationError(formatter.empty_collection("weave_title"))
 
     def _fetch_shadow_digest(self, level: str) -> OverallDigestData:
         """
@@ -158,7 +161,8 @@ class ShadowValidator:
 
         if shadow_digest is None:
             log_info("Run 'python shadow_grand_digest.py' to update shadow first")
-            raise DigestError(f"No shadow digest found for level: {level}")
+            formatter = get_error_formatter()
+            raise DigestError(formatter.digest_not_found(level, "shadow"))
 
         return shadow_digest
 
@@ -173,9 +177,8 @@ class ShadowValidator:
             ValidationError: 形式が不正な場合
         """
         if not is_valid_dict(shadow_digest):
-            raise ValidationError(
-                f"Invalid shadow digest format: expected dict, got {type(shadow_digest).__name__}"
-            )
+            formatter = get_error_formatter()
+            raise ValidationError(formatter.invalid_type("shadow digest", "dict", shadow_digest))
 
     def validate_and_get_shadow(self, level: str, weave_title: str) -> OverallDigestData:
         """

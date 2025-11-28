@@ -51,21 +51,21 @@ class TestShadowValidatorValidateShadowContent:
         """source_filesがlistでない場合はValidationError"""
         with pytest.raises(ValidationError) as exc_info:
             validator.validate_shadow_content("weekly", "not a list")
-        assert "must be a list" in str(exc_info.value)
+        assert "expected list" in str(exc_info.value)
 
     @pytest.mark.unit
     def test_raises_on_dict(self, validator):
         """source_filesがdictの場合はValidationError"""
         with pytest.raises(ValidationError) as exc_info:
             validator.validate_shadow_content("weekly", {"key": "value"})
-        assert "must be a list" in str(exc_info.value)
+        assert "expected list" in str(exc_info.value)
 
     @pytest.mark.unit
     def test_raises_on_empty_list(self, validator):
         """source_filesが空の場合はValidationError"""
         with pytest.raises(ValidationError) as exc_info:
             validator.validate_shadow_content("weekly", [])
-        assert "has no source files" in str(exc_info.value)
+        assert "cannot be empty" in str(exc_info.value)
 
     @pytest.mark.unit
     def test_raises_on_non_string_filename(self, validator):
@@ -115,7 +115,7 @@ class TestShadowValidatorValidateAndGetShadow:
         """shadow_digestがない場合はDigestError"""
         with pytest.raises(DigestError) as exc_info:
             validator.validate_and_get_shadow("weekly", "Test Title")
-        assert "No shadow digest found" in str(exc_info.value)
+        assert "Digest not found" in str(exc_info.value)
 
     @pytest.mark.integration
     def test_returns_valid_shadow(self, validator, shadow_manager, temp_plugin_env):
@@ -420,7 +420,7 @@ class TestShadowValidatorPrivateMethods:
         """_fetch_shadow_digest: Noneの場合DigestError"""
         with pytest.raises(DigestError) as exc_info:
             validator._fetch_shadow_digest("weekly")
-        assert "No shadow digest found" in str(exc_info.value)
+        assert "Digest not found" in str(exc_info.value)
 
     @pytest.mark.integration
     def test_fetch_shadow_digest_returns_data(self, validator, shadow_manager, temp_plugin_env):
@@ -444,21 +444,21 @@ class TestShadowValidatorPrivateMethods:
         """_validate_shadow_format: NoneでValidationError"""
         with pytest.raises(ValidationError) as exc_info:
             validator._validate_shadow_format(None)
-        assert "Invalid shadow digest format" in str(exc_info.value)
+        assert "expected dict" in str(exc_info.value)
 
     @pytest.mark.unit
     def test_validate_shadow_format_list_raises(self, validator):
         """_validate_shadow_format: listでValidationError"""
         with pytest.raises(ValidationError) as exc_info:
             validator._validate_shadow_format([1, 2, 3])
-        assert "Invalid shadow digest format" in str(exc_info.value)
+        assert "expected dict" in str(exc_info.value)
 
     @pytest.mark.unit
     def test_validate_shadow_format_string_raises(self, validator):
         """_validate_shadow_format: 文字列でValidationError"""
         with pytest.raises(ValidationError) as exc_info:
             validator._validate_shadow_format("not a dict")
-        assert "Invalid shadow digest format" in str(exc_info.value)
+        assert "expected dict" in str(exc_info.value)
 
     @pytest.mark.unit
     def test_validate_shadow_format_valid_dict_passes(self, validator):

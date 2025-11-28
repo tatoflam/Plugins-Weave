@@ -38,6 +38,7 @@ from pathlib import Path
 from typing import Any, Callable, Dict, Mapping, Optional, TypeVar, cast
 
 from domain.constants import DIGEST_FILE_EXTENSION
+from domain.error_formatter import get_error_formatter
 from domain.exceptions import FileIOError
 
 # Generic type for load_json_with_template
@@ -73,16 +74,17 @@ def _safe_read_json(file_path: Path, raise_on_error: bool = True) -> Optional[Di
     Raises:
         FileIOError: raise_on_error=Trueの場合、JSONパースまたはI/Oエラー時
     """
+    formatter = get_error_formatter()
     try:
         with open(file_path, 'r', encoding='utf-8') as f:
             return json.load(f)
     except json.JSONDecodeError as e:
         if raise_on_error:
-            raise FileIOError(f"Invalid JSON in {file_path}: {e}") from e
+            raise FileIOError(formatter.invalid_json(file_path, e)) from e
         return None
     except IOError as e:
         if raise_on_error:
-            raise FileIOError(f"Failed to read {file_path}: {e}") from e
+            raise FileIOError(formatter.file_io_error("read", file_path, e)) from e
         return None
 
 
@@ -100,7 +102,8 @@ def load_json(file_path: Path) -> Dict[str, Any]:
         FileIOError: ファイルが存在しない、またはJSONのパースに失敗した場合
     """
     if not file_path.exists():
-        raise FileIOError(f"File not found: {file_path}")
+        formatter = get_error_formatter()
+        raise FileIOError(formatter.file_not_found(file_path))
 
     result = _safe_read_json(file_path, raise_on_error=True)
     # _safe_read_jsonがraise_on_error=Trueで呼ばれた場合、Noneは返らない
@@ -119,12 +122,13 @@ def save_json(file_path: Path, data: Dict[str, Any], indent: int = 2) -> None:
     Raises:
         FileIOError: ファイルの書き込みに失敗した場合
     """
+    formatter = get_error_formatter()
     try:
         file_path.parent.mkdir(parents=True, exist_ok=True)
         with open(file_path, 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False, indent=indent)
     except IOError as e:
-        raise FileIOError(f"Failed to write {file_path}: {e}") from e
+        raise FileIOError(formatter.file_io_error("write", file_path, e)) from e
 
 
 def _try_load_existing(target_file: Path) -> Optional[Dict[str, Any]]:
@@ -270,10 +274,11 @@ def ensure_directory(dir_path: Path) -> None:
     Raises:
         FileIOError: ディレクトリの作成に失敗した場合
     """
+    formatter = get_error_formatter()
     try:
         dir_path.mkdir(parents=True, exist_ok=True)
     except OSError as e:
-        raise FileIOError(f"Failed to create directory {dir_path}: {e}") from e
+        raise FileIOError(formatter.directory_creation_failed(dir_path, e)) from e
 
 
 def try_load_json(

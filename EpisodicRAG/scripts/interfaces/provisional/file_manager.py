@@ -9,6 +9,7 @@ from typing import Any, Dict, List, Optional, Union, cast
 
 from config import DigestConfig
 from domain.constants import LEVEL_CONFIG
+from domain.error_formatter import get_error_formatter
 from domain.exceptions import ConfigError
 from domain.file_naming import find_max_number, format_digest_number
 from domain.types import LevelConfigData
@@ -126,5 +127,6 @@ class ProvisionalFileManager:
         """
         level_cfg = self.level_config.get(level)
         if not level_cfg:
-            raise ConfigError(f"Invalid level: {level}")
+            formatter = get_error_formatter()
+            raise ConfigError(formatter.invalid_level(level, list(self.level_config.keys())))
         return cast(LevelConfigData, level_cfg)

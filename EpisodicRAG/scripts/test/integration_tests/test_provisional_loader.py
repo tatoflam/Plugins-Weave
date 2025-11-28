@@ -109,7 +109,7 @@ class TestProvisionalLoaderLoadOrGenerate:
 
         with pytest.raises(DigestError) as exc_info:
             loader.load_or_generate("weekly", shadow_digest, "0001")
-        assert "Invalid format" in str(exc_info.value)
+        assert "expected dict" in str(exc_info.value)
 
 
 # =============================================================================

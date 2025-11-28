@@ -9,6 +9,7 @@ config.json の読み書き
 import json
 from pathlib import Path
 
+from domain.error_formatter import get_error_formatter
 from domain.exceptions import ConfigError
 from domain.types import ConfigData
 
@@ -26,13 +27,15 @@ def load_config(config_file: Path) -> ConfigData:
     Raises:
         ConfigError: 設定ファイルが見つからない、またはJSONパースに失敗した場合
     """
+    formatter = get_error_formatter()
     if not config_file.exists():
         raise ConfigError(
-            f"Config file not found: {config_file}\nRun setup first: bash scripts/setup.sh"
+            f"{formatter.file_not_found(config_file)}\n"
+            "Run setup first: bash scripts/setup.sh"
         )
 
     try:
         with open(config_file, 'r', encoding='utf-8') as f:
             return json.load(f)
     except json.JSONDecodeError as e:
-        raise ConfigError(f"Invalid JSON in config file {config_file}: {e.msg}") from e
+        raise ConfigError(formatter.invalid_json(config_file, e)) from e

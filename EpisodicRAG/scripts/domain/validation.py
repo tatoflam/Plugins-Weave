@@ -12,6 +12,7 @@ Usage:
 
 from typing import Any, List, Type, TypeVar
 
+from domain.error_formatter import get_error_formatter
 from domain.exceptions import ValidationError
 
 T = TypeVar("T")
@@ -34,7 +35,8 @@ def validate_type(data: Any, expected_type: Type[T], context: str, type_name: st
         ValidationError: dataが期待する型でない場合
     """
     if not isinstance(data, expected_type):
-        raise ValidationError(f"{context}: expected {type_name}, got {type(data).__name__}")
+        formatter = get_error_formatter()
+        raise ValidationError(formatter.invalid_type(context, type_name, data))
     return data
 
 

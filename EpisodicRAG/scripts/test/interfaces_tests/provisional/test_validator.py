@@ -216,33 +216,33 @@ class TestValidateInputFormat(unittest.TestCase):
         """Dict without individual_digests raises ValidationError"""
         with self.assertRaises(ValidationError) as cm:
             validate_input_format({"other_key": "value"})
-        self.assertIn("Invalid input format", str(cm.exception))
-        self.assertIn("dict with 'individual_digests' key", str(cm.exception))
+        self.assertIn("expected list or dict", str(cm.exception))
+        self.assertIn("'individual_digests' key", str(cm.exception))
 
     def test_none_raises_error(self):
         """None input raises ValidationError"""
         with self.assertRaises(ValidationError) as cm:
             validate_input_format(None)
-        self.assertIn("Invalid input format", str(cm.exception))
+        self.assertIn("expected list or dict", str(cm.exception))
 
     def test_string_raises_error(self):
         """String input raises ValidationError"""
         with self.assertRaises(ValidationError) as cm:
             validate_input_format("invalid")
-        self.assertIn("Invalid input format", str(cm.exception))
+        self.assertIn("expected list or dict", str(cm.exception))
         self.assertIn("str", str(cm.exception))
 
     def test_int_raises_error(self):
         """Integer input raises ValidationError"""
         with self.assertRaises(ValidationError) as cm:
             validate_input_format(123)
-        self.assertIn("Invalid input format", str(cm.exception))
+        self.assertIn("expected list or dict", str(cm.exception))
 
     def test_empty_dict_raises_error(self):
         """Empty dict raises ValidationError"""
         with self.assertRaises(ValidationError) as cm:
             validate_input_format({})
-        self.assertIn("Invalid input format", str(cm.exception))
+        self.assertIn("expected list or dict", str(cm.exception))
 
 
 if __name__ == "__main__":

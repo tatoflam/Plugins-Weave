@@ -8,6 +8,7 @@ import json
 from pathlib import Path
 from typing import Any, Dict, List, Union
 
+from domain.error_formatter import get_error_formatter
 from domain.exceptions import ValidationError
 from domain.types import IndividualDigestData
 from interfaces.provisional.validator import validate_input_format
@@ -37,7 +38,8 @@ class InputLoader:
         """
         # Empty input check
         if not input_data or not input_data.strip():
-            raise ValidationError("input_data cannot be empty")
+            formatter = get_error_formatter()
+            raise ValidationError(formatter.empty_collection("input_data"))
 
         # Quick heuristic: JSON arrays/objects start with [ or {
         # This avoids calling Path.exists() on long JSON strings (OSError on Linux)

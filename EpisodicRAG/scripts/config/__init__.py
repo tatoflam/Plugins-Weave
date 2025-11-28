@@ -11,6 +11,7 @@ Architecture:
     - PathResolver: パス解決
     - ThresholdProvider: 閾値管理
     - LevelPathService: レベル別パス管理
+    - SourcePathResolver: ソースパス解決
     - ConfigValidator: 設定とディレクトリ構造の検証
 
 Usage:
@@ -19,17 +20,12 @@ Usage:
     from domain.types import ConfigData
 """
 
-import json
 import logging
-import sys
 from pathlib import Path
 from typing import List, Optional
 
 # Domain層からインポート
-from domain.constants import (
-    LEVEL_CONFIG,
-    SOURCE_TYPE_LOOPS,
-)
+from domain.error_formatter import get_error_formatter
 from domain.exceptions import ConfigError
 from domain.types import ConfigData
 
@@ -42,6 +38,7 @@ from .config_validator import DirectoryValidator as DirectoryValidator  # noqa: 
 from .level_path_service import LevelPathService
 from .path_resolver import PathResolver
 from .plugin_root_resolver import find_plugin_root
+from .source_path_resolver import SourcePathResolver
 from .threshold_provider import ThresholdProvider
 
 # Config層専用logger（Infrastructure層に依存しない）
@@ -64,6 +61,7 @@ class DigestConfig:
         - _path_resolver: PathResolver - パス解決
         - _threshold_provider: ThresholdProvider - 閾値管理
         - _level_path_service: LevelPathService - レベル別パス管理
+        - _source_path_resolver: SourcePathResolver - ソースパス解決
         - _config_validator: ConfigValidator - 設定とディレクトリ構造の検証
     """
 
@@ -93,6 +91,9 @@ class DigestConfig:
             self._path_resolver = PathResolver(self.plugin_root, self.config)
             self._threshold_provider = ThresholdProvider(self.config)
             self._level_path_service = LevelPathService(self._path_resolver.digests_path)
+            self._source_path_resolver = SourcePathResolver(
+                self._path_resolver.loops_path, self._level_path_service
+            )
 
             # ConfigValidator を使用（DirectoryValidator を統合）
             self._config_validator = ConfigValidator(
@@ -110,7 +111,53 @@ class DigestConfig:
             self._directory_validator = self._config_validator
 
         except (PermissionError, OSError) as e:
-            raise ConfigError(f"Failed to initialize configuration: {e}") from e
+            formatter = get_error_formatter()
+            raise ConfigError(formatter.initialization_failed("configuration", e)) from e
+
+    # =========================================================================
+    # Context Manager Support
+    # =========================================================================
+
+    def __enter__(self) -> "DigestConfig":
+        """
+        Context Manager開始
+
+        Usage:
+            with DigestConfig() as config:
+                manager = ShadowGrandDigestManager(config)
+                manager.update_shadow_for_new_loops()
+            # スコープ終了時に自動的にリソースがクリアされる
+
+        Returns:
+            self: DigestConfigインスタンス
+        """
+        return self
+
+    def __exit__(
+        self,
+        exc_type: Optional[type],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[object],
+    ) -> bool:
+        """
+        Context Manager終了
+
+        Args:
+            exc_type: 例外の型（例外がない場合はNone）
+            exc_val: 例外のインスタンス（例外がない場合はNone）
+            exc_tb: トレースバック（例外がない場合はNone）
+
+        Returns:
+            False: 例外は常に伝播させる（抑制しない）
+
+        Note:
+            現在の実装では特別なクリーンアップは不要だが、
+            将来的にキャッシュやリソースの解放が必要になった場合に
+            このメソッドで対応可能。
+        """
+        # 将来の拡張用: キャッシュクリア等
+        # self._config_loader._config = None  # 例: 設定キャッシュのクリア
+        return False  # 例外は伝播させる
 
     def _find_plugin_root(self) -> Path:
         """
@@ -188,15 +235,7 @@ class DigestConfig:
         Raises:
             ConfigError: 無効なlevelが指定された場合
         """
-        if level not in LEVEL_CONFIG:
-            raise ConfigError(f"Invalid level: {level}")
-
-        source_type = str(LEVEL_CONFIG[level]["source"])
-
-        if source_type == SOURCE_TYPE_LOOPS:
-            return self.loops_path
-        else:
-            return self.get_level_dir(source_type)
+        return self._source_path_resolver.get_source_dir(level)
 
     def get_source_pattern(self, level: str) -> str:
         """
@@ -211,16 +250,7 @@ class DigestConfig:
         Raises:
             ConfigError: 無効なlevelが指定された場合
         """
-        if level not in LEVEL_CONFIG:
-            raise ConfigError(f"Invalid level: {level}")
-
-        source_type = str(LEVEL_CONFIG[level]["source"])
-
-        if source_type == SOURCE_TYPE_LOOPS:
-            return "L*.txt"
-        else:
-            source_prefix = str(LEVEL_CONFIG[source_type]["prefix"])
-            return f"{source_prefix}*.txt"
+        return self._source_path_resolver.get_source_pattern(level)
 
     def validate_directory_structure(self) -> List[str]:
         """ディレクトリ構造の検証"""
@@ -289,29 +319,12 @@ class DigestConfig:
             _logger.info(f"Identity File: {identity_file}")
 
 
+# CLI エントリーポイント（後方互換性のため維持）
 def main() -> None:
-    """CLI エントリーポイント"""
-    import argparse
+    """CLI エントリーポイント（cli.pyに委譲）"""
+    from .cli import main as cli_main
 
-    parser = argparse.ArgumentParser(description="Digest Plugin Configuration Manager")
-    parser.add_argument("--show-paths", action="store_true", help="Show all configured paths")
-    parser.add_argument("--plugin-root", type=Path, help="Override plugin root")
-
-    args = parser.parse_args()
-
-    try:
-        config = DigestConfig(plugin_root=args.plugin_root)
-
-        if args.show_paths:
-            config.show_paths()
-        else:
-            # デフォルト: JSON出力
-            print(json.dumps(config.config, indent=2, ensure_ascii=False))
-
-    except FileNotFoundError as e:
-        # 循環インポートを避けるため直接出力
-        sys.stderr.write(f"[ERROR] {e}\n")
-        sys.exit(1)
+    cli_main()
 
 
 if __name__ == "__main__":

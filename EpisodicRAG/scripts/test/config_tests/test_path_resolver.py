@@ -74,7 +74,7 @@ class TestPathResolver:
         with pytest.raises(ConfigError) as exc_info:
             resolver.resolve_path("nonexistent_key")
 
-        assert "not found in config.json" in str(exc_info.value)
+        assert "Required configuration key missing" in str(exc_info.value)
 
     @pytest.mark.unit
     def test_base_dir_traversal_raises_config_error(self, temp_plugin_env):
@@ -84,7 +84,7 @@ class TestPathResolver:
         with pytest.raises(ConfigError) as exc_info:
             PathResolver(temp_plugin_env.plugin_root, config)
 
-        assert "resolves outside plugin root" in str(exc_info.value)
+        assert "Invalid configuration value for 'base_dir'" in str(exc_info.value)
 
     @pytest.mark.unit
     def test_base_dir_subdir_resolution(self, temp_plugin_env):

@@ -19,6 +19,7 @@ from domain.constants import (
     LOG_PREFIX_FILE,
     LOG_PREFIX_STATE,
 )
+from domain.error_formatter import get_error_formatter
 from domain.exceptions import DigestError, FileIOError, ValidationError
 from domain.level_registry import get_level_registry
 from domain.types import RegularDigestData, as_dict
@@ -95,7 +96,8 @@ class DigestPersistence:
             log_debug(f"{LOG_PREFIX_FILE} saving RegularDigest to {final_path}")
             save_json(final_path, as_dict(regular_digest))
         except IOError as e:
-            raise FileIOError(f"Failed to save RegularDigest: {e}")
+            formatter = get_error_formatter()
+            raise FileIOError(formatter.file_io_error("save", final_path, e))
 
         log_info(f"RegularDigest saved: {final_path}")
         return final_path
@@ -117,7 +119,8 @@ class DigestPersistence:
         log_info(f"[Step 2] Updating GrandDigest.txt for {level}")
         overall_digest = regular_digest.get("overall_digest")
         if not overall_digest or not is_valid_dict(overall_digest):
-            raise DigestError("RegularDigest has no valid overall_digest")
+            formatter = get_error_formatter()
+            raise DigestError(formatter.validation_error("RegularDigest", "has no valid overall_digest", None))
         # GrandDigestManager.update_digestは例外を投げる（失敗時）
         self.grand_digest_manager.update_digest(level, new_digest_name, overall_digest)
 

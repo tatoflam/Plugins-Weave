@@ -347,6 +347,109 @@ class TestCascadeError(unittest.TestCase):
         self.assertEqual(result, "Cascade failed from 'weekly' to 'monthly': threshold not met")
 
 
+class TestDirectoryCreationFailed(unittest.TestCase):
+    """directory_creation_failed() tests"""
+
+    def setUp(self):
+        """Set up test formatter"""
+        self.formatter = ErrorFormatter(Path("/project"))
+
+    def test_basic_directory_creation_failed(self):
+        """Basic directory creation failure message"""
+        path = Path("/project/data/subdir")
+        error = OSError("Permission denied")
+        result = self.formatter.directory_creation_failed(path, error)
+        self.assertIn("Failed to create directory", result)
+        self.assertIn("Permission denied", result)
+
+    def test_with_relative_path(self):
+        """Message with path inside project root shows relative path"""
+        path = Path("/project/new_dir/subdir")
+        error = OSError("Disk full")
+        result = self.formatter.directory_creation_failed(path, error)
+        # Should contain relative path
+        self.assertIn(str(Path("new_dir/subdir")), result)
+
+    def test_with_absolute_path_outside_root(self):
+        """Message with path outside project root shows absolute path"""
+        path = Path("/other/location/dir")
+        error = OSError("Access denied")
+        result = self.formatter.directory_creation_failed(path, error)
+        self.assertIn(str(path), result)
+
+    def test_includes_error_message(self):
+        """Error details are included in message"""
+        path = Path("/project/dir")
+        error = OSError("[Errno 13] Permission denied: '/project/dir'")
+        result = self.formatter.directory_creation_failed(path, error)
+        self.assertIn("Permission denied", result)
+
+
+class TestConfigSectionMissing(unittest.TestCase):
+    """config_section_missing() tests"""
+
+    def setUp(self):
+        """Set up test formatter"""
+        self.formatter = ErrorFormatter(Path("/root"))
+
+    def test_basic_section_missing(self):
+        """Basic section missing message"""
+        result = self.formatter.config_section_missing("paths")
+        self.assertEqual(result, "'paths' section missing in config.json")
+
+    def test_with_levels_section(self):
+        """Message for levels section"""
+        result = self.formatter.config_section_missing("levels")
+        self.assertIn("'levels' section missing", result)
+
+    def test_with_major_digests_section(self):
+        """Message for major_digests section (GrandDigest.txt)"""
+        result = self.formatter.config_section_missing("major_digests")
+        self.assertIn("'major_digests' section missing", result)
+
+    def test_error_message_format(self):
+        """Verify message format consistency"""
+        result = self.formatter.config_section_missing("test_section")
+        self.assertTrue(result.startswith("'test_section'"))
+        self.assertIn("missing in config.json", result)
+
+
+class TestInitializationFailed(unittest.TestCase):
+    """initialization_failed() tests"""
+
+    def setUp(self):
+        """Set up test formatter"""
+        self.formatter = ErrorFormatter(Path("/root"))
+
+    def test_basic_initialization_failed(self):
+        """Basic initialization failure message"""
+        error = Exception("Connection refused")
+        result = self.formatter.initialization_failed("database", error)
+        self.assertIn("Failed to initialize database", result)
+        self.assertIn("Connection refused", result)
+
+    def test_with_configuration_component(self):
+        """Message for configuration initialization failure"""
+        error = PermissionError("Access denied to config file")
+        result = self.formatter.initialization_failed("configuration", error)
+        self.assertIn("Failed to initialize configuration", result)
+        self.assertIn("Access denied", result)
+
+    def test_with_os_error(self):
+        """Message with OSError"""
+        error = OSError("No such file or directory")
+        result = self.formatter.initialization_failed("file_scanner", error)
+        self.assertIn("Failed to initialize file_scanner", result)
+        self.assertIn("No such file or directory", result)
+
+    def test_includes_error_details(self):
+        """Verify error details are included"""
+        error = ValueError("Invalid configuration value")
+        result = self.formatter.initialization_failed("config_loader", error)
+        self.assertIn("config_loader", result)
+        self.assertIn("Invalid configuration value", result)
+
+
 class TestGetErrorFormatter(unittest.TestCase):
     """get_error_formatter() tests"""
 

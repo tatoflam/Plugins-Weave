@@ -16,6 +16,7 @@ from domain.constants import (
     LOG_PREFIX_STATE,
     LOG_PREFIX_VALIDATE,
 )
+from domain.error_formatter import get_error_formatter
 from domain.exceptions import DigestError
 from domain.types import GrandDigestData, OverallDigestData, as_dict
 from domain.version import DIGEST_FORMAT_VERSION
@@ -93,18 +94,19 @@ class GrandDigestManager:
         log_debug(f"{LOG_PREFIX_STATE} update_digest: level={level}, digest_name={digest_name}")
         log_debug(f"{LOG_PREFIX_VALIDATE} grand_data: is_valid={is_valid_dict(grand_data)}")
 
+        formatter = get_error_formatter()
         # 型チェック
         if not is_valid_dict(grand_data):
-            raise DigestError("GrandDigest.txt has invalid format: expected dict")
+            raise DigestError(formatter.invalid_type("GrandDigest.txt", "dict", grand_data))
 
         if "major_digests" not in grand_data:
-            raise DigestError("GrandDigest.txt missing 'major_digests' section")
+            raise DigestError(formatter.config_section_missing("major_digests"))
 
         available_levels = list(grand_data["major_digests"].keys())
         log_debug(f"{LOG_PREFIX_VALIDATE} available_levels: {available_levels}")
 
         if level not in grand_data["major_digests"]:
-            raise DigestError(f"Unknown level: {level}")
+            raise DigestError(formatter.unknown_level(level))
 
         # overall_digestを更新（完全なオブジェクトとして保存）
         log_debug(f"{LOG_PREFIX_STATE} updating overall_digest for level={level}")

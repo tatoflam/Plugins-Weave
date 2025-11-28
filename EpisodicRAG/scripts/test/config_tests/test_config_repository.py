@@ -36,7 +36,7 @@ class TestLoadConfig:
         with pytest.raises(ConfigError) as exc_info:
             load_config(nonexistent_file)
 
-        assert "Config file not found" in str(exc_info.value)
+        assert "File not found" in str(exc_info.value)
 
     @pytest.mark.unit
     def test_load_config_invalid_json(self, temp_plugin_env):

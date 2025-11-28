@@ -58,7 +58,7 @@ class TestInputLoaderLoadFromString(unittest.TestCase):
         json_str = '{"other_key": "value"}'
         with self.assertRaises(ValidationError) as cm:
             InputLoader.load(json_str)
-        self.assertIn("Invalid input format", str(cm.exception))
+        self.assertIn("expected list or dict", str(cm.exception))
 
     def test_load_json_string_not_object(self):
         """JSON primitive string raises ValidationError"""

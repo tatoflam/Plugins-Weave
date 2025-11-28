@@ -7,6 +7,7 @@ Centralizes all validation logic for provisional digest data structures.
 from typing import Any, List
 
 from application.validators import is_valid_dict, is_valid_list
+from domain.error_formatter import get_error_formatter
 from domain.exceptions import ValidationError
 from domain.types import IndividualDigestData
 
@@ -24,12 +25,13 @@ def validate_individual_digest(digest: Any, index: int, context: str = "") -> No
         ValidationError: If validation fails
     """
     prefix = f"{context} " if context else ""
+    formatter = get_error_formatter()
     if not is_valid_dict(digest):
         raise ValidationError(
-            f"Invalid {prefix}digest at index {index}: expected dict, got {type(digest).__name__}"
+            formatter.invalid_type(f"{prefix}digest at index {index}", "dict", digest)
         )
     if "source_file" not in digest:
-        raise ValidationError(f"Invalid {prefix}digest at index {index}: missing 'source_file' key")
+        raise ValidationError(formatter.validation_error(f"{prefix}digest at index {index}", "missing 'source_file' key", None))
 
 
 def validate_individual_digests_list(
@@ -99,7 +101,7 @@ def validate_input_format(data: Any) -> List[IndividualDigestData]:
         return data["individual_digests"]
 
     # Invalid format
+    formatter = get_error_formatter()
     raise ValidationError(
-        f"Invalid input format. Expected list or dict with 'individual_digests' key. "
-        f"Got: {type(data).__name__}"
+        formatter.invalid_type("input format", "list or dict with 'individual_digests' key", data)
     )

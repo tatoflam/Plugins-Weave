@@ -18,6 +18,7 @@ import json
 from pathlib import Path
 from typing import Any, List, Optional
 
+from domain.error_formatter import get_error_formatter
 from domain.exceptions import ConfigError
 from domain.types import ConfigData, as_dict
 
@@ -90,16 +91,18 @@ class ConfigLoader:
         Raises:
             ConfigError: 設定ファイルが見つからない、またはJSONパースに失敗した場合
         """
+        formatter = get_error_formatter()
         if not self.config_file.exists():
             raise ConfigError(
-                f"Config file not found: {self.config_file}\nRun setup first: bash scripts/setup.sh"
+                f"{formatter.file_not_found(self.config_file)}\n"
+                "Run setup first: bash scripts/setup.sh"
             )
 
         try:
             with open(self.config_file, "r", encoding="utf-8") as f:
                 return json.load(f)
         except json.JSONDecodeError as e:
-            raise ConfigError(f"Invalid JSON in config file {self.config_file}: {e.msg}") from e
+            raise ConfigError(formatter.invalid_json(self.config_file, e)) from e
 
     def get_config(self) -> ConfigData:
         """
@@ -154,7 +157,8 @@ class ConfigLoader:
         # Use dict view for dynamic key access
         config_dict = as_dict(config)
         if key not in config_dict:
-            raise ConfigError(f"Required configuration key missing: '{key}'")
+            formatter = get_error_formatter()
+            raise ConfigError(formatter.config_key_missing(key))
         return config_dict[key]
 
     @property

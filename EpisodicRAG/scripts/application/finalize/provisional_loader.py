@@ -19,6 +19,7 @@ from domain.constants import (
     LOG_PREFIX_STATE,
     LOG_PREFIX_VALIDATE,
 )
+from domain.error_formatter import get_error_formatter
 from domain.exceptions import DigestError
 from domain.types import IndividualDigestData, OverallDigestData
 from infrastructure import load_json, log_debug, log_info, log_warning, try_read_json_from_file
@@ -85,7 +86,8 @@ class ProvisionalLoader:
         )
 
         if not is_valid_dict(provisional_data):
-            raise DigestError(f"Invalid format in {provisional_path.name}: expected dict")
+            formatter = get_error_formatter()
+            raise DigestError(formatter.invalid_type(provisional_path.name, "dict", provisional_data))
 
         individual_digests = provisional_data.get("individual_digests", [])
         log_debug(f"{LOG_PREFIX_STATE} loaded_digests_count: {len(individual_digests)}")

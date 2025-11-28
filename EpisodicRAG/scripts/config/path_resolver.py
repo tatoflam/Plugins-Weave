@@ -9,6 +9,7 @@ base_dir基準のパス解決
 from pathlib import Path
 from typing import Optional
 
+from domain.error_formatter import get_error_formatter
 from domain.exceptions import ConfigError
 from domain.types import ConfigData, as_dict
 
@@ -55,8 +56,13 @@ class PathResolver:
         try:
             resolved.relative_to(plugin_root_resolved)
         except ValueError:
+            formatter = get_error_formatter()
             raise ConfigError(
-                f"Invalid base_dir: '{base_dir_setting}' resolves outside plugin root"
+                formatter.config_invalid_value(
+                    "base_dir",
+                    "path within plugin root",
+                    f"'{base_dir_setting}' (resolves outside plugin root)"
+                )
             )
         return resolved
 
@@ -73,11 +79,12 @@ class PathResolver:
         Raises:
             ConfigError: pathsセクションまたはキーが存在しない場合
         """
+        formatter = get_error_formatter()
         if "paths" not in self.config:
-            raise ConfigError("'paths' section missing in config.json")
+            raise ConfigError(formatter.config_section_missing("paths"))
         paths = as_dict(self.config["paths"])
         if key not in paths:
-            raise ConfigError(f"Path key '{key}' not found in config.json")
+            raise ConfigError(formatter.config_key_missing(f"paths.{key}"))
         rel_path = str(paths[key])
         return (self.base_dir / rel_path).resolve()
 

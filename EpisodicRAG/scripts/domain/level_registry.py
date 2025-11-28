@@ -37,6 +37,7 @@ from dataclasses import dataclass
 from typing import Dict, List, Optional
 
 from domain.constants import LEVEL_CONFIG
+from domain.error_formatter import get_error_formatter
 from domain.exceptions import ConfigError
 
 # =============================================================================
@@ -225,7 +226,8 @@ class LevelRegistry:
             ConfigError: 不明なレベル名の場合
         """
         if level not in self._levels:
-            raise ConfigError(f"Unknown level: '{level}'")
+            formatter = get_error_formatter()
+            raise ConfigError(formatter.unknown_level(level))
         return self._levels[level][1]
 
     def get_metadata(self, level: str) -> LevelMetadata:
@@ -242,7 +244,8 @@ class LevelRegistry:
             ConfigError: 不明なレベル名の場合
         """
         if level not in self._levels:
-            raise ConfigError(f"Unknown level: '{level}'")
+            formatter = get_error_formatter()
+            raise ConfigError(formatter.unknown_level(level))
         return self._levels[level][0]
 
     def get_level_names(self) -> List[str]:

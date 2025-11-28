@@ -15,6 +15,7 @@ Usage:
 
 from typing import Any, Callable, Dict, List, Optional, Type, TypeVar
 
+from domain.error_formatter import get_error_formatter
 from domain.exceptions import ValidationError
 from domain.validation import validate_type as _validate_type
 
@@ -111,14 +112,15 @@ def validate_source_files(files: Any, context: str = "source_files") -> List[str
     Raises:
         ValidationError: filesがlistでない、または空の場合
     """
+    formatter = get_error_formatter()
     if files is None:
-        raise ValidationError(f"{context}: cannot be None")
+        raise ValidationError(formatter.validation_error(context, "cannot be None", None))
 
     if not isinstance(files, list):
-        raise ValidationError(f"{context}: expected list, got {type(files).__name__}")
+        raise ValidationError(formatter.invalid_type(context, "list", files))
 
     if not files:
-        raise ValidationError(f"{context}: cannot be empty")
+        raise ValidationError(formatter.empty_collection(context))
 
     return files
 
