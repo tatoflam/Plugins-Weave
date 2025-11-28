@@ -90,7 +90,7 @@ class TestMultiLevelCascade:
         shadow_manager.cascade_update_on_digest_finalize("weekly")
 
         # 4. Monthly Shadowを確認
-        monthly_shadow = shadow_manager.get_shadow_digest_for_level("monthly")
+        _monthly_shadow = shadow_manager.get_shadow_digest_for_level("monthly")
         # Note: monthly Shadowにweeklyダイジェストがソースとして追加される
         # （実際の動作は実装に依存）
 
