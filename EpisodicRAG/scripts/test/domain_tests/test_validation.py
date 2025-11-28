@@ -13,7 +13,6 @@ import pytest
 from domain.exceptions import ValidationError
 from domain.validation import collect_type_error, validate_type
 
-
 # =============================================================================
 # validate_type テスト
 # =============================================================================
