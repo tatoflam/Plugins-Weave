@@ -78,27 +78,19 @@ EpisodicRAGプラグインに関するよくある質問と回答集です。
 
 ### Q: Loopファイルの命名規則は？
 
-**A**: 以下の形式に従ってください：
-
-```
-Loop[連番]_[タイトル].txt
-```
-
-- 連番: 4桁以上の数字（例: 0001, 0002, ...）
-- タイトル: 英数字、日本語、ハイフン、アンダースコアなど
-- 正規表現: `^Loop[0-9]+_[\p{L}\p{N}ー・\w]+\.txt$`
+**A**: `Loop[連番]_[タイトル].txt` の形式です。
 
 **例**: `Loop0001_認知アーキテクチャ論.txt`
+
+> 📖 詳細（正規表現・連番ルール）は [GLOSSARY.md > ファイル命名規則](../GLOSSARY.md#ファイル命名規則) を参照
 
 ### Q: `/digest`と`/digest weekly`の違いは？
 
 **A**:
-- `/digest`: 新規Loopの検出と分析（ShadowGrandDigestに追加）
-- `/digest weekly`: Weekly Digestの確定（Shadowから正式Digestを生成）
+- **`/digest`**: Loopを追加したら都度実行（記憶定着）
+- **`/digest weekly`**: 5個溜まったら実行（確定）
 
-**使い分け**:
-1. Loopを追加したら → `/digest`
-2. 5個のLoopが溜まったら → `/digest weekly`
+> 📖 実行フロー・データフローの詳細は [GUIDE.md > コマンド詳解](GUIDE.md#digest-コマンド) を参照
 
 ### Q: まだらボケとは何ですか？
 
