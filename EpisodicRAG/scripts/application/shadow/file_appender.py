@@ -7,7 +7,7 @@ File Appender
 """
 
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Set
 
 from application.validators import is_valid_dict
 from domain.constants import (
@@ -84,6 +84,56 @@ class FileAppender:
 
         return overall_digest
 
+    def _add_new_files_to_digest(
+        self,
+        overall_digest: OverallDigestData,
+        new_files: List[Path],
+        existing_files: Set[str],
+    ) -> int:
+        """
+        新規ファイルをoverall_digestに追加
+
+        Args:
+            overall_digest: 追加先のダイジェスト
+            new_files: 追加候補のファイルリスト
+            existing_files: 既存ファイル名のセット
+
+        Returns:
+            追加されたファイル数
+        """
+        added_count = 0
+        for file_path in new_files:
+            if file_path.name not in existing_files:
+                overall_digest["source_files"].append(file_path.name)
+                added_count += 1
+                log_info(f"  + {file_path.name}")
+            else:
+                log_debug(f"{LOG_PREFIX_FILE} skipped (already exists): {file_path.name}")
+        return added_count
+
+    def _log_digest_contents_for_level(
+        self,
+        new_files: List[Path],
+        existing_files: Set[str],
+        level: str,
+        source_type: str,
+    ) -> None:
+        """
+        Monthly以上のレベルでDigestファイル内容をログ出力
+
+        Args:
+            new_files: 追加されたファイルリスト
+            existing_files: 既存ファイル名のセット
+            level: レベル名
+            source_type: ソースタイプ
+        """
+        if source_type == SOURCE_TYPE_LOOPS:
+            return
+
+        for file_path in new_files:
+            if file_path.name not in existing_files:
+                self._log_digest_content(file_path, level)
+
     def _log_digest_content(self, file_path: Path, level: str) -> None:
         """
         Digestファイルの内容を読み込んでログ出力（Monthly以上用）
@@ -133,19 +183,11 @@ class FileAppender:
         log_debug(f"{LOG_PREFIX_STATE} existing_files_count: {len(existing_files)}")
         log_debug(f"{LOG_PREFIX_STATE} source_type: {source_type}")
 
-        # 新しいファイルだけをsource_filesに追加
-        added_count = 0
-        for file_path in new_files:
-            if file_path.name not in existing_files:
-                overall_digest["source_files"].append(file_path.name)
-                added_count += 1
-                log_info(f"  + {file_path.name}")
+        # ファイル追加
+        added_count = self._add_new_files_to_digest(overall_digest, new_files, existing_files)
 
-                # Monthly以上: Digestファイルの内容を読み込んでログ出力
-                if source_type != SOURCE_TYPE_LOOPS:
-                    self._log_digest_content(file_path, level)
-            else:
-                log_debug(f"{LOG_PREFIX_FILE} skipped (already exists): {file_path.name}")
+        # ログ出力（Monthly以上）
+        self._log_digest_contents_for_level(new_files, existing_files, level, source_type)
 
         log_debug(f"{LOG_PREFIX_STATE} files_added: {added_count}")
 

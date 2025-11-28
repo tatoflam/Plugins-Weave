@@ -4,5 +4,8 @@
   "description": "Hierarchical Episodic Memory Generator (8-layer, 100-year span)",
   "author": {
     "name": "Weave"
-  }
+  },
+  "license": "MIT",
+  "repository": "https://github.com/Bizuayeu/Plugins-Weave",
+  "keywords": ["memory", "episodic", "hierarchy", "digest", "claude-code"]
 }
