@@ -314,6 +314,9 @@ cp ~/episodicrag-backup/{DATE}/Loops/Loop*.txt {DATA_PATH}/Loops/
 
 ## トラブルシューティング
 
+> **Note**: このセクションはGitHub連携に特化した問題を扱います。
+> DigestAnalyzer、ShadowGrandDigest、階層カスケードなどの高度な問題は [TROUBLESHOOTING.md](TROUBLESHOOTING.md) を参照してください。
+
 ### SHAが古いままになる
 
 キャッシュの問題でSHAが更新されない場合：
@@ -338,7 +341,12 @@ curl https://api.github.com/repos/{USER}/{REPO}/git/refs/heads/main
 
 ---
 
-詳細な技術仕様については [ARCHITECTURE.md](../dev/ARCHITECTURE.md) を参照してください。
+## 次のステップ
+
+- 📘 **基本的な使い方を学びたい**: [GUIDE.md](GUIDE.md)
+- 🆘 **高度な問題に直面した**: [TROUBLESHOOTING.md](TROUBLESHOOTING.md)
+- 📙 **技術仕様を理解したい**: [ARCHITECTURE.md](../dev/ARCHITECTURE.md)
+- ❓ **よくある質問**: [FAQ.md](FAQ.md)
 
 ---
 **EpisodicRAG** by Weave | [GitHub](https://github.com/Bizuayeu/Plugins-Weave)
