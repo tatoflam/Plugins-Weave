@@ -132,8 +132,7 @@ from interfaces.provisional import ProvisionalMerger
 |--------|---------|
 | `config_loader.py` | 設定ファイル読み込み |
 | `config_repository.py` | 設定データアクセス |
-| `config_validator.py` | 設定値バリデーション |
-| `directory_validator.py` | ディレクトリ存在確認 |
+| `config_validator.py` | 設定値・ディレクトリバリデーション |
 | `level_path_service.py` | レベル別パス生成 |
 | `path_resolver.py` | パス解決ユーティリティ |
 | `plugin_root_resolver.py` | プラグインルート検出 |

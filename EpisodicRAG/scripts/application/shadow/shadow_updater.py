@@ -74,23 +74,71 @@ class ShadowUpdater:
     # =========================================================================
 
     def add_files_to_shadow(self, level: str, new_files: List[Path]) -> None:
-        """指定レベルのShadowに新しいファイルを追加（増分更新）"""
+        """
+        指定レベルのShadowに新しいファイルを追加（増分更新）
+
+        Args:
+            level: 対象レベル（"weekly", "monthly"等）
+            new_files: 追加するファイルパスのリスト
+
+        Note:
+            - ファイルはsource_filesに追加される
+            - overall_digestが未初期化の場合は自動的に初期化
+            - プレースホルダーが設定され、Claude分析待ちとなる
+        """
         return self._file_appender.add_files_to_shadow(level, new_files)
 
     def clear_shadow_level(self, level: str) -> None:
-        """指定レベルのShadowを初期化"""
+        """
+        指定レベルのShadowを初期化
+
+        Args:
+            level: 対象レベル（"weekly", "monthly"等）
+
+        Note:
+            ダイジェスト確定後にShadowをクリアする際に使用。
+            source_files、overall_digestをテンプレート状態にリセット。
+        """
         return self._cascade_processor.clear_shadow_level(level)
 
     def get_shadow_digest_for_level(self, level: str) -> Optional[OverallDigestData]:
-        """指定レベルのShadowダイジェストを取得"""
+        """
+        指定レベルのShadowダイジェストを取得
+
+        Args:
+            level: 対象レベル（"weekly", "monthly"等）
+
+        Returns:
+            OverallDigestData: Shadowダイジェストデータ
+            None: レベルにデータが存在しない場合
+        """
         return self._cascade_processor.get_shadow_digest_for_level(level)
 
     def promote_shadow_to_grand(self, level: str) -> None:
-        """ShadowのレベルをGrandDigestに昇格"""
+        """
+        ShadowのレベルをGrandDigestに昇格
+
+        Args:
+            level: 対象レベル（"weekly", "monthly"等）
+
+        Note:
+            GrandDigest.txtの該当レベルにShadowの内容をコピー。
+            通常は finalize_from_shadow.py から呼び出される。
+        """
         return self._cascade_processor.promote_shadow_to_grand(level)
 
     def update_shadow_for_new_loops(self) -> None:
-        """新しいLoopファイルを検出してShadowを増分更新"""
+        """
+        新しいLoopファイルを検出してShadowを増分更新
+
+        last_digest_times.json を参照し、前回処理以降の新規Loopファイルを
+        検出してweekly Shadowに追加する。
+
+        Note:
+            - 新規ファイルがない場合は何も行わない
+            - Shadowファイルが存在しない場合は自動作成
+            - 追加後、Claude分析待ちのプレースホルダーが設定される
+        """
         # Shadowファイルを読み込み（存在しなければ作成）
         self.shadow_io.load_or_create()
 
@@ -106,5 +154,18 @@ class ShadowUpdater:
         self.add_files_to_shadow("weekly", new_files)
 
     def cascade_update_on_digest_finalize(self, level: str) -> None:
-        """ダイジェスト確定時のカスケード処理（処理3）"""
+        """
+        ダイジェスト確定時のカスケード処理
+
+        指定レベルのダイジェストが確定した際に、上位レベルのShadowを更新する。
+        例: weekly確定時 → monthly Shadowに新しいweeklyダイジェストを追加
+
+        Args:
+            level: 確定したレベル（"weekly", "monthly"等）
+
+        Note:
+            - 確定レベルのShadowはクリアされる
+            - 上位レベルのShadowに新しいソースファイルが追加される
+            - 8階層カスケード構造に従って処理が連鎖
+        """
         return self._cascade_processor.cascade_update_on_digest_finalize(level)

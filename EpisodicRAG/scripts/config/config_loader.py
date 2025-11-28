@@ -21,6 +21,8 @@ from typing import Any, List, Optional
 from domain.exceptions import ConfigError
 from domain.types import ConfigData, as_dict
 
+from .config_constants import REQUIRED_CONFIG_KEYS
+
 
 class ConfigLoader:
     """
@@ -165,8 +167,8 @@ class ConfigLoader:
         """
         return self._config is not None
 
-    # 必須の設定キー
-    REQUIRED_KEYS = ["loops_path", "digests_path", "essences_path"]
+    # 必須の設定キー（共通定数を参照）
+    REQUIRED_KEYS = REQUIRED_CONFIG_KEYS
 
     def validate_required_keys(self) -> List[str]:
         """

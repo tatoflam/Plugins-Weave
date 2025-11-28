@@ -22,6 +22,7 @@ from domain.constants import LEVEL_CONFIG, LEVEL_NAMES
 from domain.types import ConfigData, as_dict
 from domain.validation import collect_type_error as _collect_type_error
 
+from .config_constants import REQUIRED_CONFIG_KEYS, THRESHOLD_KEYS
 from .level_path_service import LevelPathService
 
 
@@ -40,26 +41,14 @@ class ConfigValidator:
         level_path_service: レベルパスサービス
     """
 
-    # 必須の設定キー
-    REQUIRED_KEYS = ["loops_path", "digests_path", "essences_path"]
+    # 必須の設定キー（共通定数を参照）
+    REQUIRED_KEYS = REQUIRED_CONFIG_KEYS
 
     # オプションの設定キー（型チェック用）
     OPTIONAL_KEYS_WITH_TYPES: Dict[str, type] = {
         "base_dir": str,
         "identity_file": str,
     }
-
-    # 閾値キーと型
-    THRESHOLD_KEYS = [
-        "weekly_threshold",
-        "monthly_threshold",
-        "quarterly_threshold",
-        "annual_threshold",
-        "triennial_threshold",
-        "decadal_threshold",
-        "multi_decadal_threshold",
-        "centurial_threshold",
-    ]
 
     def __init__(
         self,
@@ -142,7 +131,7 @@ class ConfigValidator:
 
         # Use dict view for dynamic key access
         config_dict = as_dict(self.config)
-        for key in self.THRESHOLD_KEYS:
+        for key in THRESHOLD_KEYS:
             if key in config_dict:
                 value = config_dict[key]
                 # 型検証（validators.pyを再利用）

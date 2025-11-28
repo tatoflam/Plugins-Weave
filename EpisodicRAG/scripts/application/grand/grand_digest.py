@@ -30,7 +30,14 @@ class GrandDigestManager:
         self.grand_digest_file = config.essences_path / "GrandDigest.txt"
 
     def get_template(self) -> GrandDigestData:
-        """GrandDigest.txtのテンプレートを返す（全8レベル対応）"""
+        """
+        GrandDigest.txtのテンプレートを返す（全8レベル対応）
+
+        Returns:
+            GrandDigestData: 以下の構造を持つ辞書
+                - metadata: {last_updated: str, version: str}
+                - major_digests: {level: {overall_digest: None}, ...}
+        """
         return {
             "metadata": {
                 "last_updated": datetime.now().isoformat(),
@@ -40,7 +47,15 @@ class GrandDigestManager:
         }
 
     def load_or_create(self) -> GrandDigestData:
-        """GrandDigest.txtを読み込む。存在しなければテンプレートで作成"""
+        """
+        GrandDigest.txtを読み込む。存在しなければテンプレートで作成
+
+        Returns:
+            GrandDigestData: 読み込んだまたは新規作成したデータ
+
+        Raises:
+            FileIOError: ファイルの読み書きに失敗した場合
+        """
         return load_json_with_template(
             target_file=self.grand_digest_file,
             default_factory=self.get_template,
@@ -48,7 +63,15 @@ class GrandDigestManager:
         )
 
     def save(self, data: GrandDigestData) -> None:
-        """GrandDigest.txtを保存"""
+        """
+        GrandDigest.txtを保存
+
+        Args:
+            data: 保存するGrandDigestデータ
+
+        Raises:
+            FileIOError: ファイル書き込みに失敗した場合
+        """
         save_json(self.grand_digest_file, as_dict(data))
 
     def update_digest(

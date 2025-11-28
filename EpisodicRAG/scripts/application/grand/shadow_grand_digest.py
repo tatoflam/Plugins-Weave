@@ -77,27 +77,76 @@ class ShadowGrandDigestManager:
     # ========================================
 
     def add_files_to_shadow(self, level: str, new_files: List[Path]) -> None:
-        """指定レベルのShadowに新しいファイルを追加（増分更新）"""
+        """
+        指定レベルのShadowに新しいファイルを追加（増分更新）
+
+        Args:
+            level: 対象レベル（"weekly", "monthly"等）
+            new_files: 追加するファイルパスのリスト
+
+        Note:
+            ShadowUpdater.add_files_to_shadow() に委譲。
+        """
         return self._updater.add_files_to_shadow(level, new_files)
 
     def clear_shadow_level(self, level: str) -> None:
-        """指定レベルのShadowを初期化"""
+        """
+        指定レベルのShadowを初期化
+
+        Args:
+            level: 対象レベル（"weekly", "monthly"等）
+
+        Note:
+            ShadowUpdater.clear_shadow_level() に委譲。
+        """
         self._updater.clear_shadow_level(level)
 
     def get_shadow_digest_for_level(self, level: str) -> Optional[OverallDigestData]:
-        """指定レベルのShadowダイジェストを取得"""
+        """
+        指定レベルのShadowダイジェストを取得
+
+        Args:
+            level: 対象レベル（"weekly", "monthly"等）
+
+        Returns:
+            OverallDigestData: Shadowダイジェストデータ
+            None: レベルにデータが存在しない場合
+        """
         return self._updater.get_shadow_digest_for_level(level)
 
     def promote_shadow_to_grand(self, level: str) -> None:
-        """ShadowのレベルをGrandDigestに昇格（確認のみ）"""
+        """
+        ShadowのレベルをGrandDigestに昇格
+
+        Args:
+            level: 対象レベル（"weekly", "monthly"等）
+
+        Note:
+            ShadowUpdater.promote_shadow_to_grand() に委譲。
+        """
         self._updater.promote_shadow_to_grand(level)
 
     def update_shadow_for_new_loops(self) -> None:
-        """新しいLoopファイルを検出してShadowを増分更新"""
+        """
+        新しいLoopファイルを検出してShadowを増分更新
+
+        Note:
+            ShadowUpdater.update_shadow_for_new_loops() に委譲。
+            Loopsディレクトリから新規ファイルを検出し、weekly Shadowに追加。
+        """
         self._updater.update_shadow_for_new_loops()
 
     def cascade_update_on_digest_finalize(self, level: str) -> None:
-        """ダイジェスト確定時のカスケード処理"""
+        """
+        ダイジェスト確定時のカスケード処理
+
+        Args:
+            level: 確定したレベル（"weekly", "monthly"等）
+
+        Note:
+            ShadowUpdater.cascade_update_on_digest_finalize() に委譲。
+            確定レベルをクリアし、上位レベルのShadowを更新。
+        """
         self._updater.cascade_update_on_digest_finalize(level)
 
 
