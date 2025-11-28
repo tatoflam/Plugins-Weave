@@ -1,4 +1,4 @@
-[Docs](../README.md) > TROUBLESHOOTING
+[EpisodicRAG](../../README.md) > [Docs](../README.md) > TROUBLESHOOTING
 
 # Troubleshooting - EpisodicRAG Plugin
 

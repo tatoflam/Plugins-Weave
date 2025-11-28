@@ -1,4 +1,4 @@
-[Docs](../README.md) > ADVANCED
+[EpisodicRAG](../../README.md) > [Docs](../README.md) > ADVANCED
 
 # Advanced Features - EpisodicRAG Plugin
 

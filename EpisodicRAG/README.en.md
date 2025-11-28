@@ -336,6 +336,27 @@ Examples: 2025-07-01_W0001_CognitiveArchitecture.txt
 
 ---
 
+## Terminology Index
+
+| Term | Section |
+|------|---------|
+| base_dir | [Basic Concepts](#base_dir) |
+| Cascade | [8-Layer Hierarchy](#hierarchical-cascade) |
+| Digest | [Basic Concepts](#digest) |
+| Essences | [Basic Concepts](#essences) |
+| GrandDigest | [Memory Structure](#granddigest) |
+| Loop | [Basic Concepts](#loop) |
+| Mottled Memory | [Processes & Operations](#mottled-memory-まだらボケ) |
+| paths | [Basic Concepts](#paths) |
+| Placeholder | [Processes & Operations](#placeholder) |
+| plugin_root | [Basic Concepts](#plugin_root) |
+| Provisional Digest | [Memory Structure](#provisional-digest) |
+| Regular Digest | [Memory Structure](#regular-digest) |
+| ShadowGrandDigest | [Memory Structure](#shadowgranddigest) |
+| Threshold | [Processes & Operations](#threshold) |
+
+---
+
 ## Related Documents
 
 - [Main README](../README.md) - Project Overview

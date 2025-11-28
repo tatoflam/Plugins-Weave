@@ -1,4 +1,4 @@
-[Docs](../README.md) > GUIDE
+[EpisodicRAG](../../README.md) > [Docs](../README.md) > GUIDE
 
 # EpisodicRAG Plugin ユーザーガイド
 

@@ -1,4 +1,4 @@
-[Docs](../README.md) > ARCHITECTURE
+[EpisodicRAG](../../README.md) > [Docs](../README.md) > ARCHITECTURE
 
 # Architecture - EpisodicRAG Plugin
 

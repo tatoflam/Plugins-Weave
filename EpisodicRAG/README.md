@@ -336,6 +336,27 @@ L00001追加 → `/digest`せず → L00002追加
 
 ---
 
+## 用語インデックス
+
+| 用語 | セクション |
+|------|----------|
+| base_dir | [基本概念](#base_dir) |
+| Cascade | [8階層構造](#階層的カスケード) |
+| Digest | [基本概念](#digest) |
+| Essences | [基本概念](#essences) |
+| GrandDigest | [記憶構造](#granddigest) |
+| Loop | [基本概念](#loop) |
+| paths | [基本概念](#paths) |
+| Placeholder | [プロセス・操作](#プレースホルダー) |
+| plugin_root | [基本概念](#plugin_root) |
+| Provisional Digest | [記憶構造](#provisional-digest) |
+| Regular Digest | [記憶構造](#regular-digest) |
+| ShadowGrandDigest | [記憶構造](#shadowgranddigest) |
+| Threshold | [プロセス・操作](#threshold閾値) |
+| まだらボケ | [プロセス・操作](#まだらボケ) |
+
+---
+
 ## 関連ドキュメント
 
 - [メインREADME](../README.md) - プロジェクト概要

@@ -6,6 +6,8 @@
 
 ![EpisodicRAG Plugin - 8階層の階層的記憶管理システムのアーキテクチャ図](EpisodicRAG.png)
 [![Version](https://img.shields.io/badge/version-3.0.0-blue.svg)](https://github.com/Bizuayeu/Plugins-Weave)
+[![CI](https://github.com/Bizuayeu/Plugins-Weave/actions/workflows/test.yml/badge.svg)](https://github.com/Bizuayeu/Plugins-Weave/actions/workflows/test.yml)
+[![codecov](https://codecov.io/gh/Bizuayeu/Plugins-Weave/branch/main/graph/badge.svg)](https://codecov.io/gh/Bizuayeu/Plugins-Weave)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 ---

@@ -1,8 +1,10 @@
-[API Reference](../API_REFERENCE.md) > Interfaces層
+[EpisodicRAG](../../../README.md) > [Docs](../../README.md) > [API](../API_REFERENCE.md) > Interfaces
 
 # Interfaces層 API
 
 外部からのエントリーポイント。
+
+> 📖 用語・共通概念は [用語集](../../../README.md) を参照
 
 ```python
 from interfaces import DigestFinalizerFromShadow, ProvisionalDigestSaver
@@ -17,8 +19,58 @@ from interfaces.interface_helpers import sanitize_filename, get_next_digest_numb
 
 ```python
 class DigestFinalizerFromShadow:
-    def __init__(self, config: DigestConfig): ...
-    def finalize(self, level: str, title: str) -> Path: ...
+    def __init__(
+        self,
+        config: Optional[DigestConfig] = None,
+        grand_digest_manager: Optional[GrandDigestManager] = None,
+        shadow_manager: Optional[ShadowGrandDigestManager] = None,
+        times_tracker: Optional[DigestTimesTracker] = None,
+    ): ...
+
+    def validate_shadow_content(self, level: str, source_files: list) -> None: ...
+    def finalize_from_shadow(self, level: str, weave_title: str) -> None: ...
+```
+
+| メソッド | 説明 | 例外 |
+|---------|------|------|
+| `validate_shadow_content(level, source_files)` | source_filesの形式・連番を検証 | `ValidationError` |
+| `finalize_from_shadow(level, weave_title)` | Shadow→RegularDigest確定（処理1-5実行） | `ValidationError`, `DigestError`, `FileIOError` |
+
+**処理フロー**:
+1. RegularDigest作成
+2. GrandDigest更新
+3. ShadowGrandDigest更新（カスケード）
+4. last_digest_times更新
+5. ProvisionalDigest削除
+
+**使用例（Python）**:
+
+```python
+from interfaces import DigestFinalizerFromShadow
+from config import DigestConfig
+
+config = DigestConfig()
+finalizer = DigestFinalizerFromShadow(config)
+finalizer.finalize_from_shadow("weekly", "認知アーキテクチャの深化")
+```
+
+**使用例（CLI）**:
+
+```bash
+cd scripts
+python finalize_from_shadow.py weekly "認知アーキテクチャの深化"
+```
+
+**テスト時のモック注入**:
+
+```python
+# DI対応：テスト時にモックを注入可能
+finalizer = DigestFinalizerFromShadow(
+    config=mock_config,
+    grand_digest_manager=mock_grand,
+    shadow_manager=mock_shadow,
+    times_tracker=mock_tracker
+)
 ```
 
 ---
@@ -38,6 +90,37 @@ class ProvisionalDigestSaver:
 |---------|------|
 | `save(level, digest_data) -> Path` | Provisionalファイルを保存し、パスを返す |
 | `run(level, input_data, append) -> None` | CLI/スクリプトからの実行エントリーポイント |
+
+**使用例（Python）**:
+
+```python
+from interfaces import ProvisionalDigestSaver
+from config import DigestConfig
+
+config = DigestConfig()
+saver = ProvisionalDigestSaver(config)
+
+# 新規保存
+saver.run("weekly", '[{"filename": "L00001.txt", "digest_type": "洞察", ...}]')
+
+# 既存に追加（--append相当）
+saver.run("weekly", '[{"filename": "L00002.txt", ...}]', append=True)
+
+# ファイルパスから読み込んで保存
+saver.run("weekly", "/path/to/input.json")
+```
+
+**使用例（CLI）**:
+
+```bash
+cd scripts
+
+# JSON文字列を直接渡す
+python save_provisional_digest.py weekly '[{"filename": "L00001.txt", ...}]'
+
+# 既存に追加
+python save_provisional_digest.py weekly '[{"filename": "L00002.txt", ...}]' --append
+```
 
 ---
 

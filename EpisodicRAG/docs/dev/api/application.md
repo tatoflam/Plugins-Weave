@@ -1,8 +1,10 @@
-[API Reference](../API_REFERENCE.md) > Application層
+[EpisodicRAG](../../../README.md) > [Docs](../../README.md) > [API](../API_REFERENCE.md) > Application
 
 # Application層 API
 
 ビジネスロジックの実装。
+
+> 📖 用語・共通概念は [用語集](../../../README.md) を参照
 
 ```python
 from application.shadow import ShadowTemplate, ShadowUpdater
@@ -208,10 +210,77 @@ class ShadowUpdater:
 
 ## GrandDigest管理（application/grand/）
 
-| クラス | 説明 |
-|--------|------|
-| `GrandDigestManager` | GrandDigest.txt CRUD操作 |
-| `ShadowGrandDigestManager` | ShadowGrandDigest.txt管理 |
+### GrandDigestManager
+
+GrandDigest.txt の CRUD操作を担当。
+
+```python
+class GrandDigestManager:
+    def __init__(self, config: DigestConfig): ...
+```
+
+| メソッド | 説明 | 例外 |
+|---------|------|------|
+| `get_template() -> GrandDigestData` | テンプレート生成（全8レベル対応） | - |
+| `load_or_create() -> GrandDigestData` | 読み込みまたは新規作成 | `FileIOError` |
+| `save(data: GrandDigestData) -> None` | GrandDigest.txtを保存 | `FileIOError` |
+| `update_digest(level, digest_name, overall_digest) -> None` | 指定レベルのダイジェスト更新 | `DigestError` |
+
+**使用例**:
+
+```python
+from application.grand import GrandDigestManager
+from config import DigestConfig
+
+config = DigestConfig()
+manager = GrandDigestManager(config)
+
+# テンプレート取得
+template = manager.get_template()
+
+# 読み込みまたは作成
+data = manager.load_or_create()
+
+# ダイジェスト更新
+manager.update_digest("weekly", "W0001_タイトル", overall_digest_data)
+```
+
+### ShadowGrandDigestManager
+
+ShadowGrandDigest.txt 管理のFacade。Shadow更新・カスケード処理を統括。
+
+```python
+class ShadowGrandDigestManager:
+    def __init__(self, config: Optional[DigestConfig] = None): ...
+```
+
+| メソッド | 説明 |
+|---------|------|
+| `add_files_to_shadow(level, new_files) -> None` | Shadowに新規ファイル追加（増分更新） |
+| `clear_shadow_level(level) -> None` | 指定レベルのShadow初期化 |
+| `get_shadow_digest_for_level(level) -> Optional[OverallDigestData]` | Shadowダイジェスト取得 |
+| `promote_shadow_to_grand(level) -> None` | Shadow→Grand昇格 |
+| `update_shadow_for_new_loops() -> None` | 新規Loop検出→weekly Shadow更新 |
+| `cascade_update_on_digest_finalize(level) -> None` | 確定時カスケード処理 |
+
+**使用例**:
+
+```python
+from application.grand import ShadowGrandDigestManager
+from config import DigestConfig
+
+config = DigestConfig()
+manager = ShadowGrandDigestManager(config)
+
+# 新しいLoopファイルを検出してShadowを更新
+manager.update_shadow_for_new_loops()
+
+# Weeklyダイジェスト確定時のカスケード処理
+manager.cascade_update_on_digest_finalize("weekly")
+
+# 指定レベルのShadowダイジェストを取得
+shadow = manager.get_shadow_digest_for_level("weekly")
+```
 
 ---
 

@@ -1,8 +1,10 @@
-[API Reference](../API_REFERENCE.md) > Domain層
+[EpisodicRAG](../../../README.md) > [Docs](../../README.md) > [API](../API_REFERENCE.md) > Domain
 
 # Domain層 API
 
 コアビジネスロジック。外部に依存しない純粋な定義。
+
+> 📖 用語・共通概念は [用語集](../../../README.md) を参照
 
 ```python
 from domain import (
@@ -320,6 +322,81 @@ def build_level_hierarchy() -> Dict[str, Dict[str, object]]
 ```
 
 LEVEL_CONFIGから階層関係（source/next）を抽出した辞書を構築。
+
+---
+
+## エラーフォーマット（domain/error_formatter.py）
+
+エラーメッセージの標準化を担当。一貫したパス表記、コンテキスト情報、メッセージフォーマットを提供。
+
+### ErrorFormatter
+
+```python
+class ErrorFormatter:
+    def __init__(self, project_root: Path): ...
+```
+
+| メソッド | 説明 |
+|---------|------|
+| `format_path(path)` | パスを相対パスに正規化 |
+
+#### Level/Config エラー
+
+| メソッド | 説明 |
+|---------|------|
+| `invalid_level(level, valid_levels)` | 無効レベルエラー |
+| `unknown_level(level)` | 不明レベルエラー（`invalid_level`のエイリアス） |
+| `config_key_missing(key)` | 設定キー欠落エラー |
+| `config_invalid_value(key, expected, actual)` | 設定値不正エラー |
+| `config_section_missing(section)` | 設定セクション欠落エラー |
+
+#### File I/O エラー
+
+| メソッド | 説明 |
+|---------|------|
+| `file_not_found(path)` | ファイル未検出エラー |
+| `file_already_exists(path)` | ファイル既存エラー |
+| `file_io_error(operation, path, error)` | ファイルI/Oエラー |
+| `directory_not_found(path)` | ディレクトリ未検出エラー |
+| `directory_creation_failed(path, error)` | ディレクトリ作成失敗エラー |
+| `invalid_json(path, error)` | JSON不正エラー |
+
+#### Validation エラー
+
+| メソッド | 説明 |
+|---------|------|
+| `invalid_type(context, expected, actual)` | 型不正エラー |
+| `validation_error(field, reason, value)` | バリデーションエラー |
+| `empty_collection(context)` | 空コレクションエラー |
+
+#### Digest固有エラー
+
+| メソッド | 説明 |
+|---------|------|
+| `digest_not_found(level, identifier)` | ダイジェスト未検出エラー |
+| `shadow_empty(level)` | Shadow空エラー |
+| `cascade_error(from_level, to_level, reason)` | カスケードエラー |
+| `initialization_failed(component, error)` | 初期化失敗エラー |
+
+### ファクトリ関数
+
+```python
+def get_error_formatter(project_root: Optional[Path] = None) -> ErrorFormatter
+def reset_error_formatter() -> None  # テスト用リセット
+```
+
+**使用例**:
+
+```python
+from domain.error_formatter import get_error_formatter
+
+formatter = get_error_formatter()
+msg = formatter.file_not_found(Path("/path/to/file.txt"))
+# -> "File not found: path/to/file.txt"
+
+msg = formatter.invalid_level("xyz", ["weekly", "monthly"])
+# -> "Invalid level: 'xyz'. Valid levels: weekly, monthly"
+```
 
 ---
 

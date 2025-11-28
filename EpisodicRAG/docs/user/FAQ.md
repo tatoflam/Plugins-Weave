@@ -1,4 +1,4 @@
-[Docs](../README.md) > FAQ
+[EpisodicRAG](../../README.md) > [Docs](../README.md) > FAQ
 
 # よくある質問 (FAQ)
 

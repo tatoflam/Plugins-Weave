@@ -1,8 +1,10 @@
-[API Reference](../API_REFERENCE.md) > Infrastructure層
+[EpisodicRAG](../../../README.md) > [Docs](../../README.md) > [API](../API_REFERENCE.md) > Infrastructure
 
 # Infrastructure層 API
 
 外部関心事（ファイルI/O、ロギング）。
+
+> 📖 用語・共通概念は [用語集](../../../README.md) を参照
 
 ```python
 from infrastructure import load_json, save_json, log_info, log_error

@@ -1,4 +1,4 @@
-[Docs](../README.md) > QUICKSTART (English)
+[EpisodicRAG](../../README.md) > [Docs](../README.md) > QUICKSTART (English)
 
 [日本語](QUICKSTART.md) | English
 

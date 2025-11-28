@@ -1,4 +1,4 @@
-[API Reference](../API_REFERENCE.md) > 設定・Config
+[EpisodicRAG](../../../README.md) > [Docs](../../README.md) > [API](../API_REFERENCE.md) > Config
 
 # 設定 API
 

@@ -1,4 +1,4 @@
-[Docs](../README.md) > API_REFERENCE
+[EpisodicRAG](../../README.md) > [Docs](../README.md) > API_REFERENCE
 
 # API リファレンス
 
