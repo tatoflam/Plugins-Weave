@@ -223,34 +223,7 @@ Loop/Digestファイルを深層分析し、long版とshort版の両方を生成
 - short版（individual用: abstract 1200文字、impression 400文字）
 - 並列起動による効率的な分析
 
-**呼び出しパターン:**
-```python
-# 単一ファイル分析
-Task(
-    subagent_type="EpisodicRAG-Plugin:DigestAnalyzer",
-    description="Analyze Loop0001 for digest generation",
-    prompt="""
-分析対象ファイル: {loops_path}/Loop0001_タイトル.txt
-
-このLoopファイルを深層分析し、以下の形式でJSON出力してください：
-{
-  "digest_type": "...",
-  "keywords": [...],
-  "abstract": {"long": "...", "short": "..."},
-  "impression": {"long": "...", "short": "..."}
-}
-"""
-)
-
-# 複数ファイル並列分析
-for source_file in source_files:
-    Task(
-        subagent_type="EpisodicRAG-Plugin:DigestAnalyzer",
-        prompt=f"分析対象ファイル: {source_file}"
-    )
-```
-
-詳細は [agents/digest-analyzer.md](../../agents/digest-analyzer.md) を参照してください。
+> 📖 呼び出しパターン・パラメータ仕様の詳細は [agents/digest-analyzer.md](../../agents/digest-analyzer.md) を参照
 
 ---
 
