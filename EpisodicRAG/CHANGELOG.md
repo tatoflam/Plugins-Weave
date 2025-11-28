@@ -11,9 +11,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Breaking Changes
 
-- **Loop IDの桁数変更**: 4桁→5桁（例: `Loop0001` → `L00001`）
+- **Loop IDの桁数変更**: 4桁→5桁
+  - 旧形式: `Loop0001`
+  - 新形式: `L00001`
+  - **移行方法**: 既存Loopファイルのリネームが必要
+    ```bash
+    # 例: L0001_xxx.txt → L00001_xxx.txt
+    cd your_loops_directory
+    for f in L[0-9][0-9][0-9][0-9]_*.txt; do
+      mv "$f" "L0${f:1}"
+    done
+    ```
+  - **影響範囲**:
+    - Loopファイル名
+    - ShadowGrandDigest.txt 内の `source_files` 参照
+    - last_digest_times.json 内の参照
+
 - **ドキュメントの完全SSoT化**: 用語定義はREADME.mdに一元化
+  - ユーザーへの影響なし（ドキュメント構造の改善のみ）
+
 - **テストスイートの導入**: pytest + hypothesis によるプロパティベーステスト
+  - 開発者向け変更、エンドユーザーへの影響なし
 
 ### Changed
 
