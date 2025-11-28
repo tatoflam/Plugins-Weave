@@ -35,12 +35,13 @@ Usage:
 import json
 import logging
 from pathlib import Path
-from typing import Any, Callable, Dict, Optional, TypeVar, cast, overload
+from typing import Any, Callable, Dict, Mapping, Optional, TypeVar, cast
 
 from domain.exceptions import FileIOError
 
 # Generic type for load_json_with_template
-T = TypeVar("T", bound=Dict[str, Any])
+# Use Mapping to support TypedDict (which is a structural subtype of Mapping, not Dict)
+T = TypeVar("T", bound=Mapping[str, Any])
 
 # モジュールロガー
 logger = logging.getLogger("episodic_rag")
@@ -163,18 +164,19 @@ def load_json_with_template(
     # ファイルが存在する場合はそのまま読み込み
     if target_file.exists():
         logger.debug(f"Loading existing file: {target_file}")
-        data = _safe_read_json(target_file, raise_on_error=True)
-        data = cast(T, data)
+        raw_data = _safe_read_json(target_file, raise_on_error=True)
+        # _safe_read_json returns Dict[str, Any] | None, but with raise_on_error=True it won't return None
+        data: T = cast(T, raw_data)
         logger.debug(f"Loaded {len(data)} keys from {target_file.name}")
         return data
 
     # テンプレートファイルが存在する場合はそこから初期化
     if template_file and template_file.exists():
         logger.debug(f"Target not found, loading from template: {template_file}")
-        template = _safe_read_json(template_file, raise_on_error=True)
-        template = cast(T, template)
+        raw_template = _safe_read_json(template_file, raise_on_error=True)
+        template: T = cast(T, raw_template)
         if save_on_create:
-            save_json(target_file, template)
+            save_json(target_file, cast(Dict[str, Any], template))
             logger.debug(f"Saved initialized file to: {target_file}")
         msg = log_message or f"Initialized {target_file.name} from template"
         logger.info(msg)
@@ -183,13 +185,13 @@ def load_json_with_template(
     # デフォルトファクトリーがある場合はそれを使用
     if default_factory:
         logger.debug("No template found, using default_factory")
-        template = default_factory()
+        factory_template: T = default_factory()
         if save_on_create:
-            save_json(target_file, template)
+            save_json(target_file, cast(Dict[str, Any], factory_template))
             logger.debug(f"Saved default template to: {target_file}")
         msg = log_message or f"Created {target_file.name} with default template"
         logger.info(msg)
-        return template
+        return factory_template
 
     # どちらもない場合は空のdictを返す
     logger.debug("No template or factory provided, returning empty dict")

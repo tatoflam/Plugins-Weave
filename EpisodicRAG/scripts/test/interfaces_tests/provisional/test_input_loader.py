@@ -78,8 +78,8 @@ class TestInputLoaderLoadFromFile(unittest.TestCase):
 
     def setUp(self):
         """Set up temp directory"""
-        import tempfile
         import shutil
+        import tempfile
 
         self.temp_dir = tempfile.mkdtemp()
 

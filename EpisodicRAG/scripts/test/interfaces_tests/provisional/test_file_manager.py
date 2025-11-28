@@ -39,8 +39,8 @@ class TestGetCurrentDigestNumber(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures"""
-        import tempfile
         import shutil
+        import tempfile
 
         self.temp_dir = tempfile.mkdtemp()
         self.provisional_dir = Path(self.temp_dir) / "provisional"
@@ -106,8 +106,8 @@ class TestLoadExistingProvisional(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures"""
-        import tempfile
         import shutil
+        import tempfile
 
         self.temp_dir = tempfile.mkdtemp()
         self.provisional_dir = Path(self.temp_dir) / "provisional"

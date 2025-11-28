@@ -367,7 +367,7 @@ class TestGetErrorFormatter(unittest.TestCase):
             MockPath.cwd.return_value = mock_cwd
             MockPath.return_value = mock_cwd
 
-            formatter = get_error_formatter()
+            _ = get_error_formatter()
             MockPath.cwd.assert_called()
 
     def test_with_explicit_root(self):
@@ -384,7 +384,7 @@ class TestGetErrorFormatter(unittest.TestCase):
 
     def test_explicit_root_overrides_cache(self):
         """Explicit root creates new formatter"""
-        formatter1 = get_error_formatter()
+        _ = get_error_formatter()
         root = Path("/new/root")
         formatter2 = get_error_formatter(root)
         self.assertEqual(formatter2.project_root, root)
