@@ -15,6 +15,24 @@ EpisodicRAGを最速でセットアップし、動作確認するためのガイ
 
 ---
 
+## 全体の流れ
+
+```mermaid
+flowchart LR
+    A["📦 Step 1\nInstall"] --> B["⚙️ Step 2\nSetup"]
+    B --> C["📝 Step 3\nLoop作成"]
+    C --> D["🔄 Step 4\n/digest"]
+    D --> E["✅ 完了"]
+
+    style A fill:#E8F5E9
+    style B fill:#E3F2FD
+    style C fill:#FFF3E0
+    style D fill:#F3E5F5
+    style E fill:#E8F5E9
+```
+
+---
+
 ## Step 1: インストール（1分）
 
 ### 1-1. マーケットプレイス追加

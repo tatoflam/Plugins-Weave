@@ -73,6 +73,24 @@ EpisodicRAGプラグインに関するよくある質問と回答集です。
 - **`/digest`**: Loopを追加したら都度実行（記憶定着）
 - **`/digest weekly`**: 5個溜まったら実行（確定）
 
+```mermaid
+flowchart TB
+    subgraph everyday["📅 毎日（Loop追加ごと）"]
+        D1["/digest"]
+        D1 --> |記憶定着| S1[ShadowGrandDigest更新]
+    end
+
+    subgraph weekly["📆 週次（5個揃ったら）"]
+        D2["/digest weekly"]
+        D2 --> |確定| R1[Regular Digest作成]
+    end
+
+    S1 -.->|蓄積| D2
+
+    style D1 fill:#90EE90
+    style D2 fill:#FFD700
+```
+
 > 📖 実行フロー・データフローの詳細は [GUIDE.md > コマンド詳解](GUIDE.md#digest-コマンド) を参照
 
 ### Q: まだらボケとは何ですか？
