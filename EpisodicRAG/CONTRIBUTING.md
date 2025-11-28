@@ -375,24 +375,43 @@ git status
 
 #### バージョンのSSoT
 
-バージョン情報は `scripts/domain/version.py` の `__version__` が唯一の真実です。
+バージョン情報は `.claude-plugin/plugin.json` の `version` フィールドが唯一の真実（SSoT）です。
 
-```python
-# scripts/domain/version.py
-__version__ = "3.0.0"  # ← ここを更新
+```json
+// .claude-plugin/plugin.json
+{
+  "name": "EpisodicRAG-Plugin",
+  "version": "3.0.0",  // ← ここがSSoT（唯一の更新場所）
+  ...
+}
 ```
 
 | ファイル | フィールド | 備考 |
 |---------|-----------|------|
-| `scripts/domain/version.py` | `__version__` | SSoT（ここを更新） |
-| `.claude-plugin/plugin.json` | `version` | 手動同期 |
-| `pyproject.toml` | `version` | 手動同期 |
+| `.claude-plugin/plugin.json` | `version` | **SSoT**（ここを更新） |
+| `scripts/domain/version.py` | `__version__` | plugin.json から動的読み込み（自動） |
+| `CHANGELOG.md` | `## [x.x.x]` | 変更履歴として手動更新 |
 
-**pre-commitによる自動チェック**: コミット時に `check_version.py` が自動実行され、3箇所のバージョンが一致しているか検証されます。不一致がある場合はコミットがブロックされます。
+**動的読み込みの仕組み**:
+
+`scripts/domain/version.py` は `plugin.json` からバージョンを動的に読み込みます：
+
+```python
+from domain import __version__
+print(__version__)  # plugin.json の version が表示される
+```
+
+### リリース手順
+
+バージョン更新時は以下の**2ファイルのみ**更新:
+
+1. `.claude-plugin/plugin.json` - `version` フィールドを更新（SSoT）
+2. `CHANGELOG.md` - 新しいセクション `## [x.x.x] - YYYY-MM-DD` を追加
 
 ```bash
-# 手動でチェック
-python scripts/check_version.py
+# 動作確認
+cd scripts
+python -c "from domain import __version__; print(__version__)"
 ```
 
 ### ドキュメントヘッダーのバージョン

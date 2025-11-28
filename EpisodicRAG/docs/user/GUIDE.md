@@ -185,6 +185,17 @@ flowchart TD
 
 > 📖 完全な設定仕様は [API_REFERENCE.md](../dev/API_REFERENCE.md) を参照
 
+### パス設定について
+
+データの保存場所は `base_dir` で指定します：
+
+| 設定 | データの保存先 | 用途 |
+|------|--------------|------|
+| `"base_dir": "."` | プラグイン内 `data/` | デフォルト |
+| `"base_dir": "C:/GoogleDrive/..."` | 指定した場所の `data/` | クラウド同期 |
+
+現在の設定確認: `@digest-config`
+
 ---
 
 ## 5. 困ったときは
