@@ -15,7 +15,7 @@ EpisodicRAGは、会話ログ（Loopファイル）を階層的にダイジェ�
 
 ## ディレクトリ構造
 
-```
+```text
 EpisodicRAG/
 ├── .claude-plugin/          # プラグインメタデータ・設定
 ├── agents/                  # AIエージェント仕様

@@ -24,7 +24,7 @@ AIスキル仕様書
 
 ## Quick Reference
 
-```bash
+```text
 @digest-auto         # システム状態確認（まず最初に実行）
 @digest-setup        # 初期セットアップ
 @digest-config       # 設定変更

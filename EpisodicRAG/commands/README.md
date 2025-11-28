@@ -22,7 +22,7 @@
 
 ## Quick Reference
 
-```bash
+```text
 /digest              # 新規Loop検出と分析
 /digest weekly       # Weekly Digest確定
 /digest monthly      # Monthly Digest確定

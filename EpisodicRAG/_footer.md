@@ -5,7 +5,7 @@
 
 ## フッター内容
 
-```markdown
+```text
 ---
 **EpisodicRAG** by Weave | [GitHub](https://github.com/Bizuayeu/Plugins-Weave)
 ```

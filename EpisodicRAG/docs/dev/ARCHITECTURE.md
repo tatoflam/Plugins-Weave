@@ -27,7 +27,7 @@
 
 ### Plugin構造（完全自己完結）
 
-```
+```text
 ~/.claude/plugins/EpisodicRAG-Plugin@Plugins-Weave/
 ├── .claude-plugin/
 │   ├── config.json                      # 設定ファイル（@digest-setupで生成）
@@ -76,7 +76,7 @@ v2.0.0 より、Clean Architecture（4層構造）を採用しています。
 
 ### 層構造
 
-```
+```text
 scripts/
 ├── domain/                          # コアビジネスロジック（最内層）
 │   ├── __init__.py                  # 公開API
@@ -143,7 +143,7 @@ scripts/
 
 ### 依存関係ルール
 
-```
+```text
 domain/           ← 何にも依存しない
     ↑
 infrastructure/   ← domain/ のみ
@@ -208,7 +208,7 @@ from config import DigestConfig
 
 ### 1. Loop検出フロー
 
-```
+```text
 新しいLoopファイル配置
   ↓
 /digest コマンド実行
@@ -234,7 +234,7 @@ flowchart TD
 
 ### 2. Digest確定フロー
 
-```
+```text
 thresholdを満たすファイル蓄積
   ↓
 /digest <type> コマンド実行
@@ -334,7 +334,7 @@ class DigestConfig:
 ```
 
 **解決:**
-```
+```text
 plugin_root = ~/.claude/plugins/EpisodicRAG-Plugin@Plugins-Weave
 base_dir = plugin_root / . = {plugin_root}
 loops_path = base_dir / data/Loops
@@ -352,7 +352,7 @@ loops_path = base_dir / data/Loops
 ```
 
 **解決:**
-```
+```text
 plugin_root = ~/.claude/plugins/EpisodicRAG-Plugin@Plugins-Weave
 base_dir = plugin_root / ../../.. = {workspace_root}
 loops_path = base_dir / project/data/Loops

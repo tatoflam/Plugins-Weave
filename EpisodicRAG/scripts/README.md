@@ -16,7 +16,7 @@
 
 v2.0.0 より、Clean Architecture（4層 + config層）を採用しています。
 
-```
+```text
 scripts/
 ├── domain/           # コアビジネスロジック（最内層）
 ├── infrastructure/   # 外部関心事（I/O、ロギング）
@@ -29,7 +29,7 @@ scripts/
 
 ### 依存関係ルール
 
-```
+```text
 domain/           ← 何にも依存しない（純粋なビジネスロジック）
     ↑
 infrastructure/   ← domain/ のみ
@@ -162,7 +162,7 @@ print(config.get_threshold("weekly"))
 
 ### テストディレクトリ構造
 
-```
+```text
 test/
 ├── conftest.py              # 共通フィクスチャ
 ├── test_constants.py        # 定数テスト

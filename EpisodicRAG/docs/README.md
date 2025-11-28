@@ -42,7 +42,7 @@ Claude/AI エージェント向けの技術仕様ハブです。
 
 ### コマンド
 
-```bash
+```text
 /digest              # 新規Loop検出と分析
 /digest weekly       # Weekly Digest確定
 /digest monthly      # Monthly Digest確定
@@ -52,7 +52,7 @@ Claude/AI エージェント向けの技術仕様ハブです。
 
 ### スキル
 
-```bash
+```text
 @digest-setup        # 初期セットアップ
 @digest-config       # 設定変更
 @digest-auto         # システム状態確認

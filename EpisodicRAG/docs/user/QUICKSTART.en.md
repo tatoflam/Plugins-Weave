@@ -39,7 +39,7 @@ A guide to set up EpisodicRAG as quickly as possible and verify it works.
 
 Select **[1] (default)** for all questions:
 
-```
+```text
 Q1: Loop file location → [1] Inside Plugin (self-contained)
 Q2: Digest file output → [1] Inside Plugin (self-contained)
 Q3: Essences file location → [1] Inside Plugin (self-contained)
@@ -49,7 +49,7 @@ Q5-Q12: Threshold for each layer → [1] Default value
 
 Confirm the setup completion message:
 
-```
+```text
 Setup complete!
 
 Created files:
@@ -72,7 +72,7 @@ Create a file with the following content:
 
 **Content** (copy-paste ready):
 
-```
+```text
 # Loop0001: Test Conversation
 
 User: Hello, this is a test for EpisodicRAG.
@@ -91,7 +91,7 @@ Assistant: EpisodicRAG is an 8-layer long-term memory system. It saves conversat
 
 **Expected output**:
 
-```
+```text
 Unprocessed Loop files detected: 1
 
   - Loop0001_TestConversation.txt
