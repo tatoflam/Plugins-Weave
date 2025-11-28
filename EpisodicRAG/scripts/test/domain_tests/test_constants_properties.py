@@ -6,15 +6,9 @@ domain/constants.py のProperty-basedテスト
 hypothesisを使用してプレースホルダーファクトリー関数の不変条件を検証。
 """
 
-import sys
-from pathlib import Path
-
 import pytest
 from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
-
-# パス設定
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from domain.constants import (
     LEVEL_CONFIG,
@@ -24,7 +18,6 @@ from domain.constants import (
     create_placeholder_keywords,
     create_placeholder_text,
 )
-
 
 # =============================================================================
 # Strategies

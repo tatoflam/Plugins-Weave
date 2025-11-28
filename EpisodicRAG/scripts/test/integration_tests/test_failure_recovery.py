@@ -6,16 +6,12 @@ Tests that verify system behavior during and after failures.
 """
 
 import json
-import sys
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
 
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-
 from domain.exceptions import FileIOError
-
 
 # =============================================================================
 # Cascade Failure Recovery Tests
@@ -142,7 +138,6 @@ class TestOrphanedFileDetection:
 
     def test_cleanup_old_provisional_after_finalize(self, temp_plugin_env):
         """Verify provisional files are cleaned up after finalization."""
-        from unittest.mock import MagicMock, patch
 
         # Setup provisional directory and file
         provisional_dir = temp_plugin_env.digests_path / "1_Weekly" / "Provisional"

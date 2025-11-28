@@ -12,20 +12,15 @@ import json
 from pathlib import Path
 
 import pytest
+from test_helpers import create_test_loop_file
+
+from application.finalize import ProvisionalLoader
+from application.grand import ShadowGrandDigestManager
+from config import DigestConfig
+from domain.exceptions import DigestError, FileIOError
 
 # slow マーカーを適用（ファイル全体）
 pytestmark = pytest.mark.slow
-from test_helpers import create_test_loop_file
-
-# Application層
-from application.finalize import ProvisionalLoader
-from application.grand import ShadowGrandDigestManager
-
-# 設定
-from config import DigestConfig
-
-# Domain層
-from domain.exceptions import DigestError, FileIOError
 
 # =============================================================================
 # フィクスチャ

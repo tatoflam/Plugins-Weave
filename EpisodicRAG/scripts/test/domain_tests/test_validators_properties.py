@@ -6,15 +6,9 @@ Property-Based Tests for Validators
 Using hypothesis to test type validation invariants.
 """
 
-import sys
-from pathlib import Path
-
 import pytest
 from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
-
-# パス設定
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from application.validators import (
     get_dict_or_default,

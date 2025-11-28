@@ -8,7 +8,6 @@ pytest 共通設定
 """
 
 import os
-import sys
 from pathlib import Path
 
 import pytest
@@ -36,8 +35,7 @@ except ImportError:
     # hypothesis is an optional dependency
     pass
 
-# 親ディレクトリをパスに追加（scripts/をインポート可能に）
-sys.path.insert(0, str(Path(__file__).parent.parent))
+# pythonpath設定により scripts/ は自動的にパスに追加される（pyproject.toml参照）
 
 from test_helpers import TempPluginEnvironment, create_test_loop_file
 

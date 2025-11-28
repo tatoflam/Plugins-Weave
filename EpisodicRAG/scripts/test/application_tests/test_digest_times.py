@@ -7,15 +7,10 @@ DigestTimesTracker 統合テスト
 pytestスタイルに移行済み
 """
 
-import sys
 from datetime import datetime
-from pathlib import Path
 from unittest.mock import MagicMock
 
 import pytest
-
-# 親ディレクトリをパスに追加
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 # Application層
 from application.tracking import DigestTimesTracker

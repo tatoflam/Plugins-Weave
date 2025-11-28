@@ -7,14 +7,9 @@ DigestConfigのget_source_dir()およびget_source_pattern()メソッドのテ�
 ソースパス解決ロジックの統一を検証。
 """
 
-import sys
 from pathlib import Path
 
 import pytest
-
-# 親ディレクトリをパスに追加
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-
 from test_helpers import TempPluginEnvironment
 
 from config import DigestConfig

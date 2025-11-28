@@ -12,8 +12,7 @@ from typing import List, Optional
 from application.tracking import DigestTimesTracker
 from config import DigestConfig
 from domain.constants import LEVEL_CONFIG, build_level_hierarchy
-from domain.file_naming import extract_number_only, filter_files_after
-from infrastructure import log_warning
+from domain.file_naming import filter_files_after
 
 
 class FileDetector:

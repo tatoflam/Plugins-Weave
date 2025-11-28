@@ -11,14 +11,10 @@ infrastructure/logging_config.py のユニットテスト
 
 import logging
 import os
-import sys
 from io import StringIO
 from unittest.mock import MagicMock, patch
 
 import pytest
-
-# 親ディレクトリをパスに追加
-sys.path.insert(0, str(__file__).rsplit('test', 1)[0])
 
 from infrastructure.logging_config import (
     FORMAT_DETAILED,

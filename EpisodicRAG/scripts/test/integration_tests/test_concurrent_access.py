@@ -7,16 +7,12 @@ Note: These tests simulate concurrent access patterns, not true parallel executi
 """
 
 import json
-import sys
 import threading
 import time
 from pathlib import Path
 from typing import List
 
 import pytest
-
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-
 
 # =============================================================================
 # Concurrent Read Tests

@@ -11,7 +11,7 @@ from config import DigestConfig
 from domain.constants import LEVEL_CONFIG
 from domain.exceptions import ConfigError
 from domain.file_naming import find_max_number, format_digest_number
-from domain.types import LevelConfigData, ProvisionalDigestFile
+from domain.types import LevelConfigData
 from infrastructure import load_json
 
 

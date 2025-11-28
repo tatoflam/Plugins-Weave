@@ -29,6 +29,8 @@ dev = [
 [tool.pytest.ini_options]
 # テストディレクトリ
 testpaths = ["scripts/test"]
+# Pythonパス（sys.path.insertの代替）
+pythonpath = ["scripts"]
 
 # テストファイルのパターン
 python_files = ["test_*.py"]

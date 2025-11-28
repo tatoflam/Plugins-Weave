@@ -29,6 +29,8 @@ if sys.platform == 'win32' and __name__ == "__main__":
     sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
 
 # Domain層
+# Config
+from config import DigestConfig
 from domain.exceptions import EpisodicRAGError
 from domain.file_naming import format_digest_number
 from domain.level_registry import get_level_registry
@@ -38,8 +40,8 @@ from domain.version import DIGEST_FORMAT_VERSION
 # Infrastructure層
 from infrastructure import log_error, log_info, log_warning, save_json
 
-# Config
-from config import DigestConfig
+# Helpers
+from interfaces.interface_helpers import get_next_digest_number
 
 # Provisional submodule
 from interfaces.provisional import (
@@ -48,9 +50,6 @@ from interfaces.provisional import (
     ProvisionalFileManager,
 )
 from interfaces.provisional.validator import validate_provisional_structure
-
-# Helpers
-from interfaces.interface_helpers import get_next_digest_number
 
 
 class ProvisionalDigestSaver:

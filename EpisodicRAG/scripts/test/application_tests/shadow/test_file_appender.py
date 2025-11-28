@@ -16,15 +16,12 @@ import json
 from pathlib import Path
 
 import pytest
+from test_helpers import create_test_loop_file
+
+from application.shadow.file_appender import FileAppender
 
 # slow マーカーを適用（ファイル全体）
 pytestmark = pytest.mark.slow
-
-# テストヘルパー
-from test_helpers import create_test_loop_file
-
-# Application層
-from application.shadow.file_appender import FileAppender
 
 # =============================================================================
 # フィクスチャ

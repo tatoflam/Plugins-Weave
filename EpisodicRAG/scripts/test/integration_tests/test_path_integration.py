@@ -7,12 +7,8 @@ Path Integration Tests
 Provisionalディレクトリが各レベルディレクトリ内に正しく配置されることを確認。
 """
 
-import sys
 import unittest
 from pathlib import Path
-
-# 親ディレクトリをパスに追加（integration_tests -> test -> scripts）
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from test_helpers import LEVEL_DIRS, TempPluginEnvironment
 

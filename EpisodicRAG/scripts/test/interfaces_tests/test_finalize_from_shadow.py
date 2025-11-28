@@ -8,14 +8,10 @@ DigestFinalizerFromShadow 統合テスト
 
 import json
 import shutil
-import sys
 import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import MagicMock, patch
-
-# 親ディレクトリをパスに追加
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 # Interfaces層
 # Domain層

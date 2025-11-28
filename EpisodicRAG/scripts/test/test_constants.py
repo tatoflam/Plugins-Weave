@@ -9,18 +9,17 @@ domain/constants.py のユニットテスト
 import pytest
 
 from domain.constants import (
+    DEFAULT_THRESHOLDS,
     LEVEL_CONFIG,
     LEVEL_NAMES,
     PLACEHOLDER_END,
     PLACEHOLDER_LIMITS,
     PLACEHOLDER_MARKER,
     PLACEHOLDER_SIMPLE,
-    DEFAULT_THRESHOLDS,
     SOURCE_TYPE_LOOPS,
     create_placeholder_keywords,
     create_placeholder_text,
 )
-
 
 # =============================================================================
 # LEVEL_CONFIG 構造テスト

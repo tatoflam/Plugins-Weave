@@ -6,13 +6,7 @@ infrastructure/__init__.py のユニットテスト
 Infrastructureモジュールのエクスポートと統合を検証。
 """
 
-import sys
-
 import pytest
-
-# 親ディレクトリをパスに追加
-sys.path.insert(0, str(__file__).rsplit("test", 1)[0])
-
 
 # =============================================================================
 # エクスポートテスト

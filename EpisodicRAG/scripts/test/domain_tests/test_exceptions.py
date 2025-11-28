@@ -9,12 +9,7 @@ domain/exceptions.py のユニットテスト
 - 例外チェーン（from e）の動作確認
 """
 
-import sys
-
 import pytest
-
-# 親ディレクトリをパスに追加
-sys.path.insert(0, str(__file__).rsplit('test', 1)[0])
 
 from domain.exceptions import (
     ConfigError,

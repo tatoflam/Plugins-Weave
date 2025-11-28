@@ -26,12 +26,11 @@ from typing import Dict, List, Optional, cast
 # 分割したモジュールをインポート
 from application.shadow import FileDetector, ShadowIO, ShadowTemplate, ShadowUpdater
 from application.tracking import DigestTimesTracker
-from domain.types import LevelHierarchyEntry
 
 # Plugin版: config.pyをインポート
 from config import DigestConfig
 from domain.constants import LEVEL_CONFIG, LEVEL_NAMES, LOG_SEPARATOR, build_level_hierarchy
-from domain.types import OverallDigestData
+from domain.types import LevelHierarchyEntry, OverallDigestData
 from infrastructure import log_info, log_warning
 
 

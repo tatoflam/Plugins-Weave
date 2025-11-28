@@ -293,8 +293,8 @@ class TestConfigLoaderCaching:
     @pytest.mark.unit
     def test_load_does_not_reread_file(self, config_loader, config_file, valid_config_data):
         """キャッシュがある場合、ファイルを再読み込みしない"""
-        # 最初のload
-        config1 = config_loader.load()
+        # 最初のload（キャッシュを作成）
+        _ = config_loader.load()
 
         # ファイルを変更（キャッシュには影響しない）
         valid_config_data["base_dir"] = "changed_value"

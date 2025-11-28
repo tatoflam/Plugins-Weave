@@ -39,7 +39,6 @@ from typing import Dict, List, Optional
 from domain.constants import LEVEL_CONFIG
 from domain.exceptions import ConfigError
 
-
 # =============================================================================
 # Metadata: 不変のレベルプロパティ
 # =============================================================================

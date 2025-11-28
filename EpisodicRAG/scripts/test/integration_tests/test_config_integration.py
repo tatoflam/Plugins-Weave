@@ -13,23 +13,16 @@ Config → Application → Domain 層の統合フローを検証するテスト�
 """
 
 import pytest
-
-# slow マーカーを適用（ファイル全体）
-pytestmark = pytest.mark.integration
-
 from test_helpers import create_test_loop_file
 
-# Application層
 from application.shadow import FileDetector
 from application.tracking import DigestTimesTracker
-
-# Config層
 from config import DigestConfig
-
-# Domain層
 from domain.constants import LEVEL_CONFIG, LEVEL_NAMES
 from domain.exceptions import ConfigError
 
+# integration マーカーを適用（ファイル全体）
+pytestmark = pytest.mark.integration
 
 # =============================================================================
 # Config読み込み → パス解決 統合テスト

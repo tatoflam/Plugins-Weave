@@ -7,14 +7,10 @@ GrandDigestManager テスト
 """
 
 import json
-import sys
 from pathlib import Path
 from unittest.mock import MagicMock
 
 import pytest
-
-# 親ディレクトリをパスに追加
-sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 
 # Application層
 from application.grand import GrandDigestManager

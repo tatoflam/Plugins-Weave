@@ -8,7 +8,7 @@ from typing import Any, List
 
 from application.validators import is_valid_dict, is_valid_list
 from domain.exceptions import ValidationError
-from domain.types import IndividualDigestData, ProvisionalDigestFile
+from domain.types import IndividualDigestData
 
 
 def validate_individual_digest(digest: Any, index: int, context: str = "") -> None:

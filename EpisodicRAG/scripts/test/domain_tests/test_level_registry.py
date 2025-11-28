@@ -6,12 +6,7 @@ domain/level_registry.py のユニットテスト
 LevelRegistry、LevelBehavior戦略パターンの動作を検証。
 """
 
-import sys
-
 import pytest
-
-# 親ディレクトリをパスに追加
-sys.path.insert(0, str(__file__).rsplit("test", 1)[0])
 
 from domain.level_registry import (
     LevelBehavior,
@@ -22,7 +17,6 @@ from domain.level_registry import (
     get_level_registry,
     reset_level_registry,
 )
-
 
 # =============================================================================
 # テストセットアップ

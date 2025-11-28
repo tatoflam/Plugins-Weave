@@ -15,15 +15,11 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-# slow マーカーを適用（ファイル全体）
-pytestmark = pytest.mark.slow
-
-# 親ディレクトリをパスに追加
-sys.path.insert(0, str(__file__).rsplit("test", 1)[0])
-
 from domain.exceptions import FileIOError
 from infrastructure import load_json, save_json
 
+# slow マーカーを適用（ファイル全体）
+pytestmark = pytest.mark.slow
 
 # =============================================================================
 # ファイル権限エラーテスト

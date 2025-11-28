@@ -52,11 +52,11 @@ from application.tracking import DigestTimesTracker
 
 # 設定
 from config import DigestConfig
-from domain.file_naming import format_digest_number
 
 # Domain層
 from domain.constants import LEVEL_CONFIG, LOG_SEPARATOR
 from domain.exceptions import EpisodicRAGError
+from domain.file_naming import format_digest_number
 from domain.level_registry import get_level_registry
 
 # Infrastructure層

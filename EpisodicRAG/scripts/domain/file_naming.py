@@ -18,8 +18,6 @@ import re
 from pathlib import Path
 from typing import TYPE_CHECKING, List, Optional, Tuple, Union
 
-from domain.constants import LEVEL_CONFIG, LEVEL_NAMES
-
 if TYPE_CHECKING:
     from domain.level_registry import LevelRegistry
 

@@ -6,16 +6,12 @@ Property-Based Tests for File Naming
 Using hypothesis to test invariants and edge cases in file_naming.py
 """
 
-import sys
 import tempfile
 from pathlib import Path
 
 import pytest
 from hypothesis import HealthCheck, assume, given, settings
 from hypothesis import strategies as st
-
-# パス設定
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from domain.constants import LEVEL_CONFIG, LEVEL_NAMES
 from domain.file_naming import (

@@ -6,7 +6,7 @@ Threshold Provider
 しきい値管理
 """
 
-from typing import Any, Dict, cast
+from typing import Any
 
 from domain.constants import DEFAULT_THRESHOLDS, LEVEL_CONFIG, LEVEL_NAMES
 from domain.exceptions import ConfigError

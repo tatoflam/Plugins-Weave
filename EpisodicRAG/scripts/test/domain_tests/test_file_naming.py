@@ -7,13 +7,9 @@ domain/file_naming.py のテスト。
 特に新規追加のユーティリティ関数をテスト。
 """
 
-import sys
 from pathlib import Path
 
 import pytest
-
-# 親ディレクトリをパスに追加
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from domain.file_naming import (
     extract_file_number,

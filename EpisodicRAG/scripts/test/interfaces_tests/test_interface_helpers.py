@@ -6,12 +6,8 @@ interfaces/interface_helpers.py のユニットテスト
 sanitize_filename(), get_next_digest_number() のテスト
 """
 
-import sys
 import unittest
 from pathlib import Path
-
-# 親ディレクトリをパスに追加
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from domain.exceptions import ConfigError, ValidationError
 from interfaces.interface_helpers import get_next_digest_number, sanitize_filename

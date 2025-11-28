@@ -12,9 +12,6 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-# slow マーカーを適用（ファイル全体）
-pytestmark = pytest.mark.slow
-
 from application.shadow import (
     FileDetector,
     ShadowIO,
@@ -27,6 +24,9 @@ from application.shadow.placeholder_manager import PlaceholderManager
 from application.tracking import DigestTimesTracker
 from config import DigestConfig
 from domain.constants import LEVEL_CONFIG
+
+# slow マーカーを適用（ファイル全体）
+pytestmark = pytest.mark.slow
 
 # =============================================================================
 # フィクスチャ

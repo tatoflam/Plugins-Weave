@@ -18,18 +18,13 @@ import json
 from pathlib import Path
 
 import pytest
+from test_helpers import create_test_loop_file
+
+from application.shadow import ShadowUpdater
+from domain.constants import PLACEHOLDER_MARKER
 
 # slow マーカーを適用（ファイル全体）
 pytestmark = pytest.mark.slow
-
-# テストヘルパー
-from test_helpers import create_test_loop_file
-
-# Application層
-from application.shadow import ShadowUpdater
-
-# Domain層
-from domain.constants import PLACEHOLDER_MARKER
 
 # =============================================================================
 # フィクスチャ

@@ -9,13 +9,9 @@ TypedDict定義の構造と型互換性を検証。
 - 型構造の検証
 """
 
-import sys
 from typing import Dict, List, Optional, get_args, get_origin, get_type_hints
 
 import pytest
-
-# 親ディレクトリをパスに追加
-sys.path.insert(0, str(__file__).rsplit('test', 1)[0])
 
 from domain.types import (
     # メタデータ型

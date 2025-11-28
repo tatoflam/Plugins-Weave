@@ -18,7 +18,6 @@ import pytest
 
 from domain.constants import LEVEL_CONFIG
 
-
 # =============================================================================
 # Fixtures
 # =============================================================================
@@ -144,7 +143,7 @@ class TestFileScanningPerformance:
 
         # Enumerate and filter files
         for _ in range(10):
-            files = [f for f in loops_dir.iterdir() if f.suffix == ".txt"]
+            _ = [f for f in loops_dir.iterdir() if f.suffix == ".txt"]
 
         elapsed = time.perf_counter() - start
 

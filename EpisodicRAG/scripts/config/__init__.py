@@ -22,7 +22,7 @@ Usage:
 import json
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, List, Optional
 
 # Domain層からインポート
 from domain.constants import (
@@ -35,22 +35,19 @@ from domain.constants import (
 from domain.exceptions import ConfigError
 from domain.types import ConfigData
 
+# Infrastructure層からログ関数をインポート（show_paths用）
+from infrastructure import log_debug, log_info
+
 # 内部コンポーネント
 from .config_loader import ConfigLoader
+
+# 後方互換性のため DirectoryValidator も公開（ConfigValidatorへのエイリアス）
 from .config_validator import ConfigValidator
+from .config_validator import DirectoryValidator as DirectoryValidator  # noqa: PLC0414
 from .level_path_service import LevelPathService
 from .path_resolver import PathResolver
 from .plugin_root_resolver import find_plugin_root
 from .threshold_provider import ThresholdProvider
-
-# Infrastructure層からログ関数をインポート（show_paths用）
-from infrastructure import log_debug, log_info
-
-# 後方互換性のため config_repository からも load_config をエクスポート
-from .config_repository import load_config
-
-# 後方互換性のため DirectoryValidator も公開（ConfigValidatorへのエイリアス）
-from .config_validator import DirectoryValidator
 
 # =============================================================================
 # DigestConfig クラス（Facade）

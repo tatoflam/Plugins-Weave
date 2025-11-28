@@ -7,19 +7,15 @@ ProvisionalDigestSaver 統合テスト
 """
 
 import json
-import sys
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
 
-# 親ディレクトリをパスに追加
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-
 # Interfaces層
 from domain.exceptions import ValidationError
 from interfaces import ProvisionalDigestSaver
-from interfaces.provisional import InputLoader, DigestMerger
+from interfaces.provisional import DigestMerger, InputLoader
 
 
 @pytest.fixture

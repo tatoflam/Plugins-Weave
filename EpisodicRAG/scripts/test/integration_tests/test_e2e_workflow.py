@@ -13,33 +13,20 @@ E2E Workflow Tests
 """
 
 import json
-import sys
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
-
-# slow マーカーを適用（ファイル全体）
-pytestmark = pytest.mark.slow
-
-# 親ディレクトリをパスに追加
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-
-# Application層
-# テストヘルパー
 from test_helpers import create_test_loop_file
 
 from application.grand import GrandDigestManager, ShadowGrandDigestManager
 from application.tracking import DigestTimesTracker
-
-# 設定
 from config import DigestConfig
-
-# Domain層
 from domain.constants import LEVEL_NAMES
-
-# Interfaces層
 from interfaces import DigestFinalizerFromShadow
+
+# slow マーカーを適用（ファイル全体）
+pytestmark = pytest.mark.slow
 
 # =============================================================================
 # E2E: Loop検出からShadow更新

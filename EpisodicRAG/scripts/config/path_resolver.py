@@ -7,7 +7,7 @@ base_dir基準のパス解決
 """
 
 from pathlib import Path
-from typing import Any, Dict, Optional, cast
+from typing import Optional
 
 from domain.exceptions import ConfigError
 from domain.types import ConfigData, as_dict

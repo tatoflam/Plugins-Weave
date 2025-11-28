@@ -14,14 +14,10 @@ pytestスタイルで実装。conftest.pyのフィクスチャを活用。
 """
 
 import json
-import sys
 from pathlib import Path
 from unittest.mock import patch
 
 import pytest
-
-# 親ディレクトリをパスに追加
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from config import DigestConfig
 from domain.constants import LEVEL_CONFIG, LEVEL_NAMES

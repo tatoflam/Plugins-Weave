@@ -6,15 +6,9 @@ infrastructure/user_interaction.py のユニットテスト
 ユーザー確認コールバック関数の動作を検証。
 """
 
-import sys
-
 import pytest
 
-# 親ディレクトリをパスに追加
-sys.path.insert(0, str(__file__).rsplit("test", 1)[0])
-
 from infrastructure.user_interaction import get_default_confirm_callback
-
 
 # =============================================================================
 # get_default_confirm_callback テスト

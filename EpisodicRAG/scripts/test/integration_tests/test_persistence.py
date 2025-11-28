@@ -13,21 +13,16 @@ import json
 from pathlib import Path
 
 import pytest
-
-# slow マーカーを適用（ファイル全体）
-pytestmark = pytest.mark.slow
 from test_helpers import create_test_loop_file
 
-# Application層
 from application.finalize import DigestPersistence
 from application.grand import GrandDigestManager, ShadowGrandDigestManager
 from application.tracking import DigestTimesTracker
-
-# 設定
 from config import DigestConfig
-
-# Domain層
 from domain.exceptions import DigestError
+
+# slow マーカーを適用（ファイル全体）
+pytestmark = pytest.mark.slow
 
 # =============================================================================
 # フィクスチャ

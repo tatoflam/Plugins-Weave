@@ -14,14 +14,11 @@ from pathlib import Path
 
 import pytest
 
+from application.shadow import ShadowIO, ShadowTemplate
+from domain.constants import LEVEL_NAMES
+
 # slow マーカーを適用（ファイル全体）
 pytestmark = pytest.mark.slow
-
-# Application層
-from application.shadow import ShadowIO, ShadowTemplate
-
-# Domain層
-from domain.constants import LEVEL_NAMES
 
 # =============================================================================
 # ShadowIO.load_or_create テスト

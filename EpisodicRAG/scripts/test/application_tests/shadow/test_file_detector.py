@@ -13,20 +13,15 @@ import json
 from pathlib import Path
 
 import pytest
+from test_helpers import create_test_loop_file
+
+from application.shadow import FileDetector
+from application.tracking import DigestTimesTracker
+from config import DigestConfig
+from domain.constants import LEVEL_CONFIG
 
 # slow マーカーを適用（ファイル全体）
 pytestmark = pytest.mark.slow
-from test_helpers import create_test_loop_file
-
-# Application層
-from application.shadow import FileDetector
-from application.tracking import DigestTimesTracker
-
-# 設定
-from config import DigestConfig
-
-# Domain層
-from domain.constants import LEVEL_CONFIG
 
 # =============================================================================
 # FileDetector.get_source_path テスト

@@ -6,16 +6,12 @@ Property-Based Tests for JSON Repository
 Testing JSON I/O roundtrip invariants.
 """
 
-import sys
 import tempfile
 from pathlib import Path
 
 import pytest
 from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
-
-# パス設定
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from infrastructure.json_repository import (
     load_json,
