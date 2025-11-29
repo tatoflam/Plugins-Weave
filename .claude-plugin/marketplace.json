@@ -1,17 +1,15 @@
 {
-  "name": "Plugins-Weave",
+  "name": "plugins-weave",
+  "description": "Claude Code plugins for hierarchical memory management and long-term knowledge systems",
+  "version": "3.3.0",
+  "pluginRoot": ".",
   "owner": {
     "name": "Weave",
     "email": "noreply@github.com"
   },
-  "metadata": {
-    "description": "Claude Code plugins for hierarchical memory management and long-term knowledge systems",
-    "version": "3.3.0",
-    "pluginRoot": "."
-  },
   "plugins": [
     {
-      "name": "EpisodicRAG-Plugin",
+      "name": "EpisodicRAG",
       "source": "./EpisodicRAG",
       "description": "Hierarchical memory system for Claude. Digests conversation logs into 8 tiers spanning ~100 years. Prevents memory fragmentation and enables cross-session memory inheritance.",
       "version": "3.3.0",
@@ -30,14 +28,7 @@
         "knowledge-management",
         "ai-memory"
       ],
-      "categories": ["memory", "knowledge-management", "productivity"],
-      "compatibility": {
-        "claudeCode": ">=1.0.0"
-      },
-      "dependencies": {
-        "python": ">=3.10"
-      },
-      "changelog": "./EpisodicRAG/CHANGELOG.md"
+      "category": "memory"
     }
   ]
 }
