@@ -70,12 +70,16 @@ from domain.file_naming import (
 )
 
 # Level registry (Strategy pattern for OCP)
-from domain.level_registry import (
+# Note: LevelMetadata and LevelBehavior are defined in separate files for SRP
+# but re-exported from level_registry for backward compatibility
+from domain.level_behaviors import (
     LevelBehavior,
-    LevelMetadata,
-    LevelRegistry,
     LoopLevelBehavior,
     StandardLevelBehavior,
+)
+from domain.level_metadata import LevelMetadata
+from domain.level_registry import (
+    LevelRegistry,
     get_level_registry,
     reset_level_registry,
 )

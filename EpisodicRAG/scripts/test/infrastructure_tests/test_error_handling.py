@@ -29,6 +29,7 @@ class TestSafeFileOperation:
     @pytest.mark.unit
     def test_successful_operation_returns_result(self):
         """成功した操作は結果を返す"""
+
         def operation():
             return "success"
 
@@ -38,6 +39,7 @@ class TestSafeFileOperation:
     @pytest.mark.unit
     def test_failed_operation_returns_none(self):
         """失敗した操作は None を返す（on_error なし）"""
+
         def operation():
             raise FileNotFoundError("file not found")
 
@@ -66,6 +68,7 @@ class TestSafeFileOperation:
     @pytest.mark.unit
     def test_reraise_true_raises_fileiioerror(self):
         """reraise=True で FileIOError を再送出"""
+
         def operation():
             raise FileNotFoundError("file not found")
 
@@ -75,15 +78,14 @@ class TestSafeFileOperation:
     @pytest.mark.unit
     def test_reraise_with_on_error_uses_callback(self):
         """reraise=True でも on_error があればコールバックを使用"""
+
         def operation():
             raise FileNotFoundError("file not found")
 
         def on_error(e):
             return "fallback"
 
-        result = safe_file_operation(
-            operation, "test operation", on_error=on_error, reraise=True
-        )
+        result = safe_file_operation(operation, "test operation", on_error=on_error, reraise=True)
         assert result == "fallback"
 
     @pytest.mark.unit
@@ -98,6 +100,7 @@ class TestSafeFileOperation:
     )
     def test_catches_common_file_errors(self, exception_class):
         """一般的なファイルエラーをキャッチする"""
+
         def operation():
             raise exception_class("test error")
 
@@ -107,6 +110,7 @@ class TestSafeFileOperation:
     @pytest.mark.unit
     def test_other_exceptions_not_caught(self):
         """その他の例外はキャッチしない"""
+
         def operation():
             raise ValueError("not a file error")
 
@@ -165,6 +169,7 @@ class TestSafeCleanup:
     @pytest.mark.unit
     def test_failed_cleanup_returns_true(self):
         """失敗したクリーンアップは True を返す（実装による）"""
+
         def cleanup():
             raise FileNotFoundError("cleanup failed")
 
@@ -214,6 +219,7 @@ class TestWithErrorContext:
     @pytest.mark.unit
     def test_successful_operation_returns_result(self):
         """成功した操作は結果を返す"""
+
         def operation():
             return "success"
 
@@ -223,6 +229,7 @@ class TestWithErrorContext:
     @pytest.mark.unit
     def test_failed_operation_raises_with_context(self):
         """失敗した操作はコンテキスト付きで例外を送出"""
+
         def operation():
             raise ValueError("original error")
 
@@ -234,6 +241,7 @@ class TestWithErrorContext:
     @pytest.mark.unit
     def test_custom_error_type(self):
         """カスタム例外型を指定できる"""
+
         class CustomError(Exception):
             pass
 
@@ -261,6 +269,7 @@ class TestWithErrorContext:
     @pytest.mark.unit
     def test_context_message_format(self):
         """コンテキストメッセージのフォーマット"""
+
         def operation():
             raise RuntimeError("specific error")
 

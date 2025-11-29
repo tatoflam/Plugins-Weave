@@ -1,20 +1,11 @@
 #!/usr/bin/env python3
 """
-Level Registry - Strategy Pattern for Level-specific Behavior
-==============================================================
+Level Registry - Registry for Levels and Behaviors
+===================================================
 
-レベル固有の振る舞いを拡張可能な方法で管理するRegistry。
-Open/Closed Principle (OCP) を実現：コード修正なしで新レベルを追加可能。
+レベルとその振る舞いを管理するRegistry。
 
 ## 使用デザインパターン
-
-### Strategy Pattern
-レベルごとに異なる振る舞い（フォーマット、カスケード判定）を
-LevelBehaviorインターフェースで抽象化。具体的な実装は
-StandardLevelBehavior, LoopLevelBehaviorなどで提供。
-
-新しいレベルタイプを追加する際は、LevelBehaviorを継承した
-新クラスを作成するだけで対応可能（既存コード変更不要）。
 
 ### Singleton Pattern
 get_level_registry()でアクセスするSingletonインスタンス。
@@ -31,13 +22,9 @@ get_level_registry()でアクセスするSingletonインスタンス。
 - 既存コードの修正は一切不要
 
 ### SRP (Single Responsibility Principle)
-- LevelMetadata: レベルの静的プロパティのみ
-- LevelBehavior: レベル固有の動的振る舞いのみ
-- LevelRegistry: レベルとBehaviorの登録・取得のみ
-
-### DIP (Dependency Inversion Principle)
-- LevelBehavior抽象クラスに依存し、具象クラスには依存しない
-- 呼び出し側はget_behavior()経由でBehaviorを取得
+- LevelMetadata: レベルの静的プロパティのみ (level_metadata.py)
+- LevelBehavior: レベル固有の動的振る舞いのみ (level_behaviors.py)
+- LevelRegistry: レベルとBehaviorの登録・取得のみ (このファイル)
 
 Usage:
     from domain.level_registry import get_level_registry
@@ -57,147 +44,23 @@ Usage:
         # 次レベルへ伝播
 
 Architecture:
-    - LevelMetadata: 不変のレベルプロパティ（dataclass）
-    - LevelBehavior: レベル固有の振る舞い（Strategy interface）
-    - StandardLevelBehavior: 通常レベルの実装
-    - LoopLevelBehavior: Loopファイル専用の実装
-    - LevelRegistry: レベルとBehaviorのレジストリ（Singleton）
+    - LevelMetadata: 不変のレベルプロパティ（dataclass） → level_metadata.py
+    - LevelBehavior: レベル固有の振る舞い（Strategy interface） → level_behaviors.py
+    - LevelRegistry: レベルとBehaviorのレジストリ（Singleton） → このファイル
 """
 
 import re
-from abc import ABC, abstractmethod
-from dataclasses import dataclass
 from typing import Dict, List, Optional
 
 from domain.constants import LEVEL_CONFIG
 from domain.error_formatter import get_error_formatter
 from domain.exceptions import ConfigError
-
-# =============================================================================
-# Metadata: 不変のレベルプロパティ
-# =============================================================================
-
-
-@dataclass(frozen=True)
-class LevelMetadata:
-    """
-    レベルの不変プロパティ
-
-    Attributes:
-        name: レベル名（例: "weekly", "monthly"）
-        prefix: ファイル名プレフィックス（例: "W", "M", "Loop"）
-        digits: 番号の桁数（例: 4 -> W0001）
-        dir: digests_path以下のサブディレクトリ名
-        source: この階層を生成する際の入力元
-        next_level: 確定時にカスケードする上位階層（None = 最上位）
-    """
-
-    name: str
-    prefix: str
-    digits: int
-    dir: str
-    source: str
-    next_level: Optional[str]
-
-
-# =============================================================================
-# Strategy Interface: レベル固有の振る舞い
-# =============================================================================
-
-
-class LevelBehavior(ABC):
-    """
-    レベル固有の振る舞いを定義するStrategy interface
-
-    新しい振る舞いが必要な場合、このクラスを継承して実装を追加。
-    既存コードを修正せずに拡張可能（OCP準拠）。
-
-    Design Pattern: Strategy
-        振る舞いをカプセル化し、実行時に交換可能にする。
-
-    Learning Point:
-        新しいレベルタイプを追加する際は、このクラスを継承した
-        新クラスを作成するだけで対応可能。既存コードの修正は不要（OCP）。
-
-    ## ARCHITECTURE: Strategy Pattern の Context
-    このクラスが Strategy の抽象インターフェースを定義。
-    StandardLevelBehavior, LoopLevelBehavior が具象 Strategy。
-    LevelRegistry が Context として Strategy を保持・切り替える。
-    """
-
-    @abstractmethod
-    def format_number(self, number: int) -> str:
-        """
-        番号をレベル固有のフォーマットに変換
-
-        Args:
-            number: フォーマットする番号
-
-        Returns:
-            フォーマットされた文字列（例: "W0042", "L00186"）
-        """
-        pass
-
-    @abstractmethod
-    def should_cascade(self) -> bool:
-        """
-        このレベルが次レベルへカスケードするかどうか
-
-        Returns:
-            True: 次レベルへカスケードする
-            False: カスケードしない（最上位、または特殊レベル）
-        """
-        pass
-
-
-# =============================================================================
-# Strategy Implementations
-# =============================================================================
-
-
-class StandardLevelBehavior(LevelBehavior):
-    """
-    通常ダイジェストレベルの振る舞い
-
-    LEVEL_CONFIGで定義された標準的なダイジェストレベル用。
-    """
-
-    def __init__(self, metadata: LevelMetadata):
-        """
-        Args:
-            metadata: このレベルのメタデータ
-        """
-        self.metadata = metadata
-
-    def format_number(self, number: int) -> str:
-        """プレフィックス + ゼロパディング番号"""
-        return f"{self.metadata.prefix}{number:0{self.metadata.digits}d}"
-
-    def should_cascade(self) -> bool:
-        """次レベルが存在すればカスケードする"""
-        return self.metadata.next_level is not None
-
-
-class LoopLevelBehavior(LevelBehavior):
-    """
-    Loopファイル専用の振る舞い
-
-    Loopファイルは特殊なフォーマット（L00001）を持ち、
-    カスケードは行わない。
-    """
-
-    def format_number(self, number: int) -> str:
-        """L + 5桁ゼロパディング"""
-        return f"L{number:05d}"
-
-    def should_cascade(self) -> bool:
-        """Loopはカスケードしない"""
-        return False
-
-
-# =============================================================================
-# Registry: レベルとBehaviorの管理
-# =============================================================================
+from domain.level_behaviors import (
+    LevelBehavior,
+    LoopLevelBehavior,
+    StandardLevelBehavior,
+)
+from domain.level_metadata import LevelMetadata
 
 
 class LevelRegistry:

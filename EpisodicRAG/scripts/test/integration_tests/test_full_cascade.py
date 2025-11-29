@@ -243,9 +243,7 @@ class TestFullCascadeFlow:
             next_level = hierarchy[level]["next"]
             next_index = LEVEL_ORDER.index(next_level)
 
-            assert next_index == i + 1, (
-                f"{level}({i})の次は{LEVEL_ORDER[i+1]}({i+1})であること"
-            )
+            assert next_index == i + 1, f"{level}({i})の次は{LEVEL_ORDER[i + 1]}({i + 1})であること"
 
 
 class TestCascadeStopConditions:

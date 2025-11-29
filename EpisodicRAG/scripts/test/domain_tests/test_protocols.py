@@ -54,6 +54,7 @@ class TestLevelBehaviorProtocol:
         class NonConformingBehavior:
             def format_number(self, number: int) -> str:
                 return str(number)
+
             # should_cascade がない
 
         # 実行時にはエラーにならないが、型チェッカーはエラーを報告する

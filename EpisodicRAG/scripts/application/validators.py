@@ -101,9 +101,7 @@ def validate_source_files(files: Any, context: str = "source_files") -> List[str
     return files
 
 
-def get_dict_or_default(
-    data: Any, default: Optional[Dict[str, Any]] = None
-) -> Dict[str, Any]:
+def get_dict_or_default(data: Any, default: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     """
     dataがdictならそのまま返し、そうでなければデフォルト値を返す
 
@@ -117,9 +115,7 @@ def get_dict_or_default(
     return _get_or_default(data, dict, lambda: default if default is not None else {})
 
 
-def get_list_or_default(
-    data: Any, default: Optional[List[Any]] = None
-) -> List[Any]:
+def get_list_or_default(data: Any, default: Optional[List[Any]] = None) -> List[Any]:
     """
     dataがlistならそのまま返し、そうでなければデフォルト値を返す
 

@@ -37,7 +37,9 @@ def sanitize_filename(title: str, max_length: int = 50) -> str:
     if not isinstance(title, str):
         raise ValidationError(formatter.validation.invalid_type("title", "str", title))
     if max_length <= 0:
-        raise ValidationError(formatter.validation.validation_error("max_length", "must be positive", max_length))
+        raise ValidationError(
+            formatter.validation.validation_error("max_length", "must be positive", max_length)
+        )
 
     # 危険な文字を削除
     sanitized = re.sub(r'[<>:"/\\|?*]', '', title)

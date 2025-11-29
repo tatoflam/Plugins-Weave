@@ -149,7 +149,9 @@ class GrandDigestManager:
         formatter = get_error_formatter()
         # 型チェック
         if not is_valid_dict(grand_data):
-            raise DigestError(formatter.validation.invalid_type("GrandDigest.txt", "dict", grand_data))
+            raise DigestError(
+                formatter.validation.invalid_type("GrandDigest.txt", "dict", grand_data)
+            )
 
         if "major_digests" not in grand_data:
             raise DigestError(formatter.config.config_section_missing("major_digests"))

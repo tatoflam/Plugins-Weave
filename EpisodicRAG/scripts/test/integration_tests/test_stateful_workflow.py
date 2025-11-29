@@ -189,9 +189,7 @@ class DigestWorkflowStateMachine(RuleBasedStateMachine):
         """カウントは常に非負"""
         assert self.loop_count >= 0, f"loop_count is negative: {self.loop_count}"
         assert self.weekly_count >= 0, f"weekly_count is negative: {self.weekly_count}"
-        assert (
-            self.monthly_count >= 0
-        ), f"monthly_count is negative: {self.monthly_count}"
+        assert self.monthly_count >= 0, f"monthly_count is negative: {self.monthly_count}"
 
     @invariant()
     def counts_within_valid_range(self):
@@ -295,9 +293,7 @@ class ErrorRecoveryStateMachine(RuleBasedStateMachine):
                 self.test_file.unlink()
 
             # 新しい有効なファイルを作成
-            self.test_file.write_text(
-                json.dumps({"status": "recovered", "data": []})
-            )
+            self.test_file.write_text(json.dumps({"status": "recovered", "data": []}))
             self.file_exists = True
             self.file_corrupted = False
             self.corruption_detected = False
@@ -317,7 +313,12 @@ class ErrorRecoveryStateMachine(RuleBasedStateMachine):
     def recovery_restores_valid_state(self):
         """回復後は有効な状態（回復直後かつ破損していない場合）"""
         # Only check immediately after recovery when file is not corrupted again
-        if self.recovery_attempted and not self.file_corrupted and self.test_file and self.test_file.exists():
+        if (
+            self.recovery_attempted
+            and not self.file_corrupted
+            and self.test_file
+            and self.test_file.exists()
+        ):
             try:
                 with open(self.test_file, "r", encoding="utf-8") as f:
                     data = json.load(f)

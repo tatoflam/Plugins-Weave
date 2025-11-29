@@ -106,6 +106,7 @@ class TestVersionFallback:
         import inspect
 
         from domain.version import _load_version_from_plugin_json
+
         source = inspect.getsource(_load_version_from_plugin_json)
         assert "json.JSONDecodeError" in source or "JSONDecodeError" in source
 
@@ -116,6 +117,7 @@ class TestVersionFallback:
         import inspect
 
         from domain.version import _load_version_from_plugin_json
+
         source = inspect.getsource(_load_version_from_plugin_json)
         assert '.get("version"' in source
 

@@ -108,9 +108,7 @@ class EpisodicRAGError(Exception):
         'Something failed [Context: current_level=weekly]'
     """
 
-    def __init__(
-        self, message: str, context: Optional[DiagnosticContext] = None
-    ) -> None:
+    def __init__(self, message: str, context: Optional[DiagnosticContext] = None) -> None:
         """
         初期化
 

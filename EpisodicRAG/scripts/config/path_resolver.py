@@ -64,7 +64,7 @@ class PathResolver:
                 config_invalid_value_message(
                     "base_dir",
                     "path within plugin root",
-                    f"'{base_dir_setting}' (resolves outside plugin root)"
+                    f"'{base_dir_setting}' (resolves outside plugin root)",
                 )
             )
         return resolved

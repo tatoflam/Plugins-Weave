@@ -128,9 +128,15 @@ class DigestPersistence:
         overall_digest = regular_digest.get("overall_digest")
         if not overall_digest or not is_valid_dict(overall_digest):
             formatter = get_error_formatter()
-            raise DigestError(formatter.validation.validation_error("RegularDigest", "has no valid overall_digest", None))
+            raise DigestError(
+                formatter.validation.validation_error(
+                    "RegularDigest", "has no valid overall_digest", None
+                )
+            )
         # GrandDigestManager.update_digestは例外を投げる（失敗時）
-        self.grand_digest_manager.update_digest(level, new_digest_name, cast(OverallDigestData, overall_digest))
+        self.grand_digest_manager.update_digest(
+            level, new_digest_name, cast(OverallDigestData, overall_digest)
+        )
 
     def _update_shadow_cascade(self, level: str) -> None:
         """

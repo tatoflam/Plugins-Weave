@@ -46,4 +46,6 @@ class PlaceholderManager:
             _logger.info(f"Initialized placeholder for {total_files} file(s)")
         else:
             _logger.info(f"Preserved existing analysis (now {total_files} file(s) total)")
-            _logger.info(f"Claude should re-analyze all {total_files} files to integrate new content")
+            _logger.info(
+                f"Claude should re-analyze all {total_files} files to integrate new content"
+            )

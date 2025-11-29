@@ -29,8 +29,7 @@ def load_config(config_file: Path) -> ConfigData:
     """
     if not config_file.exists():
         raise ConfigError(
-            f"{file_not_found_message(config_file)}\n"
-            "Run setup first: bash scripts/setup.sh"
+            f"{file_not_found_message(config_file)}\nRun setup first: bash scripts/setup.sh"
         )
 
     try:

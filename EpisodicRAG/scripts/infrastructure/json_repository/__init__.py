@@ -113,9 +113,7 @@ def load_json_with_template(
         data = load_json_with_template(path, default_factory=get_template)
         # data is inferred as MyTypedDict
     """
-    logger.debug(
-        f"load_json_with_template called: target={target_file}, template={template_file}"
-    )
+    logger.debug(f"load_json_with_template called: target={target_file}, template={template_file}")
 
     # コンテキスト作成
     context = LoadContext(
@@ -129,12 +127,14 @@ def load_json_with_template(
     # 戦略チェーン構築
     # ARCHITECTURE: Chain of Responsibility
     # 各戦略を順番に試行し、最初に成功したものを返す
-    loader: ChainedLoader[T] = ChainedLoader([
-        FileLoadStrategy(safe_read_json),
-        TemplateLoadStrategy(safe_read_json, save_json),
-        FactoryLoadStrategy(save_json),
-        DefaultLoadStrategy(),
-    ])
+    loader: ChainedLoader[T] = ChainedLoader(
+        [
+            FileLoadStrategy(safe_read_json),
+            TemplateLoadStrategy(safe_read_json, save_json),
+            FactoryLoadStrategy(save_json),
+            DefaultLoadStrategy(),
+        ]
+    )
 
     result = loader.load(context)
     # DefaultLoadStrategyが最後にあるため、Noneは返らない

@@ -122,7 +122,10 @@ class TestConfigThresholdInvariants:
         assert threshold <= 100, "閾値は妥当な範囲内であること"
 
     @given(level=valid_levels)
-    @settings(max_examples=50, suppress_health_check=[HealthCheck.too_slow, HealthCheck.function_scoped_fixture])
+    @settings(
+        max_examples=50,
+        suppress_health_check=[HealthCheck.too_slow, HealthCheck.function_scoped_fixture],
+    )
     def test_threshold_is_positive_integer(self, level, temp_plugin_env):
         """
         DigestConfigの閾値は正の整数である
@@ -159,7 +162,10 @@ class TestPathResolutionInvariants:
     """パス解決の不変条件"""
 
     @given(level=valid_levels)
-    @settings(max_examples=50, suppress_health_check=[HealthCheck.too_slow, HealthCheck.function_scoped_fixture])
+    @settings(
+        max_examples=50,
+        suppress_health_check=[HealthCheck.too_slow, HealthCheck.function_scoped_fixture],
+    )
     def test_level_dir_returns_absolute_path(self, level, temp_plugin_env):
         """
         get_level_dir()は絶対パスを返す
@@ -172,7 +178,10 @@ class TestPathResolutionInvariants:
         assert level_dir.is_absolute(), f"{level}のディレクトリは絶対パスであること"
 
     @given(level=valid_levels)
-    @settings(max_examples=50, suppress_health_check=[HealthCheck.too_slow, HealthCheck.function_scoped_fixture])
+    @settings(
+        max_examples=50,
+        suppress_health_check=[HealthCheck.too_slow, HealthCheck.function_scoped_fixture],
+    )
     def test_level_dir_contains_level_name(self, level, temp_plugin_env):
         """
         get_level_dir()のパスにレベル関連の名前が含まれる

@@ -56,6 +56,7 @@ class TestLoadContext:
         """全ての引数で初期化"""
         target = tmp_path / "target.json"
         template = tmp_path / "template.json"
+
         def factory():
             return {"key": "value"}
 
@@ -139,9 +140,7 @@ class TestTemplateLoadStrategy:
             save_called.append((path, data))
 
         strategy = TemplateLoadStrategy(mock_read, mock_save)
-        context = LoadContext(
-            target_file=target, template_file=template, save_on_create=True
-        )
+        context = LoadContext(target_file=target, template_file=template, save_on_create=True)
         result = strategy.load(context)
 
         assert result == {"source": "template"}
@@ -181,9 +180,7 @@ class TestTemplateLoadStrategy:
         mock_save = MagicMock()
 
         strategy = TemplateLoadStrategy(mock_read, mock_save)
-        context = LoadContext(
-            target_file=target, template_file=template, save_on_create=False
-        )
+        context = LoadContext(target_file=target, template_file=template, save_on_create=False)
         result = strategy.load(context)
 
         assert result == {"source": "template"}
@@ -211,9 +208,7 @@ class TestFactoryLoadStrategy:
             save_called.append((path, data))
 
         strategy = FactoryLoadStrategy(mock_save)
-        context = LoadContext(
-            target_file=target, default_factory=factory, save_on_create=True
-        )
+        context = LoadContext(target_file=target, default_factory=factory, save_on_create=True)
         result = strategy.load(context)
 
         assert result == {"source": "factory", "created": True}
@@ -239,9 +234,7 @@ class TestFactoryLoadStrategy:
         mock_save = MagicMock()
 
         strategy = FactoryLoadStrategy(mock_save)
-        context = LoadContext(
-            target_file=target, default_factory=factory, save_on_create=False
-        )
+        context = LoadContext(target_file=target, default_factory=factory, save_on_create=False)
         result = strategy.load(context)
 
         assert result == {"source": "factory"}
@@ -416,10 +409,12 @@ class TestStrategyIntegration:
 
         # DefaultLoadStrategyを最初に、FileLoadStrategyを2番目に
         # → 常に空dictが返る
-        loader: ChainedLoader[Dict[str, Any]] = ChainedLoader([
-            DefaultLoadStrategy(),
-            FileLoadStrategy(safe_read_json),
-        ])
+        loader: ChainedLoader[Dict[str, Any]] = ChainedLoader(
+            [
+                DefaultLoadStrategy(),
+                FileLoadStrategy(safe_read_json),
+            ]
+        )
 
         target = tmp_path / "target.json"
         target.write_text('{"key": "value"}')

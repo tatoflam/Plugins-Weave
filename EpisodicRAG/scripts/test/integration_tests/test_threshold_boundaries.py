@@ -331,7 +331,9 @@ class TestEdgeCases(TestThresholdBoundaryBase):
         final_count = len(weekly_shadow["source_files"])
 
         # 重複追加がなければ件数は同じ
-        assert final_count == initial_count, f"重複追加が発生: {final_count - initial_count}件追加された"
+        assert final_count == initial_count, (
+            f"重複追加が発生: {final_count - initial_count}件追加された"
+        )
 
 
 class TestEdgeCaseBoundaries(TestThresholdBoundaryBase):
@@ -388,7 +390,9 @@ class TestEdgeCaseBoundaries(TestThresholdBoundaryBase):
         shadow_manager = ShadowGrandDigestManager(config)
         new_files = shadow_manager._detector.find_new_files("weekly")
 
-        assert len(new_files) == file_count, f"1000件のファイルが検出されること（実際: {len(new_files)}）"
+        assert len(new_files) == file_count, (
+            f"1000件のファイルが検出されること（実際: {len(new_files)}）"
+        )
 
         shadow_manager.add_files_to_shadow("weekly", new_files)
         weekly_shadow = shadow_manager.get_shadow_digest_for_level("weekly")

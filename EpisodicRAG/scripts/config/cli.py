@@ -48,6 +48,7 @@ def main(plugin_root: Optional[Path] = None) -> None:
     except (FileNotFoundError, Exception) as e:
         # ConfigError やその他のエラーをキャッチ
         from .exceptions import ConfigError
+
         if isinstance(e, (FileNotFoundError, ConfigError)):
             sys.stderr.write(f"[ERROR] {e}\n")
             sys.exit(1)

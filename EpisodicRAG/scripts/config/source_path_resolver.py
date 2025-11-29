@@ -59,9 +59,7 @@ class SourcePathResolver:
             ConfigError: 無効なlevelが指定された場合
         """
         if level not in LEVEL_CONFIG:
-            raise ConfigError(
-                f"Invalid level: '{level}'. Valid levels: {', '.join(LEVEL_NAMES)}"
-            )
+            raise ConfigError(f"Invalid level: '{level}'. Valid levels: {', '.join(LEVEL_NAMES)}")
 
         source_type = str(LEVEL_CONFIG[level]["source"])
 
@@ -84,9 +82,7 @@ class SourcePathResolver:
             ConfigError: 無効なlevelが指定された場合
         """
         if level not in LEVEL_CONFIG:
-            raise ConfigError(
-                f"Invalid level: '{level}'. Valid levels: {', '.join(LEVEL_NAMES)}"
-            )
+            raise ConfigError(f"Invalid level: '{level}'. Valid levels: {', '.join(LEVEL_NAMES)}")
 
         source_type = str(LEVEL_CONFIG[level]["source"])
 

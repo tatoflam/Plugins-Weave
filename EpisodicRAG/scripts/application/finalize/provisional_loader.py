@@ -95,7 +95,9 @@ class ProvisionalLoader:
 
         if not is_valid_dict(provisional_data):
             formatter = get_error_formatter()
-            raise DigestError(formatter.validation.invalid_type(provisional_path.name, "dict", provisional_data))
+            raise DigestError(
+                formatter.validation.invalid_type(provisional_path.name, "dict", provisional_data)
+            )
 
         individual_digests = provisional_data.get("individual_digests", [])
         log_debug(f"{LOG_PREFIX_STATE} loaded_digests_count: {len(individual_digests)}")
@@ -199,5 +201,7 @@ class ProvisionalLoader:
 
         if skipped_count > 0:
             log_warning(f"Skipped {skipped_count}/{len(source_files)} files due to errors")
-        _logger.info(f"Auto-generated {len(individual_digests)} individual digests from source files")
+        _logger.info(
+            f"Auto-generated {len(individual_digests)} individual digests from source files"
+        )
         return individual_digests

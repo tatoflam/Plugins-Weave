@@ -58,12 +58,16 @@ class ShadowValidator:
         # 型チェック
         formatter = get_error_formatter()
         if not is_valid_list(source_files):
-            fatal_errors.append(formatter.validation.invalid_type("source_files", "list", source_files))
+            fatal_errors.append(
+                formatter.validation.invalid_type("source_files", "list", source_files)
+            )
             return fatal_errors, warnings, numbers
 
         # 空チェック
         if not source_files:
-            fatal_errors.append(formatter.validation.empty_collection(f"Shadow digest for level '{level}'"))
+            fatal_errors.append(
+                formatter.validation.empty_collection(f"Shadow digest for level '{level}'")
+            )
             return fatal_errors, warnings, numbers
 
         # ファイル名検証と番号抽出を1ループで実行
@@ -180,7 +184,9 @@ class ShadowValidator:
         """
         if not is_valid_dict(shadow_digest):
             formatter = get_error_formatter()
-            raise ValidationError(formatter.validation.invalid_type("shadow digest", "dict", shadow_digest))
+            raise ValidationError(
+                formatter.validation.invalid_type("shadow digest", "dict", shadow_digest)
+            )
 
     def validate_and_get_shadow(self, level: str, weave_title: str) -> OverallDigestData:
         """
