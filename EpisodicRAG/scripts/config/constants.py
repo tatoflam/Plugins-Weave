@@ -12,9 +12,11 @@ Note:
 
 Usage:
     from config.constants import LEVEL_CONFIG, LEVEL_NAMES, SOURCE_TYPE_LOOPS
+    from config.constants import LevelConfigEntry  # TypedDict型
 """
 
-from typing import Dict, List
+from typing import Dict, List, Optional
+from typing_extensions import TypedDict
 
 # =============================================================================
 # ソースタイプ定数
@@ -27,15 +29,29 @@ SOURCE_TYPE_LOOPS = "loops"  # Loopファイルをソースとするレベル（
 # 共通定数: レベル設定（Single Source of Truth for Config Layer）
 # =============================================================================
 
-# LevelConfigData構造:
-#   prefix    - ファイル名プレフィックス（例: W0001, M001, MD01）
-#   digits    - 番号の桁数（例: W0001は4桁）
-#   dir       - digests_path 以下のサブディレクトリ名
-#   source    - この階層を生成する際の入力元（"loops" または下位階層名）
-#   next      - 確定時にカスケードする上位階層（None = 最上位）
-#   threshold - このレベルでダイジェスト生成に必要なソースファイル数
 
-LEVEL_CONFIG: Dict[str, Dict[str, object]] = {
+class LevelConfigEntry(TypedDict):
+    """
+    レベル設定エントリの型定義
+
+    Attributes:
+        prefix: ファイル名プレフィックス（例: W0001, M001, MD01）
+        digits: 番号の桁数（例: W0001は4桁）
+        dir: digests_path 以下のサブディレクトリ名
+        source: この階層を生成する際の入力元（"loops" または下位階層名）
+        next: 確定時にカスケードする上位階層（None = 最上位）
+        threshold: このレベルでダイジェスト生成に必要なソースファイル数
+    """
+
+    prefix: str
+    digits: int
+    dir: str
+    source: str
+    next: Optional[str]
+    threshold: int
+
+
+LEVEL_CONFIG: Dict[str, LevelConfigEntry] = {
     "weekly": {
         "prefix": "W",
         "digits": 4,

@@ -4,6 +4,10 @@ DigestFinalizerFromShadow 統合テスト
 =====================================
 
 一時ディレクトリを使用したファイルI/Oテスト
+
+Note:
+    TempPluginEnvironmentを使用してsetUp重複を解消。
+    test_helpers.pyの共通ヘルパーを活用。
 """
 
 import json
@@ -20,6 +24,7 @@ from interfaces import DigestFinalizerFromShadow
 
 # Helpers
 from interfaces.interface_helpers import get_next_digest_number
+from test_helpers import TempPluginEnvironment, create_test_loop_file
 
 
 class TestGetNextDigestNumber(unittest.TestCase):
@@ -68,57 +73,16 @@ class TestDigestFinalizerFromShadow(unittest.TestCase):
     """DigestFinalizerFromShadow の統合テスト"""
 
     def setUp(self):
-        """一時ディレクトリでテスト環境を構築"""
-        self.temp_dir = tempfile.mkdtemp()
-        self.plugin_root = Path(self.temp_dir)
+        """TempPluginEnvironmentを使用してテスト環境を構築"""
+        self.env = TempPluginEnvironment()
+        self.env.__enter__()
 
-        # ディレクトリ構造を作成
-        self.digests_path = self.plugin_root / "data" / "Digests"
-        self.loops_path = self.plugin_root / "data" / "Loops"
-        self.essences_path = self.plugin_root / "data" / "Essences"
-        self.config_dir = self.plugin_root / ".claude-plugin"
-
-        self.digests_path.mkdir(parents=True)
-        self.loops_path.mkdir(parents=True)
-        self.essences_path.mkdir(parents=True)
-        self.config_dir.mkdir(parents=True)
-
-        # Digestのサブディレクトリ（各レベル内にProvisionalを配置）
-        for subdir in [
-            "1_Weekly",
-            "2_Monthly",
-            "3_Quarterly",
-            "4_Annual",
-            "5_Triennial",
-            "6_Decadal",
-            "7_Multi-decadal",
-            "8_Centurial",
-        ]:
-            (self.digests_path / subdir).mkdir()
-            (self.digests_path / subdir / "Provisional").mkdir()
-
-        # config.json作成
-        config_data = {
-            "base_dir": ".",
-            "paths": {
-                "loops_dir": "data/Loops",
-                "digests_dir": "data/Digests",
-                "essences_dir": "data/Essences",
-                "identity_file_path": None,
-            },
-            "levels": {
-                "weekly_threshold": 5,
-                "monthly_threshold": 5,
-                "quarterly_threshold": 3,
-                "annual_threshold": 4,
-                "triennial_threshold": 3,
-                "decadal_threshold": 3,
-                "multi_decadal_threshold": 3,
-                "centurial_threshold": 4,
-            },
-        }
-        with open(self.config_dir / "config.json", 'w', encoding='utf-8') as f:
-            json.dump(config_data, f)
+        # プロパティ参照を保持（後方互換）
+        self.plugin_root = self.env.plugin_root
+        self.digests_path = self.env.digests_path
+        self.loops_path = self.env.loops_path
+        self.essences_path = self.env.essences_path
+        self.config_dir = self.env.config_dir
 
         # モック設定
         self.mock_config = MagicMock()
@@ -130,8 +94,8 @@ class TestDigestFinalizerFromShadow(unittest.TestCase):
         self.finalizer = DigestFinalizerFromShadow(self.mock_config)
 
     def tearDown(self):
-        """一時ディレクトリを削除"""
-        shutil.rmtree(self.temp_dir)
+        """TempPluginEnvironmentをクリーンアップ"""
+        self.env.__exit__(None, None, None)
 
     def test_validate_shadow_content_valid(self):
         """正常なsource_filesの検証（例外なしで成功）"""
@@ -170,141 +134,32 @@ class TestDigestFinalizerIntegration(unittest.TestCase):
     """DigestFinalizerFromShadow の統合テスト（フルフロー）"""
 
     def setUp(self):
-        """完全なテスト環境を構築"""
-        self.temp_dir = tempfile.mkdtemp()
-        self.plugin_root = Path(self.temp_dir)
+        """TempPluginEnvironmentを使用して完全なテスト環境を構築"""
+        self.env = TempPluginEnvironment()
+        self.env.__enter__()
 
-        # ディレクトリ構造を作成
-        self.digests_path = self.plugin_root / "data" / "Digests"
-        self.loops_path = self.plugin_root / "data" / "Loops"
-        self.essences_path = self.plugin_root / "data" / "Essences"
-        self.config_dir = self.plugin_root / ".claude-plugin"
+        # プロパティ参照を保持（後方互換）
+        self.plugin_root = self.env.plugin_root
+        self.digests_path = self.env.digests_path
+        self.loops_path = self.env.loops_path
+        self.essences_path = self.env.essences_path
+        self.config_dir = self.env.config_dir
 
-        self.digests_path.mkdir(parents=True)
-        self.loops_path.mkdir(parents=True)
-        self.essences_path.mkdir(parents=True)
-        self.config_dir.mkdir(parents=True)
+        # GrandDigest.txt、ShadowGrandDigest.txt、last_digest_times.json作成
+        self.env.create_grand_digest()
+        self.env.create_shadow_digest(
+            level="weekly",
+            source_files=["L00001_test.txt", "L00002_test.txt"]
+        )
+        self.env.create_last_digest_times()
 
-        # Digestのサブディレクトリ（各レベル内にProvisionalを配置）
-        for subdir in [
-            "1_Weekly",
-            "2_Monthly",
-            "3_Quarterly",
-            "4_Annual",
-            "5_Triennial",
-            "6_Decadal",
-            "7_Multi-decadal",
-            "8_Centurial",
-        ]:
-            (self.digests_path / subdir).mkdir()
-            (self.digests_path / subdir / "Provisional").mkdir()
-
-        # config.json作成
-        config_data = {
-            "base_dir": ".",
-            "paths": {
-                "loops_dir": "data/Loops",
-                "digests_dir": "data/Digests",
-                "essences_dir": "data/Essences",
-                "identity_file_path": None,
-            },
-            "levels": {
-                "weekly_threshold": 5,
-                "monthly_threshold": 5,
-                "quarterly_threshold": 3,
-                "annual_threshold": 4,
-                "triennial_threshold": 3,
-                "decadal_threshold": 3,
-                "multi_decadal_threshold": 3,
-                "centurial_threshold": 4,
-            },
-        }
-        with open(self.config_dir / "config.json", 'w', encoding='utf-8') as f:
-            json.dump(config_data, f)
-
-        # GrandDigest.txt作成
-        grand_digest_data = {
-            "metadata": {"last_updated": "2025-01-01T00:00:00", "version": "1.0"},
-            "major_digests": {
-                "weekly": {"overall_digest": None},
-                "monthly": {"overall_digest": None},
-                "quarterly": {"overall_digest": None},
-                "annual": {"overall_digest": None},
-                "triennial": {"overall_digest": None},
-                "decadal": {"overall_digest": None},
-                "multi_decadal": {"overall_digest": None},
-                "centurial": {"overall_digest": None},
-            },
-        }
-        with open(self.essences_path / "GrandDigest.txt", 'w', encoding='utf-8') as f:
-            json.dump(grand_digest_data, f)
-
-        # ShadowGrandDigest.txt作成
-        shadow_digest_data = {
-            "metadata": {"last_updated": "2025-01-01T00:00:00", "version": "1.0"},
-            "latest_digests": {
-                "weekly": {
-                    "overall_digest": {
-                        "source_files": ["L00001_test.txt", "L00002_test.txt"],
-                        "digest_type": "テスト",
-                        "keywords": ["keyword1", "keyword2"],
-                        "abstract": "テスト用の要約です。",
-                        "impression": "テスト用の所感です。",
-                    }
-                },
-                "monthly": {"overall_digest": None},
-                "quarterly": {"overall_digest": None},
-                "annual": {"overall_digest": None},
-                "triennial": {"overall_digest": None},
-                "decadal": {"overall_digest": None},
-                "multi_decadal": {"overall_digest": None},
-                "centurial": {"overall_digest": None},
-            },
-        }
-        with open(self.essences_path / "ShadowGrandDigest.txt", 'w', encoding='utf-8') as f:
-            json.dump(shadow_digest_data, f)
-
-        # last_digest_times.json作成（.claude-pluginディレクトリに配置）
-        times_data = {
-            "weekly": {"timestamp": "", "last_processed": None},
-            "monthly": {"timestamp": "", "last_processed": None},
-            "quarterly": {"timestamp": "", "last_processed": None},
-            "annual": {"timestamp": "", "last_processed": None},
-            "triennial": {"timestamp": "", "last_processed": None},
-            "decadal": {"timestamp": "", "last_processed": None},
-            "multi_decadal": {"timestamp": "", "last_processed": None},
-            "centurial": {"timestamp": "", "last_processed": None},
-        }
-        with open(self.config_dir / "last_digest_times.json", 'w', encoding='utf-8') as f:
-            json.dump(times_data, f)
-
-        # Loopファイル作成
-        loop1_data = {
-            "overall_digest": {
-                "timestamp": "2025-01-01T00:00:00",
-                "digest_type": "対話",
-                "keywords": ["key1"],
-                "abstract": "Loop1の内容",
-                "impression": "所感1",
-            }
-        }
-        loop2_data = {
-            "overall_digest": {
-                "timestamp": "2025-01-02T00:00:00",
-                "digest_type": "実装",
-                "keywords": ["key2"],
-                "abstract": "Loop2の内容",
-                "impression": "所感2",
-            }
-        }
-        with open(self.loops_path / "L00001_test.txt", 'w', encoding='utf-8') as f:
-            json.dump(loop1_data, f)
-        with open(self.loops_path / "L00002_test.txt", 'w', encoding='utf-8') as f:
-            json.dump(loop2_data, f)
+        # Loopファイル作成（ヘルパー関数使用）
+        create_test_loop_file(self.loops_path, 1, "test")
+        create_test_loop_file(self.loops_path, 2, "test")
 
     def tearDown(self):
-        """一時ディレクトリを削除"""
-        shutil.rmtree(self.temp_dir, ignore_errors=True)
+        """TempPluginEnvironmentをクリーンアップ"""
+        self.env.__exit__(None, None, None)
 
     def _create_finalizer(self):
         """DigestConfigとFinalizerを作成"""

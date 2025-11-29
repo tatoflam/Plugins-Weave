@@ -255,3 +255,93 @@ class TempPluginEnvironment:
     @property
     def config_dir(self) -> Path:
         return self.paths["config_dir"]
+
+    def create_grand_digest(self, initial_data: Optional[Dict[str, Any]] = None) -> Path:
+        """
+        GrandDigest.txt を作成
+
+        Args:
+            initial_data: 初期データ（省略時はデフォルトテンプレート）
+
+        Returns:
+            作成されたファイルのPath
+        """
+        data = initial_data or {
+            "metadata": {"last_updated": "2025-01-01T00:00:00", "version": "1.0"},
+            "major_digests": {
+                level: {"overall_digest": None}
+                for level in [
+                    "weekly", "monthly", "quarterly", "annual",
+                    "triennial", "decadal", "multi_decadal", "centurial",
+                ]
+            },
+        }
+        file_path = self.essences_path / "GrandDigest.txt"
+        with open(file_path, 'w', encoding='utf-8') as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+        return file_path
+
+    def create_shadow_digest(
+        self,
+        level: str = "weekly",
+        source_files: Optional[list] = None,
+        initial_data: Optional[Dict[str, Any]] = None,
+    ) -> Path:
+        """
+        ShadowGrandDigest.txt を作成
+
+        Args:
+            level: 設定するレベル
+            source_files: source_filesリスト
+            initial_data: 初期データ全体（省略時は自動生成）
+
+        Returns:
+            作成されたファイルのPath
+        """
+        if initial_data is None:
+            data = {
+                "metadata": {"last_updated": "2025-01-01T00:00:00", "version": "1.0"},
+                "latest_digests": {
+                    lv: {"overall_digest": None}
+                    for lv in [
+                        "weekly", "monthly", "quarterly", "annual",
+                        "triennial", "decadal", "multi_decadal", "centurial",
+                    ]
+                },
+            }
+            if source_files:
+                data["latest_digests"][level] = {
+                    "overall_digest": {
+                        "source_files": source_files,
+                        "digest_type": "テスト",
+                        "keywords": ["keyword1", "keyword2"],
+                        "abstract": "テスト用の要約です。",
+                        "impression": "テスト用の所感です。",
+                    }
+                }
+        else:
+            data = initial_data
+
+        file_path = self.essences_path / "ShadowGrandDigest.txt"
+        with open(file_path, 'w', encoding='utf-8') as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+        return file_path
+
+    def create_last_digest_times(self) -> Path:
+        """
+        last_digest_times.json を作成
+
+        Returns:
+            作成されたファイルのPath
+        """
+        data = {
+            level: {"timestamp": "", "last_processed": None}
+            for level in [
+                "weekly", "monthly", "quarterly", "annual",
+                "triennial", "decadal", "multi_decadal", "centurial",
+            ]
+        }
+        file_path = self.config_dir / "last_digest_times.json"
+        with open(file_path, 'w', encoding='utf-8') as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+        return file_path
