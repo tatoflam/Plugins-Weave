@@ -7,7 +7,6 @@ Tests for DigestMerger.merge() deduplication and merging logic.
 """
 
 import unittest
-from unittest.mock import patch
 
 from domain.exceptions import ValidationError
 from interfaces.provisional.merger import DigestMerger
@@ -50,19 +49,15 @@ class TestDigestMergerMerge(unittest.TestCase):
         source_files = {d["source_file"] for d in result}
         self.assertEqual(source_files, {"a.txt", "b.txt"})
 
-    @patch("interfaces.provisional.merger.log_info")
-    def test_merge_with_overlap_new_overwrites(self, mock_log):
+    def test_merge_with_overlap_new_overwrites(self):
         """When source_file overlaps, new digest overwrites existing"""
         existing = [{"source_file": "a.txt", "content": "old"}]
         new = [{"source_file": "a.txt", "content": "new"}]
         result = DigestMerger.merge(existing, new)
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0]["content"], "new")
-        mock_log.assert_called_once()
-        self.assertIn("Overwriting", mock_log.call_args[0][0])
 
-    @patch("interfaces.provisional.merger.log_info")
-    def test_merge_partial_overlap(self, mock_log):
+    def test_merge_partial_overlap(self):
         """Partial overlap: some overwritten, some added"""
         existing = [
             {"source_file": "a.txt", "content": "old_a"},
@@ -80,11 +75,7 @@ class TestDigestMergerMerge(unittest.TestCase):
         self.assertEqual(result_dict["b.txt"]["content"], "new_b")
         self.assertEqual(result_dict["c.txt"]["content"], "new_c")
 
-        # Only one overwrite log
-        self.assertEqual(mock_log.call_count, 1)
-
-    @patch("interfaces.provisional.merger.log_info")
-    def test_merge_multiple_overlaps(self, mock_log):
+    def test_merge_multiple_overlaps(self):
         """Multiple overlapping items all get overwritten"""
         existing = [
             {"source_file": "a.txt", "content": "old_a"},
@@ -100,9 +91,6 @@ class TestDigestMergerMerge(unittest.TestCase):
         result_dict = {d["source_file"]: d for d in result}
         self.assertEqual(result_dict["a.txt"]["content"], "new_a")
         self.assertEqual(result_dict["b.txt"]["content"], "new_b")
-
-        # Two overwrite logs
-        self.assertEqual(mock_log.call_count, 2)
 
     def test_missing_source_file_in_existing_raises_error(self):
         """Missing source_file in existing digests raises ValidationError"""

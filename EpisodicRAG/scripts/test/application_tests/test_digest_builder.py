@@ -52,8 +52,10 @@ class TestRegularDigestBuilderBuild:
         ]
 
     @pytest.mark.unit
-    def test_returns_dict(self, valid_shadow_digest, individual_digests):
-        """dictを返す"""
+    def test_builds_valid_json_serializable_digest(self, valid_shadow_digest, individual_digests):
+        """構築されたダイジェストがJSONシリアライズ可能である"""
+        import json
+
         result = RegularDigestBuilder.build(
             level="weekly",
             new_digest_name="W0001",
@@ -61,11 +63,15 @@ class TestRegularDigestBuilderBuild:
             shadow_digest=valid_shadow_digest,
             individual_digests=individual_digests,
         )
-        assert isinstance(result, dict)
+
+        # JSONシリアライズ・デシリアライズ可能
+        json_str = json.dumps(result, ensure_ascii=False)
+        restored = json.loads(json_str)
+        assert restored == result
 
     @pytest.mark.unit
-    def test_has_metadata_section(self, valid_shadow_digest, individual_digests):
-        """metadataセクションが含まれる"""
+    def test_builds_complete_digest_structure(self, valid_shadow_digest, individual_digests):
+        """ダイジェストに必要な全セクションが含まれる"""
         result = RegularDigestBuilder.build(
             level="weekly",
             new_digest_name="W0001",
@@ -73,23 +79,17 @@ class TestRegularDigestBuilderBuild:
             shadow_digest=valid_shadow_digest,
             individual_digests=individual_digests,
         )
+
+        # 必須セクションの存在確認
         assert "metadata" in result
+        assert "overall_digest" in result
+        assert "individual_digests" in result
 
-    @pytest.mark.unit
-    def test_metadata_has_required_fields(self, valid_shadow_digest, individual_digests):
-        """metadataに必須フィールドが含まれる"""
-        result = RegularDigestBuilder.build(
-            level="weekly",
-            new_digest_name="W0001",
-            digest_num="W0001",
-            shadow_digest=valid_shadow_digest,
-            individual_digests=individual_digests,
-        )
+        # metadata の必須フィールド
         metadata = result["metadata"]
-        assert "digest_level" in metadata
-        assert "digest_number" in metadata
-        assert "last_updated" in metadata
-        assert "version" in metadata
+        assert all(
+            key in metadata for key in ["digest_level", "digest_number", "last_updated", "version"]
+        )
 
     @pytest.mark.unit
     def test_metadata_digest_level_matches(self, valid_shadow_digest, individual_digests):
@@ -141,20 +141,8 @@ class TestRegularDigestBuilderBuild:
         datetime.fromisoformat(result["metadata"]["last_updated"])
 
     @pytest.mark.unit
-    def test_has_overall_digest_section(self, valid_shadow_digest, individual_digests):
-        """overall_digestセクションが含まれる"""
-        result = RegularDigestBuilder.build(
-            level="weekly",
-            new_digest_name="W0001",
-            digest_num="W0001",
-            shadow_digest=valid_shadow_digest,
-            individual_digests=individual_digests,
-        )
-        assert "overall_digest" in result
-
-    @pytest.mark.unit
-    def test_overall_digest_has_required_fields(self, valid_shadow_digest, individual_digests):
-        """overall_digestに必須フィールドが含まれる"""
+    def test_overall_digest_has_complete_structure(self, valid_shadow_digest, individual_digests):
+        """overall_digestに必須フィールドが全て含まれ、値が正しい型である"""
         result = RegularDigestBuilder.build(
             level="weekly",
             new_digest_name="W0001",
@@ -163,13 +151,15 @@ class TestRegularDigestBuilderBuild:
             individual_digests=individual_digests,
         )
         overall = result["overall_digest"]
-        assert "name" in overall
-        assert "timestamp" in overall
-        assert "source_files" in overall
-        assert "digest_type" in overall
-        assert "keywords" in overall
-        assert "abstract" in overall
-        assert "impression" in overall
+
+        # 必須フィールドの存在と型チェック
+        assert isinstance(overall.get("name"), str)
+        assert isinstance(overall.get("timestamp"), str)
+        assert isinstance(overall.get("source_files"), list)
+        assert isinstance(overall.get("digest_type"), str)
+        assert isinstance(overall.get("keywords"), list)
+        assert isinstance(overall.get("abstract"), str)
+        assert isinstance(overall.get("impression"), str)
 
     @pytest.mark.unit
     def test_overall_digest_name_matches(self, valid_shadow_digest, individual_digests):
@@ -213,18 +203,6 @@ class TestRegularDigestBuilderBuild:
         assert overall["keywords"] == ["keyword1", "keyword2"]
         assert overall["abstract"] == "テスト用の全体統合分析です。"
         assert overall["impression"] == "テスト用の所感・展望です。"
-
-    @pytest.mark.unit
-    def test_has_individual_digests_section(self, valid_shadow_digest, individual_digests):
-        """individual_digestsセクションが含まれる"""
-        result = RegularDigestBuilder.build(
-            level="weekly",
-            new_digest_name="W0001",
-            digest_num="W0001",
-            shadow_digest=valid_shadow_digest,
-            individual_digests=individual_digests,
-        )
-        assert "individual_digests" in result
 
     @pytest.mark.unit
     def test_individual_digests_preserved(self, valid_shadow_digest, individual_digests):
