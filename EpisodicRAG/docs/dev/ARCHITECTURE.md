@@ -356,11 +356,15 @@ loops_path = base_dir / data/Loops
 ```
 
 **設定例2: 外部ディレクトリ統合型**
+
+> ⚠️ 外部パスを使用する場合は`trusted_external_paths`での許可が必要です
+
 ```json
 {
-  "base_dir": "../../..",
+  "base_dir": "~/DEV/production/EpisodicRAG",
+  "trusted_external_paths": ["~/DEV/production"],
   "paths": {
-    "loops_dir": "project/data/Loops"
+    "loops_dir": "data/Loops"
   }
 }
 ```
@@ -368,9 +372,9 @@ loops_path = base_dir / data/Loops
 **解決:**
 ```text
 plugin_root = ~/.claude/plugins/EpisodicRAG-Plugin@Plugins-Weave
-base_dir = plugin_root / ../../.. = {workspace_root}
-loops_path = base_dir / project/data/Loops
-           = {workspace_root}/project/data/Loops
+base_dir = ~/DEV/production/EpisodicRAG （trusted_external_paths内なので許可）
+loops_path = base_dir / data/Loops
+           = ~/DEV/production/EpisodicRAG/data/Loops
 ```
 
 ---

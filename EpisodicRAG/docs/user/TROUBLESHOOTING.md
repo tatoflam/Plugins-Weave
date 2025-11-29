@@ -27,6 +27,7 @@
 ## 目次
 
 1. [問題別解決ガイド](#問題別解決ガイド)
+   - [外部パス設定エラー](#外部パス設定エラー)
    - [DigestAnalyzerエージェントが起動しない](#digestanalyzerエージェントが起動しない)
    - [individual_digestsが空になる](#individual_digestsが空になる)
    - [ShadowGrandDigestが更新されない](#shadowgranddigestが更新されない)
@@ -67,6 +68,48 @@ flowchart TD
 ---
 
 ## 問題別解決ガイド
+
+### 外部パス設定エラー
+
+**症状**: 外部パス（Google Drive、別ディレクトリ等）を`base_dir`に設定すると以下のエラーが発生する
+
+```text
+ConfigError: Invalid configuration value for 'base_dir': expected path within plugin root or trusted_external_paths, got '~/Google Drive/EpisodicRAG' (resolves outside allowed paths)
+```
+
+**原因**: セキュリティ機能により、`base_dir`にプラグイン外のパスを指定するには`trusted_external_paths`での明示的な許可が必要
+
+**解決方法**:
+
+1. **`@digest-config`で対話的に設定**（推奨）:
+   ```bash
+   @digest-config 外部のデータディレクトリを使いたい
+   ```
+
+   手順:
+   1. [5] trusted_external_paths を選択
+   2. [1] パスを追加
+   3. 外部パスの親ディレクトリを入力（例: `~/Google Drive`）
+   4. [1] Base directory を選択
+   5. 新しいパスを入力（例: `~/Google Drive/EpisodicRAG`）
+
+2. **config.jsonを直接編集**:
+   ```json
+   {
+     "base_dir": "~/Google Drive/EpisodicRAG",
+     "trusted_external_paths": ["~/Google Drive"],
+     "paths": { ... }
+   }
+   ```
+
+**重要**:
+- `trusted_external_paths`には`base_dir`の親ディレクトリを指定
+- 相対パスは使用不可（絶対パスまたはチルダ記法のみ）
+- デフォルトは空配列（最もセキュア）
+
+> 📖 詳細は [api/config.md](../dev/api/config.md#trusted_external_paths) を参照
+
+---
 
 ### DigestAnalyzerエージェントが起動しない
 

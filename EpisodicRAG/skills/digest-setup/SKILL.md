@@ -183,8 +183,11 @@ from pathlib import Path
 
 # 設定データ作成
 config_data = {
-    "_comment_base_dir": "プラグインルートからの相対パス（. = プラグイン内、../../.. = 3階層上）",
+    "_comment_base_dir": "データの基準ディレクトリ（. = プラグイン内、~/path = 外部パス）",
     "base_dir": ".",  # パス解決の基準ディレクトリ（プラグインルート）
+
+    "_comment_trusted_external_paths": "plugin_root外でアクセスを許可する絶対パス（セキュリティ: デフォルトは空）",
+    "trusted_external_paths": [],  # 外部パス使用時のみ設定
 
     "_comment_paths": "base_dirからの相対パスでデータ配置先を指定",
     "paths": {
@@ -330,7 +333,76 @@ Threshold設定:
   - Decadal: 3 Triennial
   - Multi-decadal: 3 Decadal
   - Centurial: 4 Multi-decadal
+```
 
+#### 外部パス検出（条件付き表示）
+
+設定されたパスを検査し、プラグイン外を指すパスがあれば警告を表示します：
+
+```python
+# 外部パス検出ロジック
+from pathlib import Path
+
+def is_external_path(path_str: str, plugin_root: Path) -> bool:
+    """パスがplugin_root外を指すか判定"""
+    if path_str is None:
+        return False
+
+    path = Path(path_str).expanduser()
+
+    # 絶対パスまたはチルダで始まる場合
+    if path.is_absolute():
+        try:
+            path.resolve().relative_to(plugin_root.resolve())
+            return False  # plugin_root内
+        except ValueError:
+            return True  # plugin_root外
+
+    # 相対パスで上位ディレクトリに出る場合
+    if ".." in str(path):
+        resolved = (plugin_root / path).resolve()
+        try:
+            resolved.relative_to(plugin_root.resolve())
+            return False
+        except ValueError:
+            return True
+
+    return False
+
+# 検出実行
+external_paths = []
+
+if is_external_path(base_dir, plugin_root):
+    external_paths.append(f"base_dir: {base_dir}")
+
+if identity_file_path and is_external_path(identity_file_path, plugin_root):
+    external_paths.append(f"identity_file_path: {identity_file_path}")
+
+# 警告表示（外部パスが検出された場合のみ）
+if external_paths:
+    # 以下の警告ブロックを表示
+```
+
+外部パスが検出された場合のみ、以下の警告を表示：
+
+```text
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚠️ 外部パスが検出されました
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+以下のパスはプラグイン外を指しています:
+  - base_dir: ~/Google Drive/EpisodicRAG
+  - identity_file_path: ~/Documents/Identity.md
+
+外部パスを使用するには trusted_external_paths の設定が必要です。
+このまま使用するとエラーになります。
+
+👉 続けて @digest-config を実行し、[5] trusted_external_paths を設定してください。
+```
+
+外部パスが検出されなかった場合は、この警告ブロックは表示しません。
+
+```text
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📚 次のステップ
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -452,8 +524,11 @@ EpisodicRAGの最も重要な機能は、**セッション間で記憶を引き�
 
 ```json
 {
-  "_comment_base_dir": "プラグインルートからの相対パス（. = プラグイン内、../../.. = 3階層上）",
+  "_comment_base_dir": "データの基準ディレクトリ（. = プラグイン内、~/path = 外部パス）",
   "base_dir": ".",
+
+  "_comment_trusted_external_paths": "plugin_root外でアクセスを許可する絶対パス（セキュリティ: デフォルトは空）",
+  "trusted_external_paths": [],
 
   "_comment_paths": "base_dirからの相対パスでデータ配置先を指定",
   "paths": {
@@ -476,6 +551,26 @@ EpisodicRAGの最も重要な機能は、**セッション間で記憶を引き�
   }
 }
 ```
+
+### 外部ディレクトリ使用時の設定例
+
+既存プロジェクトのデータを使用する場合：
+
+```json
+{
+  "base_dir": "~/DEV/production/EpisodicRAG",
+  "trusted_external_paths": ["~/DEV/production"],
+  "paths": {
+    "loops_dir": "data/Loops",
+    "digests_dir": "data/Digests",
+    "essences_dir": "data/Essences",
+    "identity_file_path": null
+  },
+  "levels": { ... }
+}
+```
+
+> 📖 `trusted_external_paths` の詳細は [用語集](../../README.md#trusted_external_paths) を参照
 
 ---
 

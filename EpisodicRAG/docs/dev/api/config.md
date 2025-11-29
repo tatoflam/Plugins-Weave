@@ -18,31 +18,54 @@ config.json仕様とDigestConfigクラス。
 
 #### base_dir
 
-パス解決の基準ディレクトリ（プラグインルートからの相対パス）
+パス解決の基準ディレクトリ
 
 **デフォルト**: `.` (プラグインルート自身)
 
 **設定例：**
 - `"."` (デフォルト): プラグインルート自身を基準とする（完全自己完結型）
-- `"../../.."`: 3階層上を基準とする（例: DEVルート基準でデータを共有）
-- `"../.."`: 2階層上
+- `"subdir"`: プラグイン内のサブディレクトリ
+- `"~/DEV/production/EpisodicRAG"`: 外部パス（`trusted_external_paths`で許可が必要）
+- `"C:/Users/anyth/DEV/data"`: Windows絶対パス（`trusted_external_paths`で許可が必要）
 
 **パス解決の仕組み:**
 ```text
+# 相対パスの場合
 最終的なパス = {plugin_root} / {base_dir} / {paths.*_dir}
 
-例:
-plugin_root = ~/.claude/plugins/EpisodicRAG-Plugin@Plugins-Weave
-base_dir = "../../.."
-loops_dir = "homunculus/Weave/EpisodicRAG/Loops"
+# 絶対パスの場合（trusted_external_paths内である必要あり）
+最終的なパス = {base_dir} / {paths.*_dir}
 
-最終パス = {plugin_root}/../../.. / homunculus/Weave/EpisodicRAG/Loops
-         = {DEV}/homunculus/Weave/EpisodicRAG/Loops
+例（外部パス）:
+base_dir = "~/DEV/production/EpisodicRAG"
+loops_dir = "data/Loops"
+
+最終パス = ~/DEV/production/EpisodicRAG/data/Loops
 ```
 
 **注意:**
-- 絶対パスは使用しないでください（Git公開時の可搬性のため）
 - 相対パスはプラグインルート基準で解釈されます
+- 絶対パス・チルダパスは`trusted_external_paths`での許可が必要です
+
+---
+
+#### trusted_external_paths
+
+plugin_root外でアクセスを許可する絶対パスのリスト
+
+**デフォルト**: `[]` (空配列、plugin_root内のみ許可)
+
+**設定例：**
+- `[]`: plugin_root内のみ（最もセキュア、デフォルト）
+- `["~/DEV/production"]`: ホームディレクトリ配下の特定パスを許可
+- `["C:/Data/EpisodicRAG"]`: Windows絶対パスを許可
+- `["~/DEV", "D:/Backup"]`: 複数パスを許可
+
+**セキュリティ:**
+- デフォルトは空配列で最もセキュア
+- 外部パスを使用する場合は明示的な許可が必要
+- 相対パスは使用不可（絶対パスのみ）
+- Git公開時は`config.json`を`.gitignore`に追加推奨
 
 ---
 
@@ -117,12 +140,13 @@ loops_dir = "homunculus/Weave/EpisodicRAG/Loops"
 
 ```json
 {
-  "base_dir": "../../..",
+  "base_dir": "~/DEV/production/EpisodicRAG",
+  "trusted_external_paths": ["~/DEV/production"],
   "paths": {
-    "loops_dir": "homunculus/Weave/EpisodicRAG/Loops",
-    "digests_dir": "homunculus/Weave/EpisodicRAG/Digests",
-    "essences_dir": "homunculus/Weave/EpisodicRAG/Essences",
-    "identity_file_path": "homunculus/Weave/Identities/UserIdentity.md"
+    "loops_dir": "data/Loops",
+    "digests_dir": "data/Digests",
+    "essences_dir": "data/Essences",
+    "identity_file_path": "Identities/UserIdentity.md"
   },
   "levels": { ... }
 }

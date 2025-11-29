@@ -53,8 +53,11 @@ with open(config_file, 'r', encoding='utf-8') as f:
 📋 現在の設定
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Base Directory (plugin_rootからの相対パス):
+Base Directory:
   🔧 base_dir: .
+
+Trusted External Paths:
+  🔒 trusted_external_paths: []
 
 Paths (base_dirからの相対パス):
   📂 loops_dir: data/Loops
@@ -86,9 +89,10 @@ Thresholds:
 [2] Paths（ディレクトリパス）
 [3] Identity file（外部参照ファイル）
 [4] Thresholds（生成条件）
-[5] キャンセル（変更なし）
+[5] trusted_external_paths（外部パス許可）
+[6] キャンセル（変更なし）
 
-選択 (1/2/3/4/5):
+選択 (1/2/3/4/5/6):
 ```
 
 ### 4. Base directory 変更（選択肢 1）
@@ -99,17 +103,19 @@ Thresholds:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 base_dirは、すべてのパス解決の基準となるディレクトリです。
-プラグインルートからの相対パスで指定します。
 
 現在の設定: .
 解決後の絶対パス: {PLUGIN_ROOT}  # 実際のインストール先パス
 
 設定例:
   "." - プラグインルート自身（デフォルト、自己完結）
-  "../../.." - 3階層上（例: DEVルート基準）
-  "../.." - 2階層上
+  "subdir" - プラグイン内のサブディレクトリ
+  "~/DEV/production/EpisodicRAG" - 外部パス（trusted_external_pathsで許可が必要）
 
-新しい相対パスを入力してください:
+⚠️ 外部パス（~/...や絶対パス）を使用する場合：
+   先に [5] trusted_external_paths で許可設定が必要です
+
+新しいパスを入力してください:
 ```
 
 #### Base directory 変更の入力
@@ -387,7 +393,98 @@ config_data["paths"]["identity_file_path"] = None
 print(f"✅ identity_file_path を削除しました（null に設定）")
 ```
 
-### 8. 設定ファイル更新
+### 8. trusted_external_paths 変更（選択肢 5）
+
+```text
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔒 trusted_external_paths設定の変更
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+trusted_external_pathsは、plugin_root外でアクセスを許可する
+絶対パスのリストです（セキュリティ機能）。
+
+外部パスを使用しない場合は空配列のままで構いません。
+
+現在の設定: []
+
+[1] パスを追加
+[2] パスを削除
+[3] すべてクリア（空配列に戻す）
+[4] キャンセル
+
+選択 (1/2/3/4):
+```
+
+#### trusted_external_paths パス追加
+
+```python
+# 選択肢1: パスを追加
+print("\n追加する絶対パスを入力してください:")
+print("（チルダ展開サポート: ~/DEV/production）")
+print("")
+print("例:")
+print("  - ~/DEV/production")
+print("  - C:/Users/anyth/DEV/data")
+print("")
+
+new_path_str = input("パス [Enter でキャンセル]: ")
+
+if new_path_str == "":
+    print("変更をキャンセルしました")
+    sys.exit(0)
+
+from pathlib import Path
+
+# チルダ展開して絶対パスか確認
+expanded = Path(new_path_str).expanduser()
+if not expanded.is_absolute():
+    print(f"❌ 絶対パスを入力してください（相対パスは使用不可）")
+    sys.exit(1)
+
+# 既存リストに追加
+if "trusted_external_paths" not in config_data:
+    config_data["trusted_external_paths"] = []
+
+if new_path_str not in config_data["trusted_external_paths"]:
+    config_data["trusted_external_paths"].append(new_path_str)
+    print(f"✅ trusted_external_paths に追加しました: {new_path_str}")
+else:
+    print(f"ℹ️ 既に登録されています: {new_path_str}")
+```
+
+#### trusted_external_paths パス削除
+
+```python
+# 選択肢2: パスを削除
+current_paths = config_data.get("trusted_external_paths", [])
+
+if not current_paths:
+    print("ℹ️ 現在登録されているパスはありません")
+    sys.exit(0)
+
+print("\n現在の設定:")
+for i, path in enumerate(current_paths):
+    print(f"  [{i+1}] {path}")
+
+print("")
+selection = input("削除する番号を入力 [Enter でキャンセル]: ")
+
+if selection == "":
+    print("変更をキャンセルしました")
+    sys.exit(0)
+
+try:
+    idx = int(selection) - 1
+    if 0 <= idx < len(current_paths):
+        removed = current_paths.pop(idx)
+        print(f"✅ 削除しました: {removed}")
+    else:
+        print("❌ 無効な番号です")
+except ValueError:
+    print("❌ 数値を入力してください")
+```
+
+### 9. 設定ファイル更新
 
 変更を設定ファイルに保存します：
 
@@ -408,14 +505,17 @@ print("━━━━━━━━━━━━━━━━━━━━━━━━�
 📋 更新後の設定
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Base Directory (plugin_rootからの相対パス):
-  🔧 base_dir: ../../.. (変更されました)
+Base Directory:
+  🔧 base_dir: ~/DEV/production/EpisodicRAG (変更されました)
+
+Trusted External Paths:
+  🔒 trusted_external_paths: ["~/DEV/production"] (変更されました)
 
 Paths (base_dirからの相対パス):
   📂 loops_dir: data/Loops
   📂 digests_dir: data/Digests
   📂 essences_dir: data/Essences
-  📄 identity_file_path: ../../../Identities/WeaveIdentity.md
+  📄 identity_file_path: Identities/WeaveIdentity.md
 
 Thresholds:
   - weekly: 7 (変更されました)
@@ -462,7 +562,15 @@ Thresholds:
 
 → 対話的に weekly_threshold を 7 に変更
 
-### 例 2: Loop ディレクトリを変更
+### 例 2: 外部データディレクトリを使用
+
+```text
+@digest-config 外部のデータディレクトリを使いたい
+```
+
+→ 対話的に trusted_external_paths を設定し、base_dir を変更
+
+### 例 3: Loop ディレクトリを変更
 
 ```text
 @digest-config Loopディレクトリを既存プロジェクトと共有したい
@@ -470,7 +578,7 @@ Thresholds:
 
 → 対話的に loops_dir を変更
 
-### 例 3: 設定全体を確認
+### 例 4: 設定全体を確認
 
 ```text
 @digest-config 設定を確認

@@ -7,7 +7,7 @@ base_dir基準のパス解決
 """
 
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional
 
 from .error_messages import (
     config_invalid_value_message,
@@ -33,41 +33,114 @@ class PathResolver:
         """
         self.plugin_root = plugin_root
         self.config = config
+        self._trusted_external_paths = self._parse_trusted_paths()
         self.base_dir = self._resolve_base_dir()
+
+    def _parse_trusted_paths(self) -> List[Path]:
+        """
+        trusted_external_paths設定をパースして正規化
+
+        Returns:
+            正規化された信頼済み外部パスのリスト
+
+        Raises:
+            ConfigError: 相対パスが含まれている場合
+
+        Note:
+            - 空配列がデフォルト（セキュア）
+            - チルダ展開（~）をサポート
+            - 相対パスは禁止（絶対パスのみ）
+        """
+        raw_paths = self.config.get("trusted_external_paths", [])
+        trusted: List[Path] = []
+
+        for path_str in raw_paths:
+            # チルダ展開
+            expanded = Path(path_str).expanduser()
+
+            # 相対パスは禁止
+            if not expanded.is_absolute():
+                raise ConfigError(
+                    config_invalid_value_message(
+                        "trusted_external_paths",
+                        "absolute path",
+                        f"'{path_str}' (relative paths not allowed)",
+                    )
+                )
+
+            trusted.append(expanded.resolve())
+
+        return trusted
+
+    def _is_within_trusted_paths(self, resolved: Path) -> bool:
+        """
+        パスが信頼済み外部パス内にあるかチェック
+
+        Args:
+            resolved: チェック対象の解決済みパス
+
+        Returns:
+            信頼済みパス内であればTrue
+        """
+        for trusted_path in self._trusted_external_paths:
+            try:
+                resolved.relative_to(trusted_path)
+                return True
+            except ValueError:
+                continue
+        return False
 
     def _resolve_base_dir(self) -> Path:
         """
         base_dir設定を解釈して基準ディレクトリを返す
 
-        base_dir設定値（相対パスのみ）:
+        base_dir設定値:
           - ".": プラグインルート自身（デフォルト）
-          - "../../..": プラグインルートから3階層上
-          - 任意の相対パス: プラグインルートからの相対パス
+          - "subdir": プラグインルート配下のサブディレクトリ
+          - "~/path": ホームディレクトリからの絶対パス（チルダ展開）
+          - "C:/path": 絶対パス（trusted_external_pathsで許可が必要）
 
         Returns:
             解決された基準ディレクトリのPath
 
         Raises:
-            ConfigError: base_dirがplugin_root外を指す場合（パストラバーサル検出）
+            ConfigError: base_dirがplugin_rootまたはtrusted_external_paths外を指す場合
 
         Note:
-            絶対パスは使用しない（Git公開時の可搬性のため）
+            - plugin_root内は常に許可
+            - plugin_root外はtrusted_external_pathsで明示的な許可が必要
+            - チルダ展開（~）をサポート
         """
         base_dir_setting = self.config.get("base_dir", ".")
-        resolved = (self.plugin_root / base_dir_setting).resolve()
+
+        # チルダ展開または絶対パスの処理
+        base_path = Path(base_dir_setting).expanduser()
+        if base_path.is_absolute():
+            resolved = base_path.resolve()
+        else:
+            resolved = (self.plugin_root / base_dir_setting).resolve()
+
         plugin_root_resolved = self.plugin_root.resolve()
-        # パストラバーサル検出（plugin_root外へのアクセスを防止）
+
+        # 1. まずplugin_root内かチェック
         try:
             resolved.relative_to(plugin_root_resolved)
+            return resolved  # plugin_root内なのでOK
         except ValueError:
-            raise ConfigError(
-                config_invalid_value_message(
-                    "base_dir",
-                    "path within plugin root",
-                    f"'{base_dir_setting}' (resolves outside plugin root)",
-                )
+            pass  # plugin_root外 - 次のチェックへ
+
+        # 2. trusted_external_paths内かチェック
+        if self._is_within_trusted_paths(resolved):
+            return resolved  # 信頼済み外部パス内なのでOK
+
+        # 3. どちらにも該当しない場合はエラー
+        raise ConfigError(
+            config_invalid_value_message(
+                "base_dir",
+                "path within plugin root or trusted_external_paths",
+                f"'{base_dir_setting}' (resolves outside allowed paths)",
             )
-        return resolved
+        )
 
     def resolve_path(self, key: str) -> Path:
         """

@@ -170,6 +170,8 @@ flowchart TD
 | `"base_dir": "."` | プラグイン内 `data/` | デフォルト |
 | `"base_dir": "C:/GoogleDrive/..."` | 指定した場所の `data/` | クラウド同期 |
 
+⚠️ **外部パス使用時の注意**: プラグイン外のパスを使用する場合、先に `trusted_external_paths` で許可設定が必要です。`@digest-config` で対話的に設定できます。
+
 現在の設定確認: `@digest-config`
 
 ---

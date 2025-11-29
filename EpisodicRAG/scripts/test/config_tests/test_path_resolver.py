@@ -159,3 +159,142 @@ class TestPathResolver:
         result = resolver.resolve_path("loops_dir")
 
         assert result.is_absolute()
+
+
+class TestTrustedExternalPaths:
+    """trusted_external_paths機能のテスト"""
+
+    @pytest.mark.unit
+    def test_empty_trusted_paths_is_default(self, temp_plugin_env):
+        """trusted_external_pathsが未設定時は空配列"""
+        config = {"base_dir": ".", "paths": {"loops_dir": "data/Loops"}}
+        resolver = PathResolver(temp_plugin_env.plugin_root, config)
+
+        assert resolver._trusted_external_paths == []
+
+    @pytest.mark.unit
+    def test_base_dir_in_trusted_path_allowed(self, temp_plugin_env, tmp_path):
+        """trusted_external_paths内のbase_dirは許可される"""
+        external_dir = tmp_path / "external_data"
+        external_dir.mkdir()
+
+        config = {
+            "base_dir": str(external_dir),
+            "trusted_external_paths": [str(tmp_path)],
+            "paths": {"loops_dir": "Loops"},
+        }
+        resolver = PathResolver(temp_plugin_env.plugin_root, config)
+
+        assert resolver.base_dir == external_dir.resolve()
+
+    @pytest.mark.unit
+    def test_base_dir_outside_trusted_paths_raises_error(self, temp_plugin_env, tmp_path):
+        """trusted_external_paths外のbase_dirはConfigError"""
+        external_dir = tmp_path / "untrusted"
+        external_dir.mkdir()
+        other_dir = tmp_path / "other"
+        other_dir.mkdir()
+
+        config = {
+            "base_dir": str(external_dir),
+            "trusted_external_paths": [str(other_dir)],
+            "paths": {"loops_dir": "Loops"},
+        }
+
+        with pytest.raises(ConfigError) as exc_info:
+            PathResolver(temp_plugin_env.plugin_root, config)
+
+        assert "trusted_external_paths" in str(exc_info.value)
+
+    @pytest.mark.unit
+    def test_tilde_expansion_in_trusted_paths(self, temp_plugin_env):
+        """trusted_external_pathsでチルダ展開が動作する"""
+        from pathlib import Path
+
+        config = {
+            "base_dir": ".",
+            "trusted_external_paths": ["~/DEV"],
+            "paths": {"loops_dir": "data/Loops"},
+        }
+        resolver = PathResolver(temp_plugin_env.plugin_root, config)
+
+        # チルダが展開されていることを確認
+        assert all(not str(p).startswith("~") for p in resolver._trusted_external_paths)
+        # 展開後はホームディレクトリベース
+        home = Path.home()
+        assert resolver._trusted_external_paths[0] == (home / "DEV").resolve()
+
+    @pytest.mark.unit
+    def test_relative_path_in_trusted_paths_raises_error(self, temp_plugin_env):
+        """trusted_external_pathsに相対パスを指定するとConfigError"""
+        config = {
+            "base_dir": ".",
+            "trusted_external_paths": ["../relative/path"],
+            "paths": {"loops_dir": "data/Loops"},
+        }
+
+        with pytest.raises(ConfigError) as exc_info:
+            PathResolver(temp_plugin_env.plugin_root, config)
+
+        assert "trusted_external_paths" in str(exc_info.value)
+        assert "absolute path" in str(exc_info.value)
+
+    @pytest.mark.unit
+    def test_tilde_expansion_in_base_dir(self, temp_plugin_env):
+        """base_dirでチルダ展開が動作する"""
+        from pathlib import Path
+
+        home = Path.home()
+
+        config = {
+            "base_dir": "~",
+            "trusted_external_paths": [str(home)],
+            "paths": {"loops_dir": "data/Loops"},
+        }
+        resolver = PathResolver(temp_plugin_env.plugin_root, config)
+
+        assert resolver.base_dir == home.resolve()
+
+    @pytest.mark.unit
+    def test_backward_compatibility_without_trusted_paths(self, temp_plugin_env):
+        """trusted_external_pathsなしの既存設定は動作する（後方互換性）"""
+        config = {
+            "base_dir": ".",
+            "paths": {"loops_dir": "data/Loops"},
+        }
+        resolver = PathResolver(temp_plugin_env.plugin_root, config)
+
+        assert resolver.base_dir == temp_plugin_env.plugin_root.resolve()
+
+    @pytest.mark.unit
+    def test_absolute_path_in_base_dir_with_trusted_paths(self, temp_plugin_env, tmp_path):
+        """絶対パスのbase_dirがtrusted_external_paths内なら許可"""
+        external_dir = tmp_path / "data"
+        external_dir.mkdir()
+
+        config = {
+            "base_dir": str(external_dir),
+            "trusted_external_paths": [str(tmp_path)],
+            "paths": {"loops_dir": "Loops"},
+        }
+        resolver = PathResolver(temp_plugin_env.plugin_root, config)
+
+        assert resolver.base_dir == external_dir.resolve()
+
+    @pytest.mark.unit
+    def test_multiple_trusted_paths(self, temp_plugin_env, tmp_path):
+        """複数のtrusted_external_pathsが設定できる"""
+        dir1 = tmp_path / "dir1"
+        dir2 = tmp_path / "dir2"
+        dir1.mkdir()
+        dir2.mkdir()
+
+        config = {
+            "base_dir": str(dir2),
+            "trusted_external_paths": [str(dir1), str(dir2)],
+            "paths": {"loops_dir": "Loops"},
+        }
+        resolver = PathResolver(temp_plugin_env.plugin_root, config)
+
+        assert resolver.base_dir == dir2.resolve()
+        assert len(resolver._trusted_external_paths) == 2

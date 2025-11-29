@@ -258,6 +258,29 @@ cp -r {DATA_PATH}/Essences $BACKUP_DIR/
 
 dataディレクトリ全体をクラウドストレージ（Google Drive, Dropbox等）と同期することで、自動バックアップを実現できます。
 
+**設定方法**:
+
+1. `@digest-config` を実行
+2. [5] trusted_external_paths でクラウドストレージのパスを許可
+   - 例: `~/Google Drive` または `C:/Users/username/Google Drive`
+3. [1] base_dir をクラウドストレージ内のパスに変更
+   - 例: `~/Google Drive/EpisodicRAG`
+
+**設定例（Google Drive）**:
+```json
+{
+  "base_dir": "~/Google Drive/EpisodicRAG",
+  "trusted_external_paths": ["~/Google Drive"],
+  "paths": {
+    "loops_dir": "data/Loops",
+    "digests_dir": "data/Digests",
+    "essences_dir": "data/Essences"
+  }
+}
+```
+
+> 📖 `trusted_external_paths` の詳細は [api/config.md](../dev/api/config.md#trusted_external_paths) を参照
+
 ### リカバリ手順
 
 #### Loopファイルが破損/紛失した場合

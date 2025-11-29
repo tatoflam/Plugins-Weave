@@ -45,10 +45,43 @@ EpisodicRAGは環境によって異なるパスを使用します：
 **定義**: データ配置の基準ディレクトリ
 
 - **設定場所**: `config.json` の `base_dir` フィールド
-- **形式**: plugin_root からの相対パス
-- **例**: `.`（プラグイン内）、`../../../../../DEV/data`（外部）
+- **形式**: 相対パスまたは絶対パス（チルダ展開サポート）
+- **例**:
+  - `.`（プラグイン内、デフォルト）
+  - `subdir`（プラグイン内のサブディレクトリ）
+  - `~/DEV/production/EpisodicRAG`（外部パス、`trusted_external_paths`で許可が必要）
+  - `C:/Users/anyth/DEV/data`（Windows絶対パス、`trusted_external_paths`で許可が必要）
 
-パス解決: `plugin_root + base_dir` → 実際のデータ基準ディレクトリ
+パス解決:
+- 相対パス: `plugin_root + base_dir` → 実際のデータ基準ディレクトリ
+- 絶対パス: そのまま使用（`trusted_external_paths`内である必要あり）
+
+### trusted_external_paths
+**定義**: plugin_root外でアクセスを許可する絶対パスのリスト
+
+- **設定場所**: `config.json` の `trusted_external_paths` フィールド
+- **形式**: 絶対パスの配列（チルダ展開サポート）
+- **デフォルト**: `[]`（空配列、plugin_root内のみ許可）
+- **例**: `["~/DEV/production", "C:/Data/EpisodicRAG"]`
+
+**セキュリティ**:
+- デフォルトは空配列で最もセキュア
+- 外部パスを使用する場合は明示的な許可が必要
+- 相対パスは使用不可（絶対パスのみ）
+- Git公開時は`config.json`を`.gitignore`に追加推奨
+
+**使用例（外部データディレクトリ）**:
+```json
+{
+  "base_dir": "~/DEV/production/EpisodicRAG",
+  "trusted_external_paths": ["~/DEV/production"],
+  "paths": {
+    "loops_dir": "data/Loops",
+    "digests_dir": "data/Digests",
+    "essences_dir": "data/Essences"
+  }
+}
+```
 
 ### paths
 **定義**: 各データディレクトリの配置先

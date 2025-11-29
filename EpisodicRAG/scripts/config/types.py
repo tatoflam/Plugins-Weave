@@ -11,7 +11,7 @@ Usage:
     from config.types import as_dict, is_config_data
 """
 
-from typing import Any, Dict, Optional, TypedDict, TypeGuard, cast
+from typing import Any, Dict, List, Optional, TypedDict, TypeGuard, cast
 
 # =============================================================================
 # 設定ファイルの型定義
@@ -52,6 +52,7 @@ class ConfigData(TypedDict, total=False):
     base_dir: str
     paths: PathsConfigData
     levels: LevelsConfigData
+    trusted_external_paths: List[str]
 
 
 # =============================================================================
@@ -112,6 +113,12 @@ def is_config_data(data: Any) -> TypeGuard[ConfigData]:
 
     # levelsキーが存在する場合、dictであることを確認
     if "levels" in data and not isinstance(data["levels"], dict):
+        return False
+
+    # trusted_external_pathsキーが存在する場合、listであることを確認
+    if "trusted_external_paths" in data and not isinstance(
+        data["trusted_external_paths"], list
+    ):
         return False
 
     return True

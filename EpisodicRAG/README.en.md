@@ -46,10 +46,43 @@ EpisodicRAG uses different paths depending on the environment:
 **Definition**: The base directory for data placement
 
 - **Location**: `base_dir` field in `config.json`
-- **Format**: Relative path from plugin_root
-- **Example**: `.` (within plugin), `../../../../../DEV/data` (external)
+- **Format**: Relative or absolute path (tilde expansion supported)
+- **Examples**:
+  - `.` (within plugin, default)
+  - `subdir` (subdirectory within plugin)
+  - `~/DEV/production/EpisodicRAG` (external path, requires `trusted_external_paths` permission)
+  - `C:/Users/anyth/DEV/data` (Windows absolute path, requires `trusted_external_paths` permission)
 
-Path resolution: `plugin_root + base_dir` → actual data base directory
+Path resolution:
+- Relative path: `plugin_root + base_dir` → actual data base directory
+- Absolute path: Used as-is (must be within `trusted_external_paths`)
+
+### trusted_external_paths
+**Definition**: List of absolute paths allowed for access outside plugin_root
+
+- **Location**: `trusted_external_paths` field in `config.json`
+- **Format**: Array of absolute paths (tilde expansion supported)
+- **Default**: `[]` (empty array, only plugin_root allowed)
+- **Example**: `["~/DEV/production", "C:/Data/EpisodicRAG"]`
+
+**Security**:
+- Default is empty array (most secure)
+- External paths require explicit permission
+- Relative paths not allowed (absolute only)
+- Recommended to add `config.json` to `.gitignore` for Git publishing
+
+**Usage Example (External Data Directory)**:
+```json
+{
+  "base_dir": "~/DEV/production/EpisodicRAG",
+  "trusted_external_paths": ["~/DEV/production"],
+  "paths": {
+    "loops_dir": "data/Loops",
+    "digests_dir": "data/Digests",
+    "essences_dir": "data/Essences"
+  }
+}
+```
 
 ### paths
 **Definition**: Placement locations for each data directory

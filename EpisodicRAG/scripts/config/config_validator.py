@@ -47,6 +47,7 @@ class ConfigValidator:
     OPTIONAL_KEYS_WITH_TYPES: Dict[str, type] = {
         "base_dir": str,
         "identity_file": str,
+        "trusted_external_paths": list,
     }
 
     def __init__(
@@ -84,6 +85,7 @@ class ConfigValidator:
         errors.extend(self.validate_required_keys())
         errors.extend(self.validate_paths())
         errors.extend(self.validate_thresholds())
+        errors.extend(self.validate_trusted_external_paths())
         errors.extend(self.validate_directory_structure())
         return errors
 
@@ -141,6 +143,39 @@ class ConfigValidator:
                         f"Invalid configuration value for '{key}': "
                         f"must be positive integer, got {value}"
                     )
+
+        return errors
+
+    def validate_trusted_external_paths(self) -> List[str]:
+        """
+        trusted_external_paths設定の検証
+
+        Returns:
+            エラーメッセージのリスト
+        """
+        errors: List[str] = []
+        config_dict = as_dict(self.config)
+
+        if "trusted_external_paths" not in config_dict:
+            return errors  # オプションなのでOK
+
+        trusted_paths = config_dict["trusted_external_paths"]
+
+        # リストであることを検証
+        if not isinstance(trusted_paths, list):
+            errors.append(
+                f"Invalid configuration value for 'trusted_external_paths': "
+                f"expected list, got {type(trusted_paths).__name__}"
+            )
+            return errors
+
+        # 各要素が文字列であることを検証
+        for i, path in enumerate(trusted_paths):
+            if not isinstance(path, str):
+                errors.append(
+                    f"Invalid configuration value for 'trusted_external_paths[{i}]': "
+                    f"expected str, got {type(path).__name__}"
+                )
 
         return errors
 
