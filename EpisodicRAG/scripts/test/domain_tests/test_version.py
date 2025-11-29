@@ -122,6 +122,52 @@ class TestVersionFallback:
         assert '.get("version"' in source
 
 
+class TestVersionConsistency:
+    """バージョン整合性テスト - SSoT検証"""
+
+    @pytest.mark.unit
+    def test_plugin_json_pyproject_toml_sync(self):
+        """plugin.json と pyproject.toml のバージョンが一致"""
+        # プロジェクトルートを取得
+        plugin_root = Path(__file__).parent.parent.parent.parent
+
+        # plugin.json からバージョン取得
+        plugin_json = plugin_root / ".claude-plugin" / "plugin.json"
+        assert plugin_json.exists(), f"plugin.json not found: {plugin_json}"
+        plugin_data = json.loads(plugin_json.read_text(encoding="utf-8"))
+        plugin_version = plugin_data.get("version")
+        assert plugin_version, "plugin.json missing 'version' key"
+
+        # pyproject.toml からバージョン取得
+        pyproject = plugin_root / "pyproject.toml"
+        assert pyproject.exists(), f"pyproject.toml not found: {pyproject}"
+        pyproject_content = pyproject.read_text(encoding="utf-8")
+        pyproject_version = None
+        for line in pyproject_content.splitlines():
+            if line.startswith("version = "):
+                pyproject_version = line.split('"')[1]
+                break
+        assert pyproject_version, "pyproject.toml missing 'version'"
+
+        assert plugin_version == pyproject_version, (
+            f"Version mismatch: plugin.json={plugin_version}, pyproject.toml={pyproject_version}"
+        )
+
+    @pytest.mark.unit
+    def test_version_module_matches_plugin_json(self):
+        """version.py の __version__ が plugin.json と一致"""
+        from domain.version import __version__
+
+        plugin_root = Path(__file__).parent.parent.parent.parent
+        plugin_json = plugin_root / ".claude-plugin" / "plugin.json"
+        plugin_data = json.loads(plugin_json.read_text(encoding="utf-8"))
+        plugin_version = plugin_data.get("version")
+
+        assert __version__ == plugin_version, (
+            f"Version mismatch: __version__={__version__}, plugin.json={plugin_version}"
+        )
+
+
 class TestVersionModule:
     """version モジュール全体のテスト"""
 

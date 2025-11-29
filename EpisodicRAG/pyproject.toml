@@ -4,12 +4,30 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "episodicrag"
-version = "3.0.0"
+version = "3.2.0"
 description = "EpisodicRAG - Hierarchical digest generation for long-term memory"
 requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "Weave"}
+]
+readme = "README.md"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
 
 # Runtime dependencies (none - uses Python standard library only)
 dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/Bizuayeu/Plugins-Weave"
+Repository = "https://github.com/Bizuayeu/Plugins-Weave"
 
 [tool.setuptools.packages.find]
 where = ["."]
@@ -110,26 +128,37 @@ known-first-party = ["domain", "application", "infrastructure", "interfaces", "c
 known-third-party = ["pytest", "hypothesis"]
 
 # =============================================================================
-# Mypy Configuration
+# Mypy Configuration - Strict Mode for 100% Type Coverage
 # =============================================================================
 
 [tool.mypy]
 python_version = "3.10"
 mypy_path = "scripts"
+
+# Strict mode settings (equivalent to --strict flag)
+strict = true
 warn_redundant_casts = true
 warn_unused_configs = true
 warn_no_return = true
-check_untyped_defs = true
+warn_return_any = true
+warn_unreachable = true
+
+# Allow Any for valid use cases (validation functions, logging)
+disallow_any_generics = false
+
+# Import settings
 ignore_missing_imports = true
+
+# Exclude test layer (optional: can be enabled later)
 exclude = ["scripts/test/"]
 
-# Domain layer: strict mode (already compliant)
+# Domain layer: already 100% compliant
 [[tool.mypy.overrides]]
 module = "domain.*"
 disallow_untyped_defs = true
 disallow_incomplete_defs = true
 
-# Application layer: enable strict typing for all modules
+# Application layer: 100% type coverage
 [[tool.mypy.overrides]]
 module = [
     # Package __init__.py files
@@ -156,8 +185,9 @@ module = [
     "application.tracking.digest_times",
 ]
 disallow_untyped_defs = true
+disallow_incomplete_defs = true
 
-# Config layer: enable strict typing for all modules
+# Config layer: 100% type coverage
 [[tool.mypy.overrides]]
 module = [
     "config",
@@ -169,27 +199,46 @@ module = [
     "config.path_resolver",
     "config.plugin_root_resolver",
     "config.threshold_provider",
+    "config.source_path_resolver",
+    "config.cli",
+    "config.validation",
+    "config.config_constants",
 ]
 disallow_untyped_defs = true
+disallow_incomplete_defs = true
 
-# Infrastructure layer: enable strict typing for all modules
+# Infrastructure layer: 100% type coverage
 [[tool.mypy.overrides]]
 module = [
+    "infrastructure",
     "infrastructure.json_repository",
+    "infrastructure.json_repository.operations",
+    "infrastructure.json_repository.load_strategy",
+    "infrastructure.json_repository.chained_loader",
     "infrastructure.file_scanner",
     "infrastructure.logging_config",
     "infrastructure.user_interaction",
+    "infrastructure.structured_logging",
+    "infrastructure.error_handling",
 ]
 disallow_untyped_defs = true
+disallow_incomplete_defs = true
 
-# Interfaces layer: enable strict typing for all modules
+# Interfaces layer: 100% type coverage
 [[tool.mypy.overrides]]
 module = [
+    "interfaces",
+    "interfaces.provisional",
     "interfaces.provisional.*",
     "interfaces.finalize_from_shadow",
     "interfaces.interface_helpers",
     "interfaces.save_provisional_digest",
 ]
 disallow_untyped_defs = true
+disallow_incomplete_defs = true
 
-# Test layer: excluded via exclude = ["scripts/test/"] in [tool.mypy]
+# Note: Test layer excluded via exclude = ["scripts/test/"]
+# To enable strict typing for tests, remove the exclude and add:
+# [[tool.mypy.overrides]]
+# module = "test.*"
+# disallow_untyped_defs = true

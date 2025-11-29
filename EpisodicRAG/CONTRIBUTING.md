@@ -383,7 +383,7 @@ git status
 // .claude-plugin/plugin.json
 {
   "name": "EpisodicRAG-Plugin",
-  "version": "3.0.0",  // ← ここがSSoT（唯一の更新場所）
+  "version": "x.y.z",  // ← ここがSSoT（唯一の更新場所）- 実際の値は plugin.json を参照
   ...
 }
 ```
