@@ -102,7 +102,7 @@ flowchart TB
     style D2 fill:#FFD700
 ```
 
-> 📖 実行フロー・データフローの詳細は [GUIDE.md > コマンド詳解](GUIDE.md#digest-コマンド) を参照
+> 📖 実行フロー・データフローの詳細は [GUIDE.md > /digestの動作](GUIDE.md#digest-の動作) を参照
 
 ### Q: まだらボケとは何ですか？
 
@@ -114,7 +114,7 @@ flowchart TB
 
 **A**: `@digest-config` → [4] Thresholds を選択。
 
-> 📖 詳細: [API_REFERENCE.md](../dev/API_REFERENCE.md#config.json-詳細仕様)
+> 📖 詳細: [api/config.md](../dev/api/config.md)
 
 ---
 
@@ -162,7 +162,7 @@ flowchart TB
 1. `ShadowGrandDigest.txt`を削除
 2. `/digest` を実行して再構築
 
-> 📖 詳細: [TROUBLESHOOTING.md](TROUBLESHOOTING.md#shadowgranddigest更新されない)
+> 📖 詳細: [TROUBLESHOOTING.md](TROUBLESHOOTING.md#shadowgranddigestが更新されない)
 
 ### Q: 誤ってファイルを削除してしまいました
 

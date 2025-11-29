@@ -38,7 +38,7 @@ digests_path = config.digests_path
 essences_path = config.essences_path
 ```
 
-> 📖 DigestConfigの全プロパティ・メソッドは [API_REFERENCE.md](../../docs/dev/API_REFERENCE.md#クラス-digestconfig) を参照
+> 📖 DigestConfigの全プロパティ・メソッドは [api/config.md](../../docs/dev/api/config.md) を参照
 
 ---
 

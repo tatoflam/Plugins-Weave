@@ -333,7 +333,7 @@ class DigestConfig:
     def essences_path(self) -> Path: ...   # GrandDigest配置先
 ```
 
-> **詳細なAPI仕様**: [API_REFERENCE.md#設定configinitpy](API_REFERENCE.md#設定configinitpy) を参照
+> **詳細なAPI仕様**: [api/config.md](api/config.md) を参照
 
 ### パス解決の例
 
