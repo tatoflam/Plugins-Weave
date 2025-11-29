@@ -16,6 +16,7 @@ Usage:
 """
 
 from typing import Dict, List, Optional
+
 from typing_extensions import TypedDict
 
 # =============================================================================

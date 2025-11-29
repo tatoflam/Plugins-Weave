@@ -315,7 +315,9 @@ class TestLoadContext:
         """コンテキストの初期化"""
         target = Path("/tmp/target.json")
         template = Path("/tmp/template.json")
-        factory = lambda: {"default": True}
+
+        def factory():
+            return {"default": True}
 
         context = LoadContext(
             target_file=target,

@@ -12,7 +12,6 @@ import pytest
 
 from domain.error_formatter.diagnostic import with_diagnostic_context
 
-
 # =============================================================================
 # Basic Message Tests
 # =============================================================================

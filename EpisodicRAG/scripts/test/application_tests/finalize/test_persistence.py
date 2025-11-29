@@ -15,7 +15,6 @@ import pytest
 
 from domain.exceptions import DigestError, FileIOError, ValidationError
 
-
 # =============================================================================
 # DigestPersistence Initialization Tests
 # =============================================================================

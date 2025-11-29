@@ -12,7 +12,6 @@ import pytest
 
 from domain.level_metadata import LevelMetadata
 
-
 # =============================================================================
 # LevelMetadata Initialization Tests
 # =============================================================================

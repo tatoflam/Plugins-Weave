@@ -13,7 +13,6 @@ import pytest
 from domain.level_behaviors import LevelBehavior, LoopLevelBehavior, StandardLevelBehavior
 from domain.level_metadata import LevelMetadata
 
-
 # =============================================================================
 # LevelBehavior Abstract Class Tests
 # =============================================================================
