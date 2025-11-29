@@ -9,12 +9,14 @@ ShadowGrandDigestの内容を検証するクラス
 from typing import Any, Callable, List, Optional, Tuple
 
 from application.grand import ShadowGrandDigestManager
-from application.validators import is_valid_dict, is_valid_list
+from domain.validators import is_valid_dict, is_valid_list
 from domain.error_formatter import get_error_formatter
 from domain.exceptions import DigestError, ValidationError
 from domain.file_naming import extract_file_number
 from domain.types import OverallDigestData
-from infrastructure import get_default_confirm_callback, log_info, log_warning
+from infrastructure import get_default_confirm_callback, get_structured_logger, log_warning
+
+_logger = get_structured_logger(__name__)
 
 
 class ShadowValidator:
@@ -126,7 +128,7 @@ class ShadowValidator:
             if not self.confirm_callback("Continue anyway?"):
                 raise ValidationError("User cancelled due to non-consecutive files")
 
-        log_info(
+        _logger.info(
             f"Shadow validation passed: {len(source_files)} file(s), range: {numbers[0]}-{numbers[-1]}"
         )
 
@@ -160,7 +162,7 @@ class ShadowValidator:
         shadow_digest = self.shadow_manager.get_shadow_digest_for_level(level)
 
         if shadow_digest is None:
-            log_info("Run 'python shadow_grand_digest.py' to update shadow first")
+            _logger.info("Run 'python shadow_grand_digest.py' to update shadow first")
             formatter = get_error_formatter()
             raise DigestError(formatter.digest.digest_not_found(level, "shadow"))
 
@@ -208,5 +210,5 @@ class ShadowValidator:
         source_files = shadow_digest.get("source_files", [])
         self.validate_shadow_content(level, source_files)
 
-        log_info(f"Shadow digest contains {len(source_files)} source file(s)")
+        _logger.info(f"Shadow digest contains {len(source_files)} source file(s)")
         return shadow_digest

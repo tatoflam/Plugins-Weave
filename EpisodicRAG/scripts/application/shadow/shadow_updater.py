@@ -10,7 +10,9 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 from domain.types import LevelHierarchyEntry, OverallDigestData
-from infrastructure import log_info
+from infrastructure import get_structured_logger
+
+_logger = get_structured_logger(__name__)
 
 from .cascade_processor import CascadeProcessor
 from .file_appender import FileAppender
@@ -152,10 +154,10 @@ class ShadowUpdater:
         new_files = self.file_detector.find_new_files("weekly")
 
         if not new_files:
-            log_info("No new Loop files found")
+            _logger.info("No new Loop files found")
             return
 
-        log_info(f"Found {len(new_files)} new Loop file(s):")
+        _logger.info(f"Found {len(new_files)} new Loop file(s):")
 
         # Shadowに増分追加
         self.add_files_to_shadow("weekly", new_files)

@@ -86,7 +86,9 @@ from domain.file_naming import format_digest_number
 from domain.level_registry import get_level_registry
 
 # Infrastructure層
-from infrastructure import log_error, log_info
+from infrastructure import get_structured_logger, log_error
+
+_logger = get_structured_logger(__name__)
 
 # Helpers
 from interfaces.interface_helpers import get_next_digest_number, sanitize_filename
@@ -169,12 +171,12 @@ class DigestFinalizerFromShadow:
             DigestError: ダイジェスト処理に失敗した場合
             FileIOError: ファイルI/Oに失敗した場合
         """
-        log_info(LOG_SEPARATOR)
-        log_info(f"Finalize Digest from Shadow: {level.upper()}")
-        log_info(LOG_SEPARATOR)
+        _logger.info(LOG_SEPARATOR)
+        _logger.info(f"Finalize Digest from Shadow: {level.upper()}")
+        _logger.info(LOG_SEPARATOR)
 
         # ===== 処理1: RegularDigest作成 =====
-        log_info("[Step 1] Creating RegularDigest from Shadow...")
+        _logger.info("[Step 1] Creating RegularDigest from Shadow...")
 
         # Shadowデータの検証と取得（例外を投げる）
         shadow_digest = self._validator.validate_and_get_shadow(level, weave_title)
@@ -210,9 +212,9 @@ class DigestFinalizerFromShadow:
             level, source_files, provisional_file_to_delete
         )
 
-        log_info(LOG_SEPARATOR)
-        log_info("Digest finalization completed!")
-        log_info(LOG_SEPARATOR)
+        _logger.info(LOG_SEPARATOR)
+        _logger.info("Digest finalization completed!")
+        _logger.info(LOG_SEPARATOR)
 
 
 def main() -> None:

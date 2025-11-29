@@ -6,7 +6,7 @@ Centralizes all validation logic for provisional digest data structures.
 
 from typing import Any, List
 
-from application.validators import is_valid_dict, is_valid_list
+from domain.validators import is_valid_dict, is_valid_list
 from domain.error_formatter import get_error_formatter
 from domain.exceptions import ValidationError
 from domain.types import IndividualDigestData

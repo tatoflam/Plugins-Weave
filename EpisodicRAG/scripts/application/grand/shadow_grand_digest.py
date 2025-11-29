@@ -31,7 +31,9 @@ from application.tracking import DigestTimesTracker
 from config import DigestConfig
 from domain.constants import LEVEL_CONFIG, LEVEL_NAMES, LOG_SEPARATOR, build_level_hierarchy
 from domain.types import LevelHierarchyEntry, OverallDigestData
-from infrastructure import log_info, log_warning
+from infrastructure import get_structured_logger, log_warning
+
+_logger = get_structured_logger(__name__)
 
 
 class ShadowGrandDigestManager:
@@ -155,19 +157,19 @@ def main() -> None:
     config = DigestConfig()
     manager = ShadowGrandDigestManager(config)
 
-    log_info(LOG_SEPARATOR)
-    log_info("ShadowGrandDigest Update - New Loop Detection")
-    log_info(LOG_SEPARATOR)
+    _logger.info(LOG_SEPARATOR)
+    _logger.info("ShadowGrandDigest Update - New Loop Detection")
+    _logger.info(LOG_SEPARATOR)
 
     # 新しいLoopファイルの検出と追加
     manager.update_shadow_for_new_loops()
 
-    log_info(LOG_SEPARATOR)
-    log_info("Placeholder added to ShadowGrandDigest.weekly")
-    log_info(LOG_SEPARATOR)
+    _logger.info(LOG_SEPARATOR)
+    _logger.info("Placeholder added to ShadowGrandDigest.weekly")
+    _logger.info(LOG_SEPARATOR)
     log_warning("[!] WARNING: Claude analysis required immediately!")
     log_warning("Without analysis, memory fragmentation (madaraboke) occurs.")
-    log_info(LOG_SEPARATOR)
+    _logger.info(LOG_SEPARATOR)
 
 
 if __name__ == "__main__":

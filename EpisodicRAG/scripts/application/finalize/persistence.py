@@ -11,8 +11,8 @@ from typing import Callable, List, Optional
 
 from application.grand import GrandDigestManager, ShadowGrandDigestManager
 from application.tracking import DigestTimesTracker
-from application.validators import is_valid_dict
 from config import DigestConfig
+from domain.validators import is_valid_dict
 from domain.constants import (
     LEVEL_CONFIG,
     LOG_PREFIX_DECISION,
@@ -23,7 +23,9 @@ from domain.error_formatter import get_error_formatter
 from domain.exceptions import DigestError, FileIOError, ValidationError
 from domain.level_registry import get_level_registry
 from domain.types import RegularDigestData, as_dict
-from infrastructure import get_default_confirm_callback, log_debug, log_info, log_warning, save_json
+from infrastructure import get_default_confirm_callback, get_structured_logger, log_debug, log_warning, save_json
+
+_logger = get_structured_logger(__name__)
 
 
 class DigestPersistence:
@@ -99,7 +101,7 @@ class DigestPersistence:
             formatter = get_error_formatter()
             raise FileIOError(formatter.file.file_io_error("save", final_path, e))
 
-        log_info(f"RegularDigest saved: {final_path}")
+        _logger.info(f"RegularDigest saved: {final_path}")
         return final_path
 
     def update_grand_digest(
@@ -116,7 +118,7 @@ class DigestPersistence:
         Raises:
             DigestError: overall_digestが無効な場合、またはGrandDigest更新に失敗した場合
         """
-        log_info(f"[Step 2] Updating GrandDigest.txt for {level}")
+        _logger.info(f"[Step 2] Updating GrandDigest.txt for {level}")
         overall_digest = regular_digest.get("overall_digest")
         if not overall_digest or not is_valid_dict(overall_digest):
             formatter = get_error_formatter()
@@ -139,11 +141,11 @@ class DigestPersistence:
         log_debug(f"{LOG_PREFIX_DECISION} should_cascade({level}): {should_cascade}")
 
         if should_cascade:
-            log_info("[Step 3] Processing ShadowGrandDigest cascade")
+            _logger.info("[Step 3] Processing ShadowGrandDigest cascade")
             log_debug(f"{LOG_PREFIX_STATE} starting cascade for level={level}")
             self.shadow_manager.cascade_update_on_digest_finalize(level)
         else:
-            log_info(f"[Step 3] Skipped ({level} is top level, no cascade needed)")
+            _logger.info(f"[Step 3] Skipped ({level} is top level, no cascade needed)")
 
     def _update_digest_times(self, level: str, source_files: List[str]) -> None:
         """
@@ -153,7 +155,7 @@ class DigestPersistence:
             level: ダイジェストレベル
             source_files: ソースファイルリスト
         """
-        log_info(f"[Step 4] Updating last_digest_times.json for {level}")
+        _logger.info(f"[Step 4] Updating last_digest_times.json for {level}")
         self.times_tracker.save(level, source_files)
 
     def _cleanup_provisional_file(self, provisional_file: Optional[Path]) -> None:
@@ -166,7 +168,7 @@ class DigestPersistence:
         if provisional_file and provisional_file.exists():
             try:
                 provisional_file.unlink()
-                log_info(
+                _logger.info(
                     f"[Step 5] Removed Provisional digest after merge: {provisional_file.name}"
                 )
             except (FileNotFoundError, PermissionError, IsADirectoryError) as e:

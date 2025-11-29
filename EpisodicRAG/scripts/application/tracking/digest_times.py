@@ -10,12 +10,14 @@ finalize_from_shadow.py から分離。
 from datetime import datetime
 from typing import List, Optional, Union, cast
 
-from application.validators import is_valid_list
 from config import DigestConfig
+from domain.validators import is_valid_list
 from domain.constants import LEVEL_NAMES
 from domain.file_naming import extract_number_only, extract_numbers_formatted
 from domain.types import DigestTimesData
-from infrastructure import load_json_with_template, log_info, log_warning, save_json
+from infrastructure import get_structured_logger, load_json_with_template, log_warning, save_json
+
+_logger = get_structured_logger(__name__)
 
 
 class DigestTimesTracker:
@@ -100,6 +102,6 @@ class DigestTimesTracker:
         times[level] = {"timestamp": datetime.now().isoformat(), "last_processed": last_processed}
         save_json(self.last_digest_file, times)
 
-        log_info(f"Updated last_digest_times.json for level: {level}")
+        _logger.info(f"Updated last_digest_times.json for level: {level}")
         if last_processed:
-            log_info(f"Last processed: {last_processed}")
+            _logger.info(f"Last processed: {last_processed}")

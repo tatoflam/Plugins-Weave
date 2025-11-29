@@ -13,7 +13,9 @@ from domain.constants import (
     create_placeholder_text,
 )
 from domain.types import OverallDigestData
-from infrastructure import log_info
+from infrastructure import get_structured_logger
+
+_logger = get_structured_logger(__name__)
 
 
 class PlaceholderManager:
@@ -41,7 +43,7 @@ class PlaceholderManager:
                 "所感・展望", limits['impression_chars']
             )
             overall_digest["keywords"] = create_placeholder_keywords(limits["keyword_count"])
-            log_info(f"Initialized placeholder for {total_files} file(s)")
+            _logger.info(f"Initialized placeholder for {total_files} file(s)")
         else:
-            log_info(f"Preserved existing analysis (now {total_files} file(s) total)")
-            log_info(f"Claude should re-analyze all {total_files} files to integrate new content")
+            _logger.info(f"Preserved existing analysis (now {total_files} file(s) total)")
+            _logger.info(f"Claude should re-analyze all {total_files} files to integrate new content")

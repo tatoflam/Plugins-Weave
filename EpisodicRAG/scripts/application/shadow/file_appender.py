@@ -9,13 +9,11 @@ File Appender
 from pathlib import Path
 from typing import Dict, List, Set
 
-from application.validators import is_valid_dict
 from domain.constants import SOURCE_TYPE_LOOPS
 from domain.types import LevelHierarchyEntry, OverallDigestData, ShadowDigestData
-from domain.validators import is_valid_overall_digest
+from domain.validators import is_valid_dict, is_valid_overall_digest
 from infrastructure import (
     get_structured_logger,
-    log_info,
     log_warning,
     try_read_json_from_file,
 )
@@ -112,7 +110,7 @@ class FileAppender:
             if file_path.name not in existing_files:
                 overall_digest["source_files"].append(file_path.name)
                 added_count += 1
-                log_info(f"  + {file_path.name}")
+                _logger.info(f"  + {file_path.name}")
             else:
                 _logger.file_op("skipped (already exists)", file=file_path.name)
         return added_count
@@ -162,11 +160,11 @@ class FileAppender:
         overall_raw = digest_data.get("overall_digest")
         overall = overall_raw if isinstance(overall_raw, dict) else {}
 
-        log_info(f"Read digest content from {file_path.name}")
-        log_info(f"      - digest_type: {overall.get('digest_type', 'N/A')}")
-        log_info(f"      - keywords: {len(overall.get('keywords', []))} items")
-        log_info(f"      - abstract: {len(overall.get('abstract', ''))} chars")
-        log_info(f"      - impression: {len(overall.get('impression', ''))} chars")
+        _logger.info(f"Read digest content from {file_path.name}")
+        _logger.info(f"      - digest_type: {overall.get('digest_type', 'N/A')}")
+        _logger.info(f"      - keywords: {len(overall.get('keywords', []))} items")
+        _logger.info(f"      - abstract: {len(overall.get('abstract', ''))} chars")
+        _logger.info(f"      - impression: {len(overall.get('impression', ''))} chars")
 
     def add_files_to_shadow(self, level: str, new_files: List[Path]) -> None:
         """

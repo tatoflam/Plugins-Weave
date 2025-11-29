@@ -10,8 +10,8 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 from application.grand import ShadowGrandDigestManager
-from application.validators import is_valid_dict
 from config import DigestConfig
+from domain.validators import is_valid_dict
 from domain.constants import (
     LEVEL_CONFIG,
     LOG_PREFIX_DECISION,
@@ -22,7 +22,9 @@ from domain.constants import (
 from domain.error_formatter import get_error_formatter
 from domain.exceptions import DigestError
 from domain.types import IndividualDigestData, OverallDigestData
-from infrastructure import load_json, log_debug, log_info, log_warning, try_read_json_from_file
+from infrastructure import get_structured_logger, load_json, log_debug, log_warning, try_read_json_from_file
+
+_logger = get_structured_logger(__name__)
 
 
 class ProvisionalLoader:
@@ -91,7 +93,7 @@ class ProvisionalLoader:
 
         individual_digests = provisional_data.get("individual_digests", [])
         log_debug(f"{LOG_PREFIX_STATE} loaded_digests_count: {len(individual_digests)}")
-        log_info(
+        _logger.info(
             f"Loaded {len(individual_digests)} individual digests from {provisional_path.name}"
         )
 
@@ -125,7 +127,7 @@ class ProvisionalLoader:
 
         # Provisionalファイルが存在しない場合、source_filesから自動生成
         log_debug(f"{LOG_PREFIX_DECISION} provisional_not_found: generating from source files")
-        log_info("No Provisional digest found, generating from source files...")
+        _logger.info("No Provisional digest found, generating from source files...")
         individual_digests = self.generate_from_source(level, shadow_digest)
 
         return individual_digests, None
@@ -187,9 +189,9 @@ class ProvisionalLoader:
 
             individual_entry = self._build_individual_entry(source_file, source_data)
             individual_digests.append(individual_entry)
-            log_info(f"Auto-generated individual digest from {source_file}")
+            _logger.info(f"Auto-generated individual digest from {source_file}")
 
         if skipped_count > 0:
             log_warning(f"Skipped {skipped_count}/{len(source_files)} files due to errors")
-        log_info(f"Auto-generated {len(individual_digests)} individual digests from source files")
+        _logger.info(f"Auto-generated {len(individual_digests)} individual digests from source files")
         return individual_digests

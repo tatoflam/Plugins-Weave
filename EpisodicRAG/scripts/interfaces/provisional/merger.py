@@ -7,7 +7,9 @@ Handles merging of individual digests with deduplication.
 from typing import List
 
 from domain.types import IndividualDigestData
-from infrastructure import log_info
+from infrastructure import get_structured_logger
+
+_logger = get_structured_logger(__name__)
 from interfaces.provisional.validator import validate_individual_digests_list
 
 
@@ -46,7 +48,7 @@ class DigestMerger:
         for new_digest in new_digests:
             source_file = new_digest["source_file"]
             if source_file in merged_dict:
-                log_info(f"Overwriting existing digest: {source_file}")
+                _logger.info(f"Overwriting existing digest: {source_file}")
             merged_dict[source_file] = new_digest
 
         return list(merged_dict.values())

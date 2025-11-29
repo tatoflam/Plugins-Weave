@@ -38,7 +38,9 @@ from domain.types import IndividualDigestData
 from domain.version import DIGEST_FORMAT_VERSION
 
 # Infrastructure層
-from infrastructure import log_error, log_info, log_warning, save_json
+from infrastructure import get_structured_logger, log_error, log_warning, save_json
+
+_logger = get_structured_logger(__name__)
 
 # Helpers
 from interfaces.interface_helpers import get_next_digest_number
@@ -118,7 +120,7 @@ class ProvisionalDigestSaver:
             log_warning("--append specified but no existing Provisional found. Creating new file.")
             return get_next_digest_number(self.config.digests_path, level), individual_digests
 
-        log_info(
+        _logger.info(
             f"Appending to existing Provisional: {format_digest_number(level, current_num)}_Individual.txt"
         )
 
@@ -185,23 +187,23 @@ Examples:
         if len(individual_digests) == 0:
             log_warning("No individual digests to save. Creating empty Provisional file.")
 
-        log_info(f"Loaded {len(individual_digests)} individual digests")
+        _logger.info(f"Loaded {len(individual_digests)} individual digests")
 
         # Save ProvisionalDigest
         saved_path = saver.save_provisional(args.level, individual_digests, append=args.append)
 
-        log_info("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-        log_info("ProvisionalDigest saved successfully")
-        log_info("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-        log_info(f"Path: {saved_path}")
-        log_info(f"Individual digests: {len(individual_digests)}")
+        _logger.info("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+        _logger.info("ProvisionalDigest saved successfully")
+        _logger.info("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+        _logger.info(f"Path: {saved_path}")
+        _logger.info(f"Individual digests: {len(individual_digests)}")
         if args.append:
-            log_info("Mode: Append (merged with existing file)")
+            _logger.info("Mode: Append (merged with existing file)")
         else:
-            log_info("Mode: New file")
-        log_info("Next step:")
-        log_info(f'  python finalize_from_shadow.py {args.level} "TITLE"')
-        log_info("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+            _logger.info("Mode: New file")
+        _logger.info("Next step:")
+        _logger.info(f'  python finalize_from_shadow.py {args.level} "TITLE"')
+        _logger.info("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
 
     except FileNotFoundError as e:
         log_error(f"File not found: {e}", exit_code=1)
