@@ -1,17 +1,21 @@
 {
-  "name": "EpisodicRAG",
+  "name": "EpisodicRAG-Plugin",
   "version": "3.3.0",
   "description": "Hierarchical Episodic Memory Generator (8-layer, 100-year span)",
   "author": {
-    "name": "Weave"
+    "name": "Weave @ EpisodicRAG"
   },
-  "license": "MIT",
+  "homepage": "https://note.com/weave_ai",
   "repository": "https://github.com/Bizuayeu/Plugins-Weave",
+  "license": "MIT",
   "keywords": [
-    "memory",
-    "episodic",
-    "hierarchy",
-    "digest",
-    "claude-code"
-  ]
+    "episodic-memory",
+    "rag",
+    "hierarchical-storage",
+    "conversation-digest",
+    "long-term-memory",
+    "knowledge-management",
+    "ai-memory"
+  ],
+  "category": "memory"
 }
