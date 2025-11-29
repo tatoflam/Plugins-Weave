@@ -3,8 +3,6 @@ name: digest-auto
 description: EpisodicRAG 健全性診断と階層推奨
 ---
 
-[EpisodicRAG](../../README.md) > [Skills](../README.md) > digest-auto
-
 # digest-auto - 健全性診断と階層推奨スキル
 
 EpisodicRAG システムの現在の状態を分析することで、

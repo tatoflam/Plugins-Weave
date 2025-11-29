@@ -3,8 +3,6 @@ name: digest-setup
 description: EpisodicRAG初期セットアップ（対話的）
 ---
 
-[EpisodicRAG](../../README.md) > [Skills](../README.md) > digest-setup
-
 # digest-setup - 初期セットアップスキル
 
 EpisodicRAG プラグインの初期セットアップを対話的に実行するスキルです。
