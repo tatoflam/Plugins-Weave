@@ -151,7 +151,19 @@ infrastructure/   ← domain/ のみ
 application/      ← domain/ + infrastructure/
     ↑
 interfaces/       ← application/
+
+config/           ← 何にも依存しない（完全独立）
 ```
+
+> ⚠️ **CRITICAL: Config層の独立性**
+>
+> `config/` パッケージは **domain/ を含む他のすべての層から完全に独立** していなければなりません。
+>
+> **理由**: Config層は `digest-config` スキルの本体であり、Claudeプラグインとして単独でロード可能である必要があります。Domain層への依存があると、プラグインの初期化順序やCircular Importの問題が発生します。
+>
+> **禁止**: `from domain import ...` を config/ 内で使用しないでください。
+>
+> Config層が必要とする型・例外・定数は、すべて `config/types.py`, `config/exceptions.py`, `config/constants.py` に独自定義されています。
 
 ```mermaid
 graph BT

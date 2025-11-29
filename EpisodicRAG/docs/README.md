@@ -66,6 +66,15 @@ AI/Claudeエージェント向けの技術仕様ハブです。
 
 ---
 
+## Learning Resources
+
+| 目的 | ドキュメント |
+|------|-------------|
+| 学習パス | [LEARNING_PATH.md](dev/LEARNING_PATH.md) |
+| 設計判断 | [DESIGN_DECISIONS.md](dev/DESIGN_DECISIONS.md) |
+
+---
+
 ## Developer Documentation
 
 | 目的 | ドキュメント | 概要 |

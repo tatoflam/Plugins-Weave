@@ -28,6 +28,13 @@ class ShadowUpdater:
     （FileAppender, CascadeProcessor, PlaceholderManager）を統合して
     シンプルなAPIを提供します。
 
+    Design Pattern: Facade
+        複雑なサブシステムをシンプルなインターフェースで隠蔽。
+
+    Learning Point:
+        呼び出し側は内部コンポーネントの存在を意識せずにShadow操作が可能。
+        内部実装の変更が外部APIに影響しないため、保守性が向上。
+
     設計意図:
     - 呼び出し側は内部コンポーネントの存在を意識せずにShadow操作が可能
     - 内部コンポーネントの変更が外部に影響しない（カプセル化）

@@ -5,6 +5,21 @@ Digest Plugin Configuration Manager
 
 Plugin自己完結版：Plugin内の.claude-plugin/config.jsonから設定を読み込む
 
+## ⚠️ CRITICAL: Config層の独立性
+
+このパッケージは **domain/ を含む他のすべての層から完全に独立** しています。
+
+**理由**: Config層は `digest-config` スキルの本体であり、Claudeプラグインとして
+単独でロード可能である必要があります。Domain層への依存があると、プラグインの
+初期化順序やCircular Importの問題が発生します。
+
+**禁止**: `from domain import ...` をこのパッケージ内で使用しないでください。
+
+Config層が必要とする型・例外・定数は、すべて以下に独自定義されています:
+- `config/types.py` - TypedDict定義
+- `config/exceptions.py` - ConfigError例外
+- `config/constants.py` - LEVEL_CONFIG, LEVEL_NAMES
+
 ## 設計意図
 
 ARCHITECTURE: Thin Facade Pattern
@@ -68,6 +83,14 @@ class DigestConfig:
 
     薄い Facade として機能し、各コンポーネントに責任を委譲。
     後方互換性を維持しつつ、内部実装を分離。
+
+    Design Pattern: Facade
+        複雑なサブシステム（PathResolver, ThresholdProvider等）を
+        単純なインターフェースで隠蔽。
+
+    Learning Point:
+        利用者は DigestConfig のみをインポートすれば設定にアクセス可能。
+        内部コンポーネントへの直接アクセスを防ぎ、変更に強い設計を実現。
 
     Components:
         - _config_loader: ConfigLoader - 設定ファイルの読み込み

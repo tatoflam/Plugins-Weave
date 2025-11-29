@@ -112,6 +112,13 @@ class LevelBehavior(ABC):
     新しい振る舞いが必要な場合、このクラスを継承して実装を追加。
     既存コードを修正せずに拡張可能（OCP準拠）。
 
+    Design Pattern: Strategy
+        振る舞いをカプセル化し、実行時に交換可能にする。
+
+    Learning Point:
+        新しいレベルタイプを追加する際は、このクラスを継承した
+        新クラスを作成するだけで対応可能。既存コードの修正は不要（OCP）。
+
     ## ARCHITECTURE: Strategy Pattern の Context
     このクラスが Strategy の抽象インターフェースを定義。
     StandardLevelBehavior, LoopLevelBehavior が具象 Strategy。
