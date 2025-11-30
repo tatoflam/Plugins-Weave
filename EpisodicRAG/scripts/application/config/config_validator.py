@@ -7,7 +7,7 @@ Config Validator
 DirectoryValidator の機能を包含し、さらに設定検証機能を追加。
 
 Usage:
-    from config.config_validator import ConfigValidator
+    from application.config import ConfigValidator
 
     validator = ConfigValidator(config, loops_path, digests_path, essences_path, level_path_service)
     errors = validator.validate_all()
@@ -18,11 +18,12 @@ Usage:
 from pathlib import Path
 from typing import Dict, List, Optional
 
-from .config_constants import REQUIRED_CONFIG_KEYS, THRESHOLD_KEYS
-from .constants import LEVEL_CONFIG, LEVEL_NAMES
-from .level_path_service import LevelPathService
-from .types import ConfigData, as_dict
-from .validation import collect_type_error as _collect_type_error
+from domain.config.config_constants import REQUIRED_CONFIG_KEYS, THRESHOLD_KEYS
+from domain.config.validation import collect_type_error as _collect_type_error
+from domain.constants import LEVEL_CONFIG, LEVEL_NAMES
+from domain.types import ConfigData, as_dict
+
+from application.config.level_path_service import LevelPathService
 
 
 class ConfigValidator:

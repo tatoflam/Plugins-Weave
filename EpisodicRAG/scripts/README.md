@@ -142,7 +142,7 @@ from interfaces.provisional import ProvisionalMerger
 | `threshold_provider.py` | 閾値提供 |
 
 ```python
-from config import DigestConfig
+from application.config import DigestConfig
 
 config = DigestConfig()
 print(config.loops_path)

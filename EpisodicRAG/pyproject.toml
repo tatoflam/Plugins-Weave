@@ -62,6 +62,7 @@ markers = [
     "slow: 時間のかかるテスト",
     "property: Property-based tests using hypothesis",
     "performance: パフォーマンス・ベンチマークテスト",
+    "cli: CLI統合テスト（subprocess経由）",
 ]
 
 # デフォルトオプション

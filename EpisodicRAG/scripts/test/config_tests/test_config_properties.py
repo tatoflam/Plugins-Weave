@@ -133,7 +133,7 @@ class TestConfigThresholdInvariants:
         Note: LEVEL_CONFIGにthresholdを統合（Single Source of Truth）。
         このテストはLEVEL_CONFIGの閾値が正しく適用されていることを検証。
         """
-        from config import DigestConfig
+        from application.config import DigestConfig
         from domain.constants import LEVEL_CONFIG
 
         digest_config = DigestConfig(plugin_root=temp_plugin_env.plugin_root)
@@ -170,7 +170,7 @@ class TestPathResolutionInvariants:
         """
         get_level_dir()は絶対パスを返す
         """
-        from config import DigestConfig
+        from application.config import DigestConfig
 
         config = DigestConfig(plugin_root=temp_plugin_env.plugin_root)
         level_dir = config.get_level_dir(level)
@@ -186,7 +186,7 @@ class TestPathResolutionInvariants:
         """
         get_level_dir()のパスにレベル関連の名前が含まれる
         """
-        from config import DigestConfig
+        from application.config import DigestConfig
 
         config = DigestConfig(plugin_root=temp_plugin_env.plugin_root)
         level_dir = config.get_level_dir(level)

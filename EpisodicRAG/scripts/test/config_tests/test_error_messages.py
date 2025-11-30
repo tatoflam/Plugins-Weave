@@ -20,7 +20,7 @@ from pathlib import Path
 
 import pytest
 
-from config.error_messages import (
+from infrastructure.config.error_messages import (
     config_invalid_value_message,
     config_key_missing_message,
     config_section_missing_message,

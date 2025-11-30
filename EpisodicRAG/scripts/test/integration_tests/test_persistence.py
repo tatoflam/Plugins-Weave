@@ -18,7 +18,7 @@ from test_helpers import create_test_loop_file
 from application.finalize import DigestPersistence
 from application.grand import GrandDigestManager, ShadowGrandDigestManager
 from application.tracking import DigestTimesTracker
-from config import DigestConfig
+from application.config import DigestConfig
 from domain.exceptions import DigestError
 
 # slow マーカーを適用（ファイル全体）

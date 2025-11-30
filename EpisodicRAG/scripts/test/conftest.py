@@ -89,6 +89,7 @@ def pytest_configure(config):
     config.addinivalue_line("markers", "fast: 高速テスト（純粋ロジック、I/Oなし）")
     config.addinivalue_line("markers", "property: Property-based tests using hypothesis")
     config.addinivalue_line("markers", "performance: パフォーマンス・ベンチマークテスト")
+    config.addinivalue_line("markers", "cli: CLI統合テスト（subprocess経由）")
 
 
 # =============================================================================
@@ -148,7 +149,7 @@ def digest_config(temp_plugin_env):
     """
     初期化済みのDigestConfigインスタンスを提供
     """
-    from config import DigestConfig
+    from application.config import DigestConfig
 
     return DigestConfig(plugin_root=temp_plugin_env.plugin_root)
 

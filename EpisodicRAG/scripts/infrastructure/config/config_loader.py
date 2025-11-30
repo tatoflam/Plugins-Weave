@@ -7,7 +7,7 @@ Config Loader
 config.json の読み込み、キャッシュ、アクセスを一元管理。
 
 Usage:
-    from config.config_loader import ConfigLoader
+    from infrastructure.config import ConfigLoader
 
     loader = ConfigLoader(config_file)
     config = loader.load()
@@ -18,10 +18,15 @@ import json
 from pathlib import Path
 from typing import Any, List, Optional
 
-from .config_constants import REQUIRED_CONFIG_KEYS
-from .error_messages import config_key_missing_message, file_not_found_message, invalid_json_message
-from .exceptions import ConfigError
-from .types import ConfigData, as_dict, is_config_data
+from domain.config.config_constants import REQUIRED_CONFIG_KEYS
+from domain.exceptions import ConfigError
+from domain.types import ConfigData, as_dict, is_config_data
+
+from infrastructure.config.error_messages import (
+    config_key_missing_message,
+    file_not_found_message,
+    invalid_json_message,
+)
 
 
 class ConfigLoader:

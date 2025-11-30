@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 """
-Config層専用のエラーメッセージ関数
-==================================
+Config Error Messages
+=====================
 
-Config層をDomain層から独立させるためのシンプルなエラーメッセージ生成。
-domain/error_formatter/config_errors.py の機能を簡略化して提供。
+設定関連のエラーメッセージ生成関数。
 
 Usage:
-    from config.error_messages import (
+    from infrastructure.config.error_messages import (
         invalid_level_message,
         config_key_missing_message,
         file_not_found_message,

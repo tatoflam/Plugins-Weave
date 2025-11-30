@@ -20,7 +20,7 @@ import pytest
 from test_helpers import create_test_loop_file
 
 from application.grand import ShadowGrandDigestManager
-from config import DigestConfig
+from application.config import DigestConfig
 from domain.constants import LEVEL_NAMES
 
 # 統合テストマーカー

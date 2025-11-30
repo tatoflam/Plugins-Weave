@@ -10,7 +10,7 @@ from pathlib import Path
 
 import pytest
 
-from config.plugin_root_resolver import find_plugin_root
+from infrastructure.config.plugin_root_resolver import find_plugin_root
 
 
 class TestFindPluginRoot:

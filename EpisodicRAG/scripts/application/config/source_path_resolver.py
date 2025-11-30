@@ -6,7 +6,7 @@ Source Path Resolver
 レベル別ソースファイルディレクトリとパターンの解決を担当。
 
 Usage:
-    from config.source_path_resolver import SourcePathResolver
+    from application.config import SourcePathResolver
 
     resolver = SourcePathResolver(loops_path, level_path_service)
     source_dir = resolver.get_source_dir("weekly")
@@ -15,9 +15,10 @@ Usage:
 
 from pathlib import Path
 
-from .constants import LEVEL_CONFIG, LEVEL_NAMES, SOURCE_TYPE_LOOPS
-from .exceptions import ConfigError
-from .level_path_service import LevelPathService
+from domain.constants import LEVEL_CONFIG, LEVEL_NAMES, SOURCE_TYPE_LOOPS
+from domain.exceptions import ConfigError
+
+from application.config.level_path_service import LevelPathService
 
 
 class SourcePathResolver:

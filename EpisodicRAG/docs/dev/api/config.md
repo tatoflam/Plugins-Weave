@@ -154,7 +154,7 @@ plugin_root外でアクセスを許可する絶対パスのリスト
 
 ---
 
-## DigestConfig クラス（config/__init__.py）
+## DigestConfig クラス（application/config/__init__.py）
 
 ```python
 class DigestConfig:
@@ -203,19 +203,19 @@ def validate_directory_structure(self) -> list
 
 ## CLI使用方法
 
-### config モジュール
+### interfaces.config_cli モジュール
 
 ```bash
 cd scripts
 
 # 設定をJSON形式で表示
-python -m config
+python -m interfaces.config_cli
 
 # パス設定を表示
-python -m config --show-paths
+python -m interfaces.config_cli --show-paths
 
 # プラグインルートを指定
-python -m config --plugin-root /path/to/plugin
+python -m interfaces.config_cli --plugin-root /path/to/plugin
 ```
 
 ### テスト実行

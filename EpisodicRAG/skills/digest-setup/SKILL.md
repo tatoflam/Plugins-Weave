@@ -11,7 +11,7 @@ EpisodicRAG プラグインの初期セットアップを対話的に実行す�
 
 - [用語説明](#用語説明)
 - [セットアップフロー](#セットアップフロー)
-- [実装時の注意事項](#実装時の注意事項)
+- [CLIスクリプト](#cliスクリプト)
 - [スキルの自律判断](#スキルの自律判断)
 - [デフォルト設定例](#デフォルト設定例)
 
@@ -21,494 +21,112 @@ EpisodicRAG プラグインの初期セットアップを対話的に実行す�
 
 ## セットアップフロー
 
-### 1. 設定ファイル確認
+### 概要
 
-まず、既存の設定ファイルを確認します：
+1. 既存設定ファイル確認（再設定確認）
+2. 対話的Q&A（Claudeが実施）
+   - Q1: Loopファイル配置先
+   - Q2: Digestsファイル配置先
+   - Q3: Essencesファイル配置先
+   - Q4: 外部Identity.md
+   - Q5: Threshold設定
+3. 設定ファイル作成
+4. ディレクトリ作成（8階層 + Provisional）
+5. 初期ファイル作成（テンプレートからコピー）
+6. 完了報告（外部パス警告含む）
 
-```python
-from pathlib import Path
-import sys
+---
 
-# プラグインルートの検出
-plugin_root = Path("{PLUGIN_ROOT}")  # 実際のパスに調整
-# 例: ~/.claude/plugins/EpisodicRAG-Plugin@Plugins-Weave
-config_file = plugin_root / ".claude-plugin" / "config.json"
+## CLIスクリプト
 
-if config_file.exists():
-    # 既にセットアップ済み
-    print("⚠️ 既にセットアップ済みです")
-    print(f"設定ファイル: {config_file}")
+### 配置先
 
-    # 再設定の確認
-    user_response = input("再設定しますか？ (y/N): ")
-    if user_response.lower() != 'y':
-        print("セットアップをキャンセルしました")
-        sys.exit(0)
+```
+scripts/interfaces/digest_setup.py
 ```
 
-### 2. 対話的設定
+### コマンド
 
-以下の質問に対話的に回答してもらいます：
+#### セットアップ状態確認
 
-#### Q1: Loop ファイルの配置先
-
-```text
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📂 Q1: Loopファイルの配置先を選択してください
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-💡 Loopとは？
-会話セッションの記録ファイルです。各会話が1つのLoopファイル
-として保存され、EpisodicRAGシステムの基礎データとなります。
-
-[1] data/Loops (デフォルト、完全自己完結)
-    - プラグイン内に全データを保持
-    - プラグイン削除で全て綺麗に消える
-    - 推奨: 新規プロジェクト
-
-[2] カスタムパス（既存プロジェクト統合）
-    - 既存のLoopディレクトリを共有
-    - 例: ../../../EpisodicRAG/Loops
-    - 推奨: 既存プロジェクトとの統合
-
-選択 (1/2):
+```bash
+python -m interfaces.digest_setup check
 ```
 
-#### Q2: Digests ファイルの配置先
-
-```text
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📂 Q2: Digestsファイルの配置先を選択してください
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-💡 Digestsとは？
-複数のLoopファイルを要約・統合した階層的な記録です。
-週次→月次→四半期...と8階層で時間軸の記憶を構造化します。
-
-[1] data/Digests (デフォルト、完全自己完結)
-    - プラグイン内に全データを保持
-    - プラグイン削除で全て綺麗に消える
-    - 推奨: 新規プロジェクト
-
-[2] カスタムパス（既存プロジェクト統合）
-    - 既存のDigestsディレクトリを共有
-    - 例: homunculus/Weave/EpisodicRAG/Digests
-    - 推奨: 既存プロジェクトとの統合
-
-選択 (1/2):
-```
-
-#### Q3: Essences ファイルの配置先
-
-```text
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📂 Q3: Essencesファイルの配置先を選択してください
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-💡 Essencesとは？
-GrandDigest（全階層の要約マップ）やShadowGrandDigest
-（並行処理用の作業データ）などのメタ情報を保存するディレクトリです。
-記憶の本質的な抽出物（エッセンス）を格納します。
-
-[1] data/Essences (デフォルト、完全自己完結)
-    - プラグイン内に全データを保持
-    - プラグイン削除で全て綺麗に消える
-    - 推奨: 新規プロジェクト
-
-[2] カスタムパス（既存プロジェクト統合）
-    - 既存のEssencesディレクトリを共有
-    - 例: homunculus/Weave/EpisodicRAG/Essences
-    - 推奨: 既存プロジェクトとの統合
-
-選択 (1/2):
-```
-
-#### Q4: 外部 Identity.md ファイル
-
-```text
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📄 Q4: 外部Identity.mdファイルを使用しますか？
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-💡 外部Identity.mdファイルとは？
-AIの自己認識、ペルソナ、プロジェクト固有の文脈情報を
-記述したファイルです。Weaveなどの統合システムで
-外部のIdentityファイルを参照する際に使用します（オプション）。
-
-[1] 使用しない（デフォルト）
-    - Identityファイルなしで運用
-
-[2] パスを指定
-    - 既存のIdentity.mdファイルを参照
-    - 例: ../../../Identities/WeaveIdentity.md
-
-選択 (1/2):
-```
-
-#### Q5: Threshold 設定
-
-```text
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-⚙️ Q5: Threshold設定（各階層の生成に必要なファイル数）
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-💡 Thresholdとは？
-各階層のDigestを生成するために必要な最小ファイル数です。
-例：Weekly Threshold=5 の場合、5つのLoopファイルが揃うと
-週次Digestの自動生成対象となります。
-
-[1] デフォルト値を使用（推奨）
-    - Weekly: 5 Loops
-    - Monthly: 5 Weekly
-    - Quarterly: 3 Monthly
-    - Annual: 4 Quarterly
-    - Triennial: 3 Annual
-    - Decadal: 3 Triennial
-    - Multi-decadal: 3 Decadal
-    - Centurial: 4 Multi-decadal
-
-[2] カスタマイズ
-    - 各階層のthresholdを個別に設定
-
-選択 (1/2):
-```
-
-### 3. 設定ファイル作成
-
-ユーザーの回答に基づいて、設定ファイルを作成します：
-
-```python
-import json
-from pathlib import Path
-
-# 設定データ作成
-config_data = {
-    "_comment_base_dir": "データの基準ディレクトリ（. = プラグイン内、~/path = 外部パス）",
-    "base_dir": ".",  # パス解決の基準ディレクトリ（プラグインルート）
-
-    "_comment_trusted_external_paths": "plugin_root外でアクセスを許可する絶対パス（セキュリティ: デフォルトは空）",
-    "trusted_external_paths": [],  # 外部パス使用時のみ設定
-
-    "_comment_paths": "base_dirからの相対パスでデータ配置先を指定",
-    "paths": {
-        "loops_dir": loops_dir,  # Q1の回答
-        "digests_dir": digests_dir,  # Q2の回答
-        "essences_dir": essences_dir,  # Q3の回答
-        "identity_file_path": identity_file_path  # Q4の回答（nullまたはパス）
-    },
-
-    "_comment_levels": "各階層のダイジェスト生成に必要なファイル数（Threshold）",
-    "levels": {
-        "weekly_threshold": weekly_threshold,  # Q5の回答
-        "monthly_threshold": monthly_threshold,
-        "quarterly_threshold": quarterly_threshold,
-        "annual_threshold": annual_threshold,
-        "triennial_threshold": triennial_threshold,
-        "decadal_threshold": decadal_threshold,
-        "multi_decadal_threshold": multi_decadal_threshold,
-        "centurial_threshold": centurial_threshold
-    }
+**出力例（未セットアップ）:**
+```json
+{
+  "status": "not_configured",
+  "config_exists": false,
+  "directories_exist": false,
+  "message": "Initial setup required"
 }
-
-# 設定ファイル書き込み（Write toolを使用）
-config_file = plugin_root / ".claude-plugin" / "config.json"
-with open(config_file, 'w', encoding='utf-8') as f:
-    json.dump(config_data, f, indent=2, ensure_ascii=False)
-
-print(f"✅ 設定ファイルを作成しました: {config_file}")
 ```
 
-### 4. ディレクトリ作成
-
-必要なディレクトリを作成します：
-
-```python
-from pathlib import Path
-
-# パスの解決（相対パスの場合、plugin_root基準で解決）
-loops_path = Path(loops_dir)
-if not loops_path.is_absolute():
-    loops_path = plugin_root / loops_dir
-
-digests_path = Path(digests_dir)
-if not digests_path.is_absolute():
-    digests_path = plugin_root / digests_dir
-
-essences_path = Path(essences_dir)
-if not essences_path.is_absolute():
-    essences_path = plugin_root / essences_dir
-
-# ディレクトリリスト
-directories = [
-    loops_path,
-    digests_path / "1_Weekly",
-    digests_path / "2_Monthly",
-    digests_path / "3_Quarterly",
-    digests_path / "4_Annual",
-    digests_path / "5_Triennial",
-    digests_path / "6_Decadal",
-    digests_path / "7_Multi-decadal",
-    digests_path / "8_Centurial",
-    digests_path / "1_Weekly" / "Provisional",
-    digests_path / "2_Monthly" / "Provisional",
-    digests_path / "3_Quarterly" / "Provisional",
-    digests_path / "4_Annual" / "Provisional",
-    digests_path / "5_Triennial" / "Provisional",
-    digests_path / "6_Decadal" / "Provisional",
-    digests_path / "7_Multi-decadal" / "Provisional",
-    digests_path / "8_Centurial" / "Provisional",
-    essences_path,
-]
-
-for directory in directories:
-    directory.mkdir(parents=True, exist_ok=True)
-    print(f"  ✅ {directory}")
-
-print(f"\n✅ ディレクトリ作成完了")
+**出力例（セットアップ済み）:**
+```json
+{
+  "status": "configured",
+  "config_exists": true,
+  "directories_exist": true,
+  "config_file": "/path/to/config.json",
+  "message": "Setup already completed"
+}
 ```
 
-### 5. 初期ファイル作成
+#### セットアップ実行
 
-GrandDigest.txt と ShadowGrandDigest.txt を初期化します：
-
-```python
-# 初期ファイル作成（テンプレートから）
-import shutil
-
-# GrandDigest.txt初期化（テンプレートから）
-template_file = plugin_root / ".claude-plugin" / "GrandDigest.template.txt"
-grand_digest_file = essences_path / "GrandDigest.txt"
-
-if template_file.exists():
-    shutil.copy(template_file, grand_digest_file)
-    print(f"  ✅ GrandDigest.txt 初期化完了（テンプレートから作成）")
-else:
-    print(f"  ⚠️  テンプレートファイルが見つかりません: {template_file}")
-
-# ShadowGrandDigest.txt初期化（テンプレートから）
-template_file = plugin_root / ".claude-plugin" / "ShadowGrandDigest.template.txt"
-shadow_digest_file = essences_path / "ShadowGrandDigest.txt"
-
-if template_file.exists():
-    shutil.copy(template_file, shadow_digest_file)
-    print(f"  ✅ ShadowGrandDigest.txt 初期化完了（テンプレートから作成）")
-else:
-    print(f"  ⚠️  テンプレートファイルが見つかりません: {template_file}")
-
-# last_digest_times.json初期化（テンプレートから）
-template_file = plugin_root / ".claude-plugin" / "last_digest_times.template.json"
-last_digest_times_file = plugin_root / ".claude-plugin" / "last_digest_times.json"
-
-if template_file.exists():
-    shutil.copy(template_file, last_digest_times_file)
-    print(f"  ✅ last_digest_times.json 初期化完了（テンプレートから作成）")
-else:
-    print(f"  ⚠️  テンプレートファイルが見つかりません: {template_file}")
+```bash
+python -m interfaces.digest_setup init --config '{
+  "base_dir": ".",
+  "paths": {
+    "loops_dir": "data/Loops",
+    "digests_dir": "data/Digests",
+    "essences_dir": "data/Essences",
+    "identity_file_path": null
+  },
+  "levels": {
+    "weekly_threshold": 5,
+    "monthly_threshold": 5,
+    "quarterly_threshold": 3,
+    "annual_threshold": 4,
+    "triennial_threshold": 3,
+    "decadal_threshold": 3,
+    "multi_decadal_threshold": 3,
+    "centurial_threshold": 4
+  }
+}'
 ```
 
-### 6. 完了報告
-
-セットアップ完了を報告し、次のステップを案内します：
-
-```text
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-✅ セットアップ完了
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Base Directory (plugin_rootからの相対パス):
-  🔧 base_dir: {base_dir}
-
-Paths (base_dirからの相対パス):
-  📂 loops_dir: {loops_dir}
-  📂 digests_dir: {digests_dir}
-  📂 essences_dir: {essences_dir}
-  📄 identity_file_path: {identity_file_path または "null"}
-
-Threshold設定:
-  - Weekly: 5 Loops
-  - Monthly: 5 Weekly
-  - Quarterly: 3 Monthly
-  - Annual: 4 Quarterly
-  - Triennial: 3 Annual
-  - Decadal: 3 Triennial
-  - Multi-decadal: 3 Decadal
-  - Centurial: 4 Multi-decadal
+**出力例（成功）:**
+```json
+{
+  "status": "ok",
+  "created": {
+    "config_file": "/path/to/config.json",
+    "directories": ["data/Loops", "data/Digests/1_Weekly", ...],
+    "files": ["GrandDigest.txt", "ShadowGrandDigest.txt", "last_digest_times.json"]
+  },
+  "warnings": [],
+  "external_paths_detected": []
+}
 ```
 
-#### 外部パス検出（条件付き表示）
+#### 強制再セットアップ
 
-設定されたパスを検査し、プラグイン外を指すパスがあれば警告を表示します：
-
-```python
-# 外部パス検出ロジック
-from pathlib import Path
-
-def is_external_path(path_str: str, plugin_root: Path) -> bool:
-    """パスがplugin_root外を指すか判定"""
-    if path_str is None:
-        return False
-
-    path = Path(path_str).expanduser()
-
-    # 絶対パスまたはチルダで始まる場合
-    if path.is_absolute():
-        try:
-            path.resolve().relative_to(plugin_root.resolve())
-            return False  # plugin_root内
-        except ValueError:
-            return True  # plugin_root外
-
-    # 相対パスで上位ディレクトリに出る場合
-    if ".." in str(path):
-        resolved = (plugin_root / path).resolve()
-        try:
-            resolved.relative_to(plugin_root.resolve())
-            return False
-        except ValueError:
-            return True
-
-    return False
-
-# 検出実行
-external_paths = []
-
-if is_external_path(base_dir, plugin_root):
-    external_paths.append(f"base_dir: {base_dir}")
-
-if identity_file_path and is_external_path(identity_file_path, plugin_root):
-    external_paths.append(f"identity_file_path: {identity_file_path}")
-
-# 警告表示（外部パスが検出された場合のみ）
-if external_paths:
-    # 以下の警告ブロックを表示
+```bash
+python -m interfaces.digest_setup init --config '...' --force
 ```
 
-外部パスが検出された場合のみ、以下の警告を表示：
+### Claudeによる対話フロー
 
-```text
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-⚠️ 外部パスが検出されました
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Claudeは `check` コマンドでセットアップ状態を確認
+2. ユーザーに対話的に設定値を質問
+3. 収集した設定を JSON に構築
+4. `init` コマンドでセットアップを実行
+5. 結果をユーザーに報告
 
-以下のパスはプラグイン外を指しています:
-  - base_dir: ~/Google Drive/EpisodicRAG
-  - identity_file_path: ~/Documents/Identity.md
-
-外部パスを使用するには trusted_external_paths の設定が必要です。
-このまま使用するとエラーになります。
-
-👉 続けて @digest-config を実行し、[5] trusted_external_paths を設定してください。
-```
-
-外部パスが検出されなかった場合は、この警告ブロックは表示しません。
-
-```text
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📚 次のステップ
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-## 1. 会話ログを保存する
-
-**推奨ツール（Chrome Extension）:**
-
-会話ログを簡単に保存できるChrome Extensionを推奨します：
-- **Save - Conversation Saver**
-  URL: https://save.hugocollin.com/
-
-  Claude/ChatGPTの会話を丸ごと保存できます。
-
-**Loop命名ルール：**
-- 形式: `L[連番]_[タイトル].txt`
-- 連番: 5桁の数字（大きいほど新しい記録）
-- タイトル: 英数字、日本語、ハイフン、アンダースコアなど
-- 正規表現: `^L[0-9]+_[\p{L}\p{N}ー・\w]+\.txt$`
-
-例:
-  L00001_初回セッション.txt
-  L00002_プロジェクト設計.txt
-  L00003_実装_Phase1.txt
-
-**配置先:**
-  {loops_dir}/L00001_タイトル.txt
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-## 2. 最初の分析を実行
-
-Loopファイルを配置したら：
-
-  /digest
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-## 3. システム状態を確認
-
-  @digest-auto
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🔄 セッション間で記憶を引き継ぐ（重要）
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-EpisodicRAGの最も重要な機能は、**セッション間で記憶を引き継ぐ**ことです。
-
-### GitHub連携のセットアップ（必須）
-
-1. **GitHubリポジトリを作成**
-
-   gh repo create {YOUR_REPO_NAME} --public
-
-2. **Essencesをpush**
-
-   cd {essences_dir}
-   git init
-   git add GrandDigest.txt ShadowGrandDigest.txt
-   git commit -m "Initial commit: EpisodicRAG memory"
-   git remote add origin https://github.com/{USER}/{REPO}.git
-   git push -u origin main
-
-3. **記憶読み込みの設定**
-
-   環境に応じて貼り付け先が異なります：
-   - 📱 **Claude WebChat**: プロジェクト指示（Project Instruction）にコピペ
-   - 💻 **Claude Code**: `.claude/CLAUDE.md` にコピペ
-
-   ┌────────────────────────────────────────┐
-   │ コピー＆ペースト用テンプレート         │
-   └────────────────────────────────────────┘
-
-   ## セッション開始時の必須動作
-
-   1. ユーザーに以下のURLを提示し、最新の`{SHA}`の取得を依頼：
-      `https://api.github.com/repos/{USER}/{REPO}/git/refs/heads/main`
-      # キャッシュバスティングのため、ユーザーから`{SHA}`を受け取る
-
-   2. 取得した`{SHA}`を使って以下の2つのURLを生成し、ユーザーに提示：
-      `https://raw.githubusercontent.com/{USER}/{REPO}/{SHA}/{ESSENCES_PATH}/GrandDigest.txt`
-      `https://raw.githubusercontent.com/{USER}/{REPO}/{SHA}/{ESSENCES_PATH}/ShadowGrandDigest.txt`
-      # {ESSENCES_PATH} は GitHubリポジトリ内のEssencesディレクトリへの相対パス
-
-   3. ユーザーから2つのURLの`web_fetch`承認を取得し、長期記憶にアクセス
-
-   > ⚠️ この手順をスキップすると、AIは過去の記憶を持たない状態で開始します
-
-   ┌────────────────────────────────────────┐
-   │ {USER}、{REPO}、{ESSENCES_PATH} を実際の値に置き換えてください │
-   └────────────────────────────────────────┘
-
-**詳細な設定方法**: docs/ADVANCED.md を参照
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🎉 EpisodicRAGの準備が整いました！
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-📖 詳細なワークフローは GUIDE.md を参照してください
-```
-
-> 📖 **次のステップ**: 詳細なワークフロー例は [GUIDE.md](../../docs/user/GUIDE.md#3-日常ワークフロー) を参照してください。
-
-## 実装時の注意事項
-
-> 📖 共通の実装ガイドライン（パス検証、閾値検証、エラーハンドリング）は [_implementation-notes.md](../shared/_implementation-notes.md) を参照してください。
+---
 
 ## スキルの自律判断
 
@@ -520,25 +138,22 @@ EpisodicRAGの最も重要な機能は、**セッション間で記憶を引き�
 - 設定の上書きは慎重に行うべき
 - ユーザーの意図を確認する必要がある
 
+---
+
 ## デフォルト設定例
+
+### 完全自己完結型（デフォルト）
 
 ```json
 {
-  "_comment_base_dir": "データの基準ディレクトリ（. = プラグイン内、~/path = 外部パス）",
   "base_dir": ".",
-
-  "_comment_trusted_external_paths": "plugin_root外でアクセスを許可する絶対パス（セキュリティ: デフォルトは空）",
   "trusted_external_paths": [],
-
-  "_comment_paths": "base_dirからの相対パスでデータ配置先を指定",
   "paths": {
     "loops_dir": "data/Loops",
     "digests_dir": "data/Digests",
     "essences_dir": "data/Essences",
     "identity_file_path": null
   },
-
-  "_comment_levels": "各階層のダイジェスト生成に必要なファイル数（Threshold）",
   "levels": {
     "weekly_threshold": 5,
     "monthly_threshold": 5,
@@ -552,9 +167,7 @@ EpisodicRAGの最も重要な機能は、**セッション間で記憶を引き�
 }
 ```
 
-### 外部ディレクトリ使用時の設定例
-
-既存プロジェクトのデータを使用する場合：
+### 外部ディレクトリ使用時
 
 ```json
 {
@@ -571,6 +184,12 @@ EpisodicRAGの最も重要な機能は、**セッション間で記憶を引き�
 ```
 
 > 📖 `trusted_external_paths` の詳細は [用語集](../../README.md#trusted_external_paths) を参照
+
+---
+
+## 実装時の注意事項
+
+> 📖 共通の実装ガイドライン（パス検証、閾値検証、エラーハンドリング）は [_implementation-notes.md](../shared/_implementation-notes.md) を参照してください。
 
 ---
 

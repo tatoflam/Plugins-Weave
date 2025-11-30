@@ -18,9 +18,9 @@ from typing import cast
 
 import pytest
 
-from config.config_validator import ConfigValidator, DirectoryValidator
-from config.level_path_service import LevelPathService
-from config.types import ConfigData
+from application.config.config_validator import ConfigValidator, DirectoryValidator
+from application.config.level_path_service import LevelPathService
+from domain.types import ConfigData
 
 # =============================================================================
 # フィクスチャ

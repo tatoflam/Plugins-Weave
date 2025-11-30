@@ -10,7 +10,7 @@ finalize_from_shadow.py から分離。
 from datetime import datetime
 from typing import List, Optional, Union, cast
 
-from config import DigestConfig
+from application.config import DigestConfig
 from domain.constants import LEVEL_NAMES
 from domain.file_naming import extract_number_only, extract_numbers_formatted
 from domain.types import DigestTimesData

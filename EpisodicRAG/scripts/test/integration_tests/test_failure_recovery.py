@@ -25,7 +25,7 @@ class TestCascadeFailureRecovery:
 
     def test_cascade_interrupted_by_missing_next_level_dir(self, temp_plugin_env):
         """Cascade should handle missing next level directory gracefully."""
-        from config import DigestConfig
+        from application.config import DigestConfig
 
         # Setup: Create weekly Shadow with entries
         weekly_shadow_path = temp_plugin_env.digests_path / "1_Weekly" / "ShadowWeekly.txt"
@@ -169,7 +169,7 @@ class TestErrorStateRecovery:
 
     def test_recover_from_invalid_config(self, temp_plugin_env):
         """System should handle missing config file by using defaults."""
-        from config import DigestConfig
+        from application.config import DigestConfig
 
         # Don't create config file - DigestConfig should use template/defaults
         # TempPluginEnvironment already sets up proper structure

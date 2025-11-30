@@ -9,8 +9,8 @@ GrandDigest更新後に作成された新しいファイルを検出
 from pathlib import Path
 from typing import List, Optional
 
+from application.config import DigestConfig
 from application.tracking import DigestTimesTracker
-from config import DigestConfig
 from domain.constants import LEVEL_CONFIG, build_level_hierarchy
 from domain.file_naming import filter_files_after
 

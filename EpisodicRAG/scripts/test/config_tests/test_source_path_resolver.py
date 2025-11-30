@@ -12,8 +12,8 @@ from pathlib import Path
 import pytest
 from test_helpers import TempPluginEnvironment
 
-from config import DigestConfig
-from config.exceptions import ConfigError
+from application.config import DigestConfig
+from domain.exceptions import ConfigError
 from domain.constants import LEVEL_CONFIG
 
 # =============================================================================

@@ -10,8 +10,8 @@ import json
 
 import pytest
 
-from config.config_repository import load_config
-from config.exceptions import ConfigError
+from infrastructure.config.config_repository import load_config
+from domain.exceptions import ConfigError
 
 
 class TestLoadConfig:

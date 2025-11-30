@@ -7,11 +7,13 @@ Test Helpers Module
 本番環境と同一のディレクトリ構造を作成し、テスト間で一貫性を確保。
 """
 
+import importlib
 import json
 import shutil
 import tempfile
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Tuple, Union
+from unittest.mock import patch
 
 # 本番環境と同じディレクトリ構造定義
 LEVEL_DIRS = [
@@ -363,3 +365,139 @@ class TempPluginEnvironment:
         with open(file_path, 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
         return file_path
+
+
+class CLITestHelper:
+    """
+    CLI テスト用ヘルパークラス
+
+    In-Processテスト向け。sys.argvをパッチしてCLIコマンドを実行し、
+    終了コードと出力を返す。
+
+    Usage:
+        exit_code, output = CLITestHelper.run_cli_command(
+            "digest_config",
+            ["show"],
+            plugin_root
+        )
+        CLITestHelper.assert_json_output_ok(output)
+    """
+
+    @staticmethod
+    def run_cli_command(
+        module_name: str,
+        args: list,
+        plugin_root: Path,
+    ) -> Tuple[int, Union[Dict[str, Any], str]]:
+        """
+        CLIコマンドを実行し、終了コードと出力を返す
+
+        Args:
+            module_name: "digest_auto" | "digest_config" | "digest_setup" |
+                        "finalize_from_shadow" | "save_provisional_digest" |
+                        "shadow_state_checker"
+            args: コマンドライン引数リスト（--plugin-root は自動追加）
+            plugin_root: テスト用プラグインルート
+
+        Returns:
+            (exit_code, output): 終了コードと出力
+            - outputはJSONとしてパース可能ならdict、それ以外はstr
+        """
+        full_args = [f"{module_name}.py", "--plugin-root", str(plugin_root)] + args
+
+        exit_code = 0
+        output: Union[Dict[str, Any], str] = ""
+        captured_outputs: list = []
+
+        with patch("sys.argv", full_args):
+            # モジュールをリロードして新しいsys.argvを反映
+            module = importlib.import_module(f"interfaces.{module_name}")
+            # モジュールをリロード（キャッシュされた状態をクリア）
+            importlib.reload(module)
+
+            with patch("builtins.print", side_effect=lambda x: captured_outputs.append(x)):
+                try:
+                    module.main()
+                except SystemExit as e:
+                    exit_code = e.code if e.code is not None else 0
+
+            # 出力を結合
+            if captured_outputs:
+                raw_output = captured_outputs[0] if len(captured_outputs) == 1 else "\n".join(str(o) for o in captured_outputs)
+            else:
+                raw_output = ""
+
+        # JSONとしてパースを試行
+        if isinstance(raw_output, str):
+            try:
+                output = json.loads(raw_output)
+            except (json.JSONDecodeError, TypeError):
+                output = raw_output
+        else:
+            output = raw_output
+
+        return exit_code, output
+
+    @staticmethod
+    def assert_json_output_ok(result: Union[Dict[str, Any], str]) -> None:
+        """
+        JSON出力がOKステータスであることを確認
+
+        Args:
+            result: run_cli_commandの出力
+
+        Raises:
+            AssertionError: ステータスがokでない場合
+        """
+        assert isinstance(result, dict), f"Output should be JSON object, got: {type(result)}"
+        assert result.get("status") == "ok", f"Expected status=ok, got {result.get('status')}: {result}"
+
+    @staticmethod
+    def assert_json_output_error(
+        result: Union[Dict[str, Any], str],
+        error_contains: Optional[str] = None,
+    ) -> None:
+        """
+        JSON出力がエラーステータスであることを確認
+
+        Args:
+            result: run_cli_commandの出力
+            error_contains: エラーメッセージに含まれるべき文字列（オプション）
+
+        Raises:
+            AssertionError: ステータスがerrorでない場合
+        """
+        assert isinstance(result, dict), f"Output should be JSON object, got: {type(result)}"
+        assert result.get("status") == "error", f"Expected status=error, got {result.get('status')}"
+        if error_contains:
+            error_msg = result.get("error", "")
+            assert error_contains.lower() in error_msg.lower(), \
+                f"Expected '{error_contains}' in error message, got: {error_msg}"
+
+    @staticmethod
+    def get_valid_config_json() -> str:
+        """
+        テスト用の有効な設定JSONを返す
+
+        Returns:
+            JSON文字列
+        """
+        return json.dumps({
+            "base_dir": ".",
+            "paths": {
+                "loops_dir": "data/Loops",
+                "digests_dir": "data/Digests",
+                "essences_dir": "data/Essences",
+                "identity_file_path": None,
+            },
+            "levels": {
+                "weekly_threshold": 5,
+                "monthly_threshold": 5,
+                "quarterly_threshold": 3,
+                "annual_threshold": 4,
+                "triennial_threshold": 3,
+                "decadal_threshold": 3,
+                "multi_decadal_threshold": 3,
+                "centurial_threshold": 4,
+            },
+        })

@@ -7,7 +7,7 @@ Handles file I/O operations, numbering, and directory management.
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union, cast
 
-from config import DigestConfig
+from application.config import DigestConfig
 from domain.constants import LEVEL_CONFIG
 from domain.error_formatter import get_error_formatter
 from domain.exceptions import ConfigError

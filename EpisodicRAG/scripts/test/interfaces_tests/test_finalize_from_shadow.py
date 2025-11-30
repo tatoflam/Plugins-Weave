@@ -163,7 +163,7 @@ class TestDigestFinalizerIntegration(unittest.TestCase):
 
     def _create_finalizer(self):
         """DigestConfigとFinalizerを作成"""
-        from config import DigestConfig
+        from application.config import DigestConfig
 
         config = DigestConfig(plugin_root=self.plugin_root)
         return DigestFinalizerFromShadow(config)

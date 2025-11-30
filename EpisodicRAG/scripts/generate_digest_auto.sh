@@ -105,7 +105,7 @@ get_config_path() {
     python3 -c "
 import sys
 sys.path.insert(0, '$SCRIPT_DIR')
-from config import DigestConfig
+from application.config import DigestConfig
 config = DigestConfig()
 print(getattr(config, '${path_name}_path'))
 " 2>/dev/null || {
@@ -119,7 +119,7 @@ get_weave_identity() {
     python3 -c "
 import sys
 sys.path.insert(0, '$SCRIPT_DIR')
-from config import DigestConfig
+from application.config import DigestConfig
 config = DigestConfig()
 path = config.get_identity_file_path()
 print(path if path else '')

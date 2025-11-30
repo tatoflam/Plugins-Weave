@@ -133,3 +133,64 @@ class TestShadowGrandDigestManager:
 
         assert result is not None
         assert result["source_files"] == ["Loop0001.txt"]
+
+    @pytest.mark.integration
+    def test_promote_shadow_to_grand(self, shadow_manager):
+        """ShadowをGrandDigestに昇格（昇格準備確認）"""
+        # テストデータを作成
+        data = shadow_manager._io.load_or_create()
+        data["latest_digests"]["weekly"]["overall_digest"]["source_files"] = ["Loop0001.txt"]
+        data["latest_digests"]["weekly"]["overall_digest"]["abstract"] = "Test abstract"
+        shadow_manager._io.save(data)
+
+        # promote実行（実際の昇格はfinalize_from_shadow.pyで行われる）
+        # このメソッドはログ出力のみで、Shadowデータは変更しない
+        shadow_manager.promote_shadow_to_grand("weekly")
+
+        # 確認: 実行後もShadowデータはそのまま（変更なし）
+        updated_data = shadow_manager._io.load_or_create()
+        overall = updated_data["latest_digests"]["weekly"]["overall_digest"]
+        assert overall["source_files"] == ["Loop0001.txt"]
+
+
+class TestShadowGrandDigestManagerInit:
+    """ShadowGrandDigestManager 初期化テスト"""
+
+    @pytest.mark.integration
+    def test_init_with_none_config(self, temp_plugin_env):
+        """config=Noneでの初期化（デフォルト設定を使用）"""
+        # config.jsonを作成
+        config_file = temp_plugin_env.config_dir / "config.json"
+        config_data = {
+            "base_dir": str(temp_plugin_env.plugin_root),
+            "paths": {
+                "loops_dir": "data/Loops",
+                "digests_dir": "data/Digests",
+                "essences_dir": "data/Essences",
+            },
+        }
+        config_file.write_text(json.dumps(config_data))
+
+        # last_digest_times.jsonも作成
+        times_file = temp_plugin_env.config_dir / "last_digest_times.json"
+        times_file.write_text("{}")
+
+        with patch(
+            'application.grand.shadow_grand_digest.DigestConfig'
+        ) as mock_config_class:
+            mock_config = MagicMock()
+            mock_config.digests_path = temp_plugin_env.digests_path
+            mock_config.loops_path = temp_plugin_env.loops_path
+            mock_config.essences_path = temp_plugin_env.essences_path
+            mock_config.plugin_root = temp_plugin_env.plugin_root
+            mock_config_class.return_value = mock_config
+
+            # config=Noneで初期化
+            manager = ShadowGrandDigestManager(config=None)
+
+            # DigestConfigが呼ばれたことを確認
+            mock_config_class.assert_called_once()
+
+            # managerが正しく初期化されていることを確認
+            assert manager.config is mock_config
+            assert manager.digests_path == temp_plugin_env.digests_path

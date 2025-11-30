@@ -21,7 +21,7 @@ from test_helpers import create_test_loop_file
 
 from application.grand import GrandDigestManager, ShadowGrandDigestManager
 from application.tracking import DigestTimesTracker
-from config import DigestConfig
+from application.config import DigestConfig
 from domain.constants import LEVEL_NAMES
 from interfaces import DigestFinalizerFromShadow
 

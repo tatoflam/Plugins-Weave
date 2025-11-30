@@ -11,7 +11,7 @@ GrandDigest.txtは全8階層のダイジェスト要約を統合する最上位�
 
 Usage:
     from application.grand import GrandDigestManager
-    from config import DigestConfig
+    from application.config import DigestConfig
 
     config = DigestConfig()
     manager = GrandDigestManager(config)
@@ -39,7 +39,7 @@ Note:
 from datetime import datetime
 from typing import cast
 
-from config import DigestConfig
+from application.config import DigestConfig
 from domain.constants import (
     LEVEL_NAMES,
     LOG_PREFIX_STATE,
@@ -68,7 +68,7 @@ class GrandDigestManager:
 
     Example:
         >>> from application.grand import GrandDigestManager
-        >>> from config import DigestConfig
+        >>> from application.config import DigestConfig
         >>> manager = GrandDigestManager(DigestConfig())
         >>> data = manager.load_or_create()
         >>> manager.update_digest("weekly", "W0001", overall_digest)

@@ -13,7 +13,7 @@ from test_helpers import create_test_loop_file
 
 from application.finalize import ShadowValidator
 from application.grand import ShadowGrandDigestManager
-from config import DigestConfig
+from application.config import DigestConfig
 from domain.exceptions import DigestError, ValidationError
 
 # slow マーカーを適用（ファイル全体）

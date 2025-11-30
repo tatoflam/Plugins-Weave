@@ -8,8 +8,8 @@ config/level_path_service.py のテスト
 
 import pytest
 
-from config.exceptions import ConfigError
-from config.level_path_service import LevelPathService
+from domain.exceptions import ConfigError
+from application.config.level_path_service import LevelPathService
 from domain.constants import LEVEL_CONFIG, LEVEL_NAMES
 
 

@@ -11,7 +11,7 @@ finalize時にGrandDigest.txtへ昇格される。
 
 Usage:
     from application.shadow import ShadowIO, ShadowTemplate
-    from config import DigestConfig
+    from application.config import DigestConfig
 
     config = DigestConfig()
     template = ShadowTemplate()

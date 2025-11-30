@@ -6,8 +6,8 @@ Config CLI
 設定管理のCLIエントリーポイント。
 
 Usage:
-    python -m config.cli --show-paths
-    python -m config.cli --plugin-root /path/to/plugin
+    python -m interfaces.config_cli --show-paths
+    python -m interfaces.config_cli --plugin-root /path/to/plugin
 """
 
 import argparse
@@ -25,7 +25,8 @@ def main(plugin_root: Optional[Path] = None) -> None:
         plugin_root: Pluginルート（テスト用にオーバーライド可能）
     """
     # 循環インポートを避けるため、関数内でインポート
-    from . import DigestConfig
+    from application.config import DigestConfig
+    from domain.exceptions import ConfigError
 
     parser = argparse.ArgumentParser(description="Digest Plugin Configuration Manager")
     parser.add_argument("--show-paths", action="store_true", help="Show all configured paths")
@@ -45,14 +46,9 @@ def main(plugin_root: Optional[Path] = None) -> None:
             # デフォルト: JSON出力
             print(json.dumps(config.config, indent=2, ensure_ascii=False))
 
-    except (FileNotFoundError, Exception) as e:
-        # ConfigError やその他のエラーをキャッチ
-        from .exceptions import ConfigError
-
-        if isinstance(e, (FileNotFoundError, ConfigError)):
-            sys.stderr.write(f"[ERROR] {e}\n")
-            sys.exit(1)
-        raise
+    except (FileNotFoundError, ConfigError) as e:
+        sys.stderr.write(f"[ERROR] {e}\n")
+        sys.exit(1)
 
 
 if __name__ == "__main__":

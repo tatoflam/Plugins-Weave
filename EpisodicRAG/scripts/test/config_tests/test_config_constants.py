@@ -9,7 +9,7 @@ config/config_constants.py で定義された共有定数のテスト。
 
 import pytest
 
-from config.config_constants import REQUIRED_CONFIG_KEYS, THRESHOLD_KEYS
+from domain.config.config_constants import REQUIRED_CONFIG_KEYS, THRESHOLD_KEYS
 
 pytestmark = pytest.mark.unit
 

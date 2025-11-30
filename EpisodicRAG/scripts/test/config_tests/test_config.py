@@ -19,8 +19,8 @@ from unittest.mock import patch
 
 import pytest
 
-from config import DigestConfig
-from config.exceptions import ConfigError
+from application.config import DigestConfig
+from domain.exceptions import ConfigError
 from domain.constants import LEVEL_CONFIG, LEVEL_NAMES
 
 # =============================================================================
@@ -179,7 +179,7 @@ class TestDigestConfig:
         env = config_env["env"]
 
         # ConfigLoader.load を PermissionError を発生させるようにモック
-        from config.config_loader import ConfigLoader
+        from infrastructure.config import ConfigLoader
 
         with patch.object(ConfigLoader, "load", side_effect=PermissionError("Access denied")):
             with pytest.raises(ConfigError) as exc_info:
@@ -193,7 +193,7 @@ class TestDigestConfig:
         env = config_env["env"]
 
         # ConfigLoader.load を OSError を発生させるようにモック
-        from config.config_loader import ConfigLoader
+        from infrastructure.config import ConfigLoader
 
         with patch.object(ConfigLoader, "load", side_effect=OSError("Disk error")):
             with pytest.raises(ConfigError) as exc_info:

@@ -77,7 +77,7 @@ from application.grand import GrandDigestManager, ShadowGrandDigestManager
 from application.tracking import DigestTimesTracker
 
 # 設定
-from config import DigestConfig
+from application.config import DigestConfig
 
 # Domain層
 from domain.constants import LEVEL_CONFIG, LOG_SEPARATOR

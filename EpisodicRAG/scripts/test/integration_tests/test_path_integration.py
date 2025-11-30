@@ -12,7 +12,7 @@ from pathlib import Path
 
 from test_helpers import LEVEL_DIRS, TempPluginEnvironment
 
-from config import DigestConfig
+from application.config import DigestConfig
 from domain.constants import LEVEL_CONFIG, LEVEL_NAMES
 from domain.file_naming import format_digest_number
 

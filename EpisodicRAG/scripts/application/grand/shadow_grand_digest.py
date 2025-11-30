@@ -8,7 +8,7 @@ GrandDigest更新後に作成された新しいコンテンツを保持し、
 
 使用方法:
     from application.grand import ShadowGrandDigestManager
-    from config import DigestConfig
+    from application.config import DigestConfig
 
     config = DigestConfig()
     manager = ShadowGrandDigestManager(config)
@@ -27,8 +27,8 @@ from typing import Dict, List, Optional, cast
 from application.shadow import FileDetector, ShadowIO, ShadowTemplate, ShadowUpdater
 from application.tracking import DigestTimesTracker
 
-# Plugin版: config.pyをインポート
-from config import DigestConfig
+# Plugin版: application.configをインポート
+from application.config import DigestConfig
 from domain.constants import LEVEL_CONFIG, LEVEL_NAMES, LOG_SEPARATOR, build_level_hierarchy
 from domain.types import LevelHierarchyEntry, OverallDigestData
 from infrastructure import get_structured_logger, log_warning

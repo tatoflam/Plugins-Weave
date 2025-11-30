@@ -16,8 +16,8 @@ from pathlib import Path
 
 import pytest
 
-from config.config_loader import ConfigLoader
-from config.exceptions import ConfigError
+from infrastructure.config.config_loader import ConfigLoader
+from domain.exceptions import ConfigError
 
 # =============================================================================
 # フィクスチャ

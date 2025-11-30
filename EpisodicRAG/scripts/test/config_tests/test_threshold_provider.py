@@ -8,8 +8,8 @@ config/threshold_provider.py のテスト
 
 import pytest
 
-from config.exceptions import ConfigError
-from config.threshold_provider import ThresholdProvider
+from domain.exceptions import ConfigError
+from application.config.threshold_provider import ThresholdProvider
 from domain.constants import LEVEL_CONFIG, LEVEL_NAMES
 
 

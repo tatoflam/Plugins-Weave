@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
-Config層専用のバリデーション
-============================
+Config Validation
+=================
 
-Config層をDomain層から独立させるためのバリデーションユーティリティ。
+設定バリデーション用のユーティリティ関数。
 
 Usage:
-    from config.validation import collect_type_error
+    from domain.config.validation import collect_type_error
 """
 
 from typing import Any, List, Type

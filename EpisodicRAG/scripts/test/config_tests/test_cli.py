@@ -22,7 +22,7 @@ class TestCliMain:
     @pytest.mark.integration
     def test_main_no_arguments_outputs_json(self, temp_plugin_env):
         """引数なしでJSON出力"""
-        from config.cli import main
+        from interfaces.config_cli import main
 
         # argparseがsys.argvからパースするため、空のリストをセット
         test_args = ["cli.py"]
@@ -42,7 +42,7 @@ class TestCliMain:
         """--show-paths フラグで paths を表示"""
         import logging
 
-        from config.cli import main
+        from interfaces.config_cli import main
 
         # argparseをモック
         test_args = ["cli.py", "--show-paths"]
@@ -57,7 +57,7 @@ class TestCliMain:
     @pytest.mark.integration
     def test_main_plugin_root_override(self, temp_plugin_env):
         """plugin_root 引数でルートをオーバーライド"""
-        from config.cli import main
+        from interfaces.config_cli import main
 
         test_args = ["cli.py"]
         captured_output = StringIO()
@@ -72,7 +72,7 @@ class TestCliMain:
     @pytest.mark.integration
     def test_main_invalid_plugin_root_exits_1(self, tmp_path):
         """無効なplugin_rootでexit code 1"""
-        from config.cli import main
+        from interfaces.config_cli import main
 
         # 存在しないパス
         invalid_root = tmp_path / "nonexistent" / "path"
@@ -89,7 +89,7 @@ class TestCliMain:
     @pytest.mark.integration
     def test_json_output_format(self, temp_plugin_env):
         """JSON出力フォーマットの検証"""
-        from config.cli import main
+        from interfaces.config_cli import main
 
         test_args = ["cli.py"]
         captured_output = StringIO()
@@ -107,7 +107,7 @@ class TestCliMain:
     @pytest.mark.integration
     def test_main_with_args_plugin_root(self, temp_plugin_env):
         """--plugin-root 引数が正しく処理される"""
-        from config.cli import main
+        from interfaces.config_cli import main
 
         test_args = ["cli.py", "--plugin-root", str(temp_plugin_env.plugin_root)]
         captured_output = StringIO()
@@ -122,17 +122,17 @@ class TestCliMain:
     @pytest.mark.unit
     def test_cli_module_has_main(self):
         """cli モジュールに main 関数が存在"""
-        from config import cli
+        from interfaces import config_cli
 
-        assert hasattr(cli, "main")
-        assert callable(cli.main)
+        assert hasattr(config_cli, "main")
+        assert callable(config_cli.main)
 
     @pytest.mark.unit
     def test_cli_can_be_run_as_module(self):
         """__main__ ブロックが存在"""
         import inspect
 
-        import config.cli as cli_module
+        import interfaces.config_cli as cli_module
 
         source = inspect.getsource(cli_module)
         assert 'if __name__ == "__main__"' in source
@@ -140,7 +140,7 @@ class TestCliMain:
     @pytest.mark.integration
     def test_unicode_in_output(self, temp_plugin_env):
         """出力にUnicodeが含まれても正しく処理される"""
-        from config.cli import main
+        from interfaces.config_cli import main
 
         test_args = ["cli.py"]
         captured_output = StringIO()

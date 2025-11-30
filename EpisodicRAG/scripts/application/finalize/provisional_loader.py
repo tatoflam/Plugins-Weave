@@ -9,8 +9,8 @@ ProvisionalDigestの読み込みまたはソースファイルからの自動生
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
+from application.config import DigestConfig
 from application.grand import ShadowGrandDigestManager
-from config import DigestConfig
 from domain.constants import (
     LEVEL_CONFIG,
     LOG_PREFIX_DECISION,

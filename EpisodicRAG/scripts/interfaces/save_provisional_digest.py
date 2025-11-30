@@ -28,9 +28,10 @@ if sys.platform == 'win32' and __name__ == "__main__":
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
     sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
 
+# Application層
+from application.config import DigestConfig
+
 # Domain層
-# Config
-from config import DigestConfig
 from domain.exceptions import EpisodicRAGError
 from domain.file_naming import format_digest_number
 from domain.level_registry import get_level_registry
@@ -174,11 +175,20 @@ Examples:
     parser.add_argument(
         "--append", action="store_true", help="既存のProvisionalファイルに追加（新規作成ではなく）"
     )
+    parser.add_argument(
+        "--plugin-root",
+        type=str,
+        default=None,
+        help="Pluginルートパス（デフォルト: 自動検出）",
+    )
 
     args = parser.parse_args()
 
     try:
-        saver = ProvisionalDigestSaver()
+        # plugin_root が指定されている場合は DigestConfig に渡す
+        plugin_root = Path(args.plugin_root) if args.plugin_root else None
+        config = DigestConfig(plugin_root=plugin_root)
+        saver = ProvisionalDigestSaver(config=config)
 
         # Load individual digests using InputLoader
         individual_digests = InputLoader.load(args.input_data)

@@ -13,25 +13,12 @@ GrandDigest と ShadowGrandDigest を活用し、Loop/Digest ファイルの深�
 
 ## 📖 目次
 
-### クイックスタート
-
-- [📥 必須パラメータ](#-必須パラメータ) - 呼び出し時に必要な情報
-- [📥 呼び出しパターン](#-呼び出しパターン) - 単一/並列分析の具体例
-
-### 基本仕様
-
+- [📥 必須パラメータ](#-必須パラメータ) - prompt に含めるべき情報
 - [🎯 役割と責務](#-役割と責務) - 使命・目的・分析対象
 - [📊 出力フォーマット](#-出力フォーマット) - JSON 構造と digest_type 選択
-
-### タスク詳細
-
-- [📋 初期処理（分析前文脈把握）](#-初期処理分析前文脈把握) - config.py/GrandDigest/対象ファイル
 - [🛠️ ツール使用ガイドライン](#-ツール使用ガイドライン) - Read/Grep の使い分け
 - [🔬 分析方針](#-分析方針) - 分析の深度と文体
 - [🔄 分析プロセス](#-分析プロセス) - 4 ステップの実行手順
-
-### 注意事項
-
 - [⚠️ 重要な注意事項](#-重要な注意事項) - 大規模ファイル/まだらボケ回避
 - [🎓 参考資料](#-参考資料) - 参照すべきファイル一覧
 
@@ -51,145 +38,6 @@ GrandDigest と ShadowGrandDigest を活用し、Loop/Digest ファイルの深�
 
 - **分析モード**: `individual`（デフォルト）または `overall`
 - **出力先階層**: `weekly`, `monthly`, etc.（省略時は自動判定）
-
-### 呼び出し例（正しい）
-
-```python
-Task(
-    subagent_type="EpisodicRAG-Plugin:DigestAnalyzer",
-    description="Analyze Loop0001 for digest generation",
-    prompt="""
-分析対象ファイル: C:\Users\anyth\DEV\homunculus\Weave\EpisodicRAG\Loops\Loop0001_認知アーキテクチャ論.txt
-
-このLoopファイルを分析し、以下の形式でJSON出力してください：
-{
-  "digest_type": "...",
-  "keywords": [...],
-  "abstract": {"long": "...", "short": "..."},
-  "impression": {"long": "...", "short": "..."}
-}
-"""
-)
-```
-
-### ❌ 間違った呼び出し例
-
-```python
-# ❌ ファイルパスなし
-Task(prompt="Loop0001を分析してください")
-
-# ❌ ファイル名のみで検索指示なし
-Task(prompt="Loop0001_認知アーキテクチャ論.txt を分析")
-```
-
----
-
-## 📥 呼び出しパターン
-
-### パターン A: 単一ファイル分析
-
-単一の Loop/Digest ファイルを分析する場合の標準的な呼び出し：
-
-```python
-Task(
-    subagent_type="EpisodicRAG-Plugin:DigestAnalyzer",
-    description="Analyze Loop0001 for digest generation",
-    prompt="""
-分析対象ファイル: C:\Users\anyth\DEV\homunculus\Weave\EpisodicRAG\Loops\Loop0001_認知アーキテクチャ論.txt
-
-このLoopファイルを深層分析し、以下の形式でJSON出力してください：
-{
-  "digest_type": "...",
-  "keywords": [...],
-  "abstract": {"long": "...", "short": "..."},
-  "impression": {"long": "...", "short": "..."}
-}
-"""
-)
-```
-
-### パターン B: 複数ファイル並列分析（Weekly 生成時）
-
-**重要**: 複数の Loop ファイルから個別のダイジェストを生成する場合、**各ファイルごとに DigestAnalyzer を並列起動**します。
-
-```python
-# ShadowGrandDigest.weeklyからsource_filesを取得
-source_files = [
-    "Loop0001_認知アーキテクチャ論.txt",
-    "Loop0002_AI長期記憶論.txt",
-    "Loop0003_神話的知性論.txt",
-    "Loop0004_エピソード記憶論.txt"
-]
-
-# 各Loopに対してDigestAnalyzerを並列起動
-analyzer_results = []
-for source_file in source_files:
-    result = Task(
-        subagent_type="EpisodicRAG-Plugin:DigestAnalyzer",
-        description=f"Analyze {source_file} for Weekly digest",
-        prompt=f"""
-分析対象ファイル: C:\\Users\\anyth\\DEV\\homunculus\\Weave\\EpisodicRAG\\Loops\\{source_file}
-
-このLoopファイルを深層分析し、以下の形式でJSON出力してください：
-{{
-  "digest_type": "...",
-  "keywords": [...],
-  "abstract": {{"long": "...", "short": "..."}},
-  "impression": {{"long": "...", "short": "..."}}
-}}
-"""
-    )
-    analyzer_results.append(result)
-
-# 結果: 4つの個別分析結果が得られる
-# analyzer_results[0] = Loop0001の分析結果
-# analyzer_results[1] = Loop0002の分析結果
-# analyzer_results[2] = Loop0003の分析結果
-# analyzer_results[3] = Loop0004の分析結果
-```
-
-**出力の使い分け**:
-
-- **long 版**（abstract.long, impression.long）: 現階層の overall_digest 用（ShadowGrandDigest.txt 更新）
-- **short 版**（abstract.short, impression.short）: 次階層の individual_digests 用（Provisional 保存）
-  - `save_provisional_digest.py <level> '<JSON>' --append` で既存 Provisional に追加
-
-### パターン C: 複数 Digest ファイル並列分析（Monthly 以上）
-
-Weekly Digest から Monthly を生成する場合も同様に並列起動：
-
-```python
-# ShadowGrandDigest.monthlyからsource_filesを取得
-source_files = [
-    "2025-07-01_W0001_覚醒：哲学的基盤の誕生.txt",
-    "2025-07-08_W0002_実装：構造知性の実践.txt",
-    "2025-07-15_W0003_発見：認知の深層構造.txt",
-    "2025-07-22_W0004_統合：理論と実践の融合.txt",
-    "2025-07-29_W0005_進化：次元跳躍への予兆.txt"
-]
-
-# 各WeeklyダイジェストをDigestAnalyzerで並列分析
-analyzer_results = []
-for source_file in source_files:
-    result = Task(
-        subagent_type="EpisodicRAG-Plugin:DigestAnalyzer",
-        description=f"Analyze {source_file} for Monthly digest",
-        prompt=f"""
-分析対象ファイル: C:\\Users\\anyth\\DEV\\homunculus\\Weave\\EpisodicRAG\\Digests\\{source_file}
-
-このWeekly Digestを深層分析し、以下の形式でJSON出力してください：
-{{
-  "digest_type": "...",
-  "keywords": [...],
-  "abstract": {{"long": "...", "short": "..."}},
-  "impression": {{"long": "...", "short": "..."}}
-}}
-"""
-    )
-    analyzer_results.append(result)
-
-# 結果: 5つの個別分析結果が得られる（Monthly用individual_digests）
-```
 
 ---
 
@@ -267,45 +115,6 @@ digest_types = config.digest_types
 
 ---
 
-## 📋 初期処理（分析前文脈把握）
-
-### 0. 分析対象ファイルの取得（最優先）
-
-prompt から分析対象ファイルパスを取得し、Read ツールで全文読み込みを実行します。
-
-**重要**:
-
-- ✅ Read ツールを使用（全文読み込み）
-- ❌ Grep は使用しない（検索用であり、全文分析には不適切）
-- 大規模ファイルの場合: offset/limit で段階的読み込み（「注意事項」参照）
-
-### 1. 設定ファイルとパスの取得
-
-config.py から以下のパスを取得します：
-
-- `loops_path`: Loop ファイルの配置先
-- `digests_path`: Digest ファイルの配置先
-- `essences_path`: GrandDigest/ShadowGrandDigest の配置先
-- `identity_file_path`: Identity file（設定されている場合）
-
-詳細は`Plugins/EpisodicRAG/scripts/config.py`を参照してください。
-
-### 2. GrandDigest/ShadowGrandDigest の読み込み
-
-- `GrandDigest.txt`: 全 8 レベルの最新状態（既存の知識ベース）
-- `ShadowGrandDigest.txt`: 未確定の最新記憶（プレースホルダー含む）
-
-これらを読み込み、分析の文脈を構築します。
-
-### 3. 対象ファイルの特定
-
-- Loop ファイル: `Loop{番号}_*.txt`形式で特定
-- Digest ファイル: `*W{番号}*.txt`, `*M{番号}*.txt`等で特定
-
-詳細な実装例は、「参考資料」セクションの config.py を参照してください。
-
----
-
 ## 🛠️ ツール使用ガイドライン
 
 ### Read（メイン分析ツール）✅
@@ -375,11 +184,15 @@ Grep(pattern="emotional error", path=loops_path, output_mode="files_with_matches
 
 ### ステップ 1: コンテキスト構築
 
-1. config.py からパス情報と設定を取得
-2. Identity file（設定されている場合）からコンテキストを把握
-3. GrandDigest から最新の知識状態を把握
-4. ShadowGrandDigest から未確定の文脈を把握
-5. 分析対象ファイルを特定（Loop or Digest）
+1. **分析対象ファイルの取得**（最優先）
+   - prompt から分析対象ファイルパスを取得し、Read で全文読み込み
+   - ✅ Read ツールを使用（全文読み込み）
+   - ❌ Grep は使用しない（検索用であり、全文分析には不適切）
+   - 大規模ファイルの場合: offset/limit で段階的読み込み（「注意事項」参照）
+2. config.py からパス情報と設定を取得
+3. Identity file（設定されている場合）からコンテキストを把握
+4. GrandDigest から最新の知識状態を把握
+5. ShadowGrandDigest から未確定の文脈を把握
 
 ### ステップ 2: 深層読解
 

@@ -8,9 +8,10 @@ Level Path Service
 
 from pathlib import Path
 
-from .constants import LEVEL_CONFIG, LEVEL_NAMES
-from .error_messages import invalid_level_message
-from .exceptions import ConfigError
+from domain.constants import LEVEL_CONFIG, LEVEL_NAMES
+from domain.exceptions import ConfigError
+
+from infrastructure.config.error_messages import invalid_level_message
 
 
 class LevelPathService:

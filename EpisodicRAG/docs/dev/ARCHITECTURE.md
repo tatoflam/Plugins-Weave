@@ -48,10 +48,13 @@
 │   └── digest.md                        # /digest コマンド
 ├── scripts/                             # Clean Architecture実装
 │   ├── domain/                          # コアビジネスロジック（最内層）
+│   │   └── config/                      # 設定定数・バリデーション
 │   ├── infrastructure/                  # 外部関心事
+│   │   └── config/                      # 設定ファイルI/O
 │   ├── application/                     # ユースケース
+│   │   └── config/                      # DigestConfig（Facade）
 │   ├── interfaces/                      # エントリーポイント
-│   ├── config/                          # 設定管理パッケージ
+│   │   └── config_cli.py                # 設定CLI
 │   └── test/                            # テスト（CIバッジ参照）
 ├── data/                                # Plugin内データ（@digest-setupで作成）
 │   ├── Loops/                           # Loopファイル配置先
@@ -80,20 +83,31 @@ v2.0.0 より、Clean Architecture（4層構造）を採用しています。
 scripts/
 ├── domain/                          # コアビジネスロジック（最内層）
 │   ├── __init__.py                  # 公開API
-│   ├── types.py                     # TypedDict定義
-│   ├── exceptions.py                # ドメイン例外
+│   ├── types.py                     # TypedDict定義（ConfigData含む）
+│   ├── exceptions.py                # ドメイン例外（ConfigError含む）
 │   ├── constants.py                 # LEVEL_CONFIG等
 │   ├── version.py                   # バージョン
 │   ├── file_naming.py               # ファイル命名ユーティリティ
 │   ├── level_registry.py            # LevelRegistry（階層設定管理）
-│   └── error_formatter.py           # ErrorFormatter（エラーメッセージ標準化）
+│   ├── error_formatter.py           # ErrorFormatter（エラーメッセージ標準化）
+│   └── config/                      # 設定関連定数・バリデーション
+│       ├── __init__.py
+│       ├── config_constants.py      # REQUIRED_CONFIG_KEYS, THRESHOLD_KEYS
+│       └── validation.py            # collect_type_error
 │
 ├── infrastructure/                  # 外部関心事
 │   ├── __init__.py                  # 公開API
 │   ├── json_repository.py           # JSON操作
 │   ├── file_scanner.py              # ファイル検出
 │   ├── logging_config.py            # ロギング設定
-│   └── user_interaction.py          # ユーザー確認コールバック
+│   ├── user_interaction.py          # ユーザー確認コールバック
+│   └── config/                      # 設定ファイルI/O
+│       ├── __init__.py
+│       ├── config_loader.py         # ConfigLoader
+│       ├── config_repository.py     # load_config
+│       ├── path_resolver.py         # PathResolver
+│       ├── plugin_root_resolver.py  # find_plugin_root
+│       └── error_messages.py        # エラーメッセージヘルパー
 │
 ├── application/                     # ユースケース
 │   ├── __init__.py                  # 公開API（全コンポーネント）
@@ -111,59 +125,49 @@ scripts/
 │   ├── grand/                       # GrandDigest
 │   │   ├── grand_digest.py          # GrandDigestManager
 │   │   └── shadow_grand_digest.py   # ShadowGrandDigestManager
-│   └── finalize/                    # Finalize
-│       ├── shadow_validator.py      # ShadowValidator
-│       ├── provisional_loader.py    # ProvisionalLoader
-│       ├── digest_builder.py        # RegularDigestBuilder
-│       └── persistence.py           # DigestPersistence
+│   ├── finalize/                    # Finalize
+│   │   ├── shadow_validator.py      # ShadowValidator
+│   │   ├── provisional_loader.py    # ProvisionalLoader
+│   │   ├── digest_builder.py        # RegularDigestBuilder
+│   │   └── persistence.py           # DigestPersistence
+│   └── config/                      # 設定管理（Facade）
+│       ├── __init__.py              # DigestConfig（Facade）
+│       ├── config_validator.py      # ConfigValidator
+│       ├── level_path_service.py    # LevelPathService
+│       ├── source_path_resolver.py  # SourcePathResolver
+│       └── threshold_provider.py    # ThresholdProvider
 │
-├── interfaces/                      # エントリーポイント
-│   ├── __init__.py                  # 公開API
-│   ├── finalize_from_shadow.py      # DigestFinalizerFromShadow
-│   ├── save_provisional_digest.py   # ProvisionalDigestSaver
-│   ├── interface_helpers.py         # sanitize_filename, get_next_digest_number
-│   └── provisional/                 # Provisionalサブパッケージ
-│       ├── __init__.py
-│       ├── input_loader.py          # InputLoader
-│       ├── merger.py                # DigestMerger
-│       ├── validator.py             # バリデーション関数
-│       └── file_manager.py          # ProvisionalFileManager
-│
-└── config/                          # 設定管理パッケージ
-    ├── __init__.py                  # DigestConfig (Facade)
-    ├── config_loader.py             # ConfigLoader
-    ├── config_validator.py          # ConfigValidator
-    ├── config_repository.py         # load_config（後方互換）
-    ├── directory_validator.py       # DirectoryValidator（後方互換）
-    ├── level_path_service.py        # LevelPathService
-    ├── path_resolver.py             # PathResolver
-    ├── plugin_root_resolver.py      # find_plugin_root
-    └── threshold_provider.py        # ThresholdProvider
+└── interfaces/                      # エントリーポイント
+    ├── __init__.py                  # 公開API
+    ├── finalize_from_shadow.py      # DigestFinalizerFromShadow
+    ├── save_provisional_digest.py   # ProvisionalDigestSaver
+    ├── interface_helpers.py         # sanitize_filename, get_next_digest_number
+    ├── config_cli.py                # 設定CLIエントリーポイント
+    └── provisional/                 # Provisionalサブパッケージ
+        ├── __init__.py
+        ├── input_loader.py          # InputLoader
+        ├── merger.py                # DigestMerger
+        ├── validator.py             # バリデーション関数
+        └── file_manager.py          # ProvisionalFileManager
 ```
 
 ### 依存関係ルール
 
 ```text
-domain/           ← 何にも依存しない
+domain/           ← 何にも依存しない（config/サブディレクトリ含む）
     ↑
-infrastructure/   ← domain/ のみ
+infrastructure/   ← domain/ のみ（config/サブディレクトリ含む）
     ↑
-application/      ← domain/ + infrastructure/
+application/      ← domain/ + infrastructure/（config/サブディレクトリ含む）
     ↑
-interfaces/       ← application/
-
-config/           ← 何にも依存しない（完全独立）
+interfaces/       ← application/（config_cli.py含む）
 ```
 
-> ⚠️ **CRITICAL: Config層の独立性**
->
-> `config/` パッケージは **domain/ を含む他のすべての層から完全に独立** していなければなりません。
->
-> **理由**: Config層は `digest-config` スキルの本体であり、Claudeプラグインとして単独でロード可能である必要があります。Domain層への依存があると、プラグインの初期化順序やCircular Importの問題が発生します。
->
-> **禁止**: `from domain import ...` を config/ 内で使用しないでください。
->
-> Config層が必要とする型・例外・定数は、すべて `config/types.py`, `config/exceptions.py`, `config/constants.py` に独自定義されています。
+> **Note**: 設定管理機能は各層のconfig/サブディレクトリに分散配置されています。
+> - `domain/config/`: 設定定数、バリデーションヘルパー
+> - `infrastructure/config/`: 設定ファイルI/O、パス解決
+> - `application/config/`: DigestConfig（Facade）、サービスクラス
+> - `interfaces/config_cli.py`: CLIエントリーポイント
 
 ```mermaid
 graph BT
@@ -212,8 +216,10 @@ from interfaces import DigestFinalizerFromShadow, ProvisionalDigestSaver
 from interfaces.interface_helpers import sanitize_filename, get_next_digest_number
 from interfaces.provisional import InputLoader, DigestMerger
 
-# 設定（configパッケージ）
-from config import DigestConfig
+# 設定（application/config）
+from application.config import DigestConfig
+from domain.exceptions import ConfigError
+from domain.config import REQUIRED_CONFIG_KEYS
 ```
 
 ---

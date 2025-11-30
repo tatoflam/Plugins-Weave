@@ -7,7 +7,7 @@ Config Constants
 REQUIRED_CONFIG_KEYSなど、複数のモジュールで使用される定数を一元管理。
 
 Usage:
-    from config.config_constants import REQUIRED_CONFIG_KEYS
+    from domain.config.config_constants import REQUIRED_CONFIG_KEYS, THRESHOLD_KEYS
 """
 
 from typing import List

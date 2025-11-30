@@ -293,23 +293,27 @@ class TestMainArgumentParsing(unittest.TestCase):
     def test_save_provisional_append_flag(self):
         """--append フラグが正しく処理される"""
         with patch("sys.argv", ["save_provisional_digest.py", "weekly", "[]", "--append"]):
-            with patch("interfaces.save_provisional_digest.ProvisionalDigestSaver") as MockSaver:
-                mock_instance = MagicMock()
-                mock_instance.save_provisional.return_value = Path("/tmp/test.txt")
-                MockSaver.return_value = mock_instance
+            with patch("interfaces.save_provisional_digest.DigestConfig") as MockConfig:
+                mock_config = MagicMock()
+                MockConfig.return_value = mock_config
 
-                with patch("interfaces.save_provisional_digest.InputLoader.load") as mock_load:
-                    mock_load.return_value = []
+                with patch("interfaces.save_provisional_digest.ProvisionalDigestSaver") as MockSaver:
+                    mock_instance = MagicMock()
+                    mock_instance.save_provisional.return_value = Path("/tmp/test.txt")
+                    MockSaver.return_value = mock_instance
 
-                    with patch("infrastructure.logging_config.log_info"):
-                        with patch("infrastructure.logging_config.log_warning"):
-                            from interfaces.save_provisional_digest import main
+                    with patch("interfaces.save_provisional_digest.InputLoader.load") as mock_load:
+                        mock_load.return_value = []
 
-                            main()
+                        with patch("infrastructure.logging_config.log_info"):
+                            with patch("infrastructure.logging_config.log_warning"):
+                                from interfaces.save_provisional_digest import main
 
-                            mock_instance.save_provisional.assert_called_once()
-                            call_args = mock_instance.save_provisional.call_args
-                            assert call_args[1]["append"] is True
+                                main()
+
+                                mock_instance.save_provisional.assert_called_once()
+                                call_args = mock_instance.save_provisional.call_args
+                                assert call_args[1]["append"] is True
 
 
 if __name__ == "__main__":

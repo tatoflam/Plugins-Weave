@@ -17,8 +17,8 @@ from test_helpers import create_test_loop_file
 
 from application.shadow import FileDetector
 from application.tracking import DigestTimesTracker
-from config import DigestConfig
-from config.exceptions import ConfigError
+from application.config import DigestConfig
+from domain.exceptions import ConfigError
 from domain.constants import LEVEL_CONFIG, LEVEL_NAMES
 
 # integration マーカーを適用（ファイル全体）

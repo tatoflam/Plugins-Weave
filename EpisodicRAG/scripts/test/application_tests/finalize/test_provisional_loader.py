@@ -27,7 +27,7 @@ class TestProvisionalLoaderInit:
         """Initializes with required dependencies"""
         from application.finalize.provisional_loader import ProvisionalLoader
         from application.grand import ShadowGrandDigestManager
-        from config import DigestConfig
+        from application.config import DigestConfig
 
         config = DigestConfig(plugin_root=temp_plugin_env.plugin_root)
         shadow_manager = ShadowGrandDigestManager(config)
@@ -51,7 +51,7 @@ class TestGetSourcePathForLevel:
         """Create ProvisionalLoader instance"""
         from application.finalize.provisional_loader import ProvisionalLoader
         from application.grand import ShadowGrandDigestManager
-        from config import DigestConfig
+        from application.config import DigestConfig
 
         config = DigestConfig(plugin_root=temp_plugin_env.plugin_root)
         return ProvisionalLoader(config=config, shadow_manager=ShadowGrandDigestManager(config))
@@ -80,7 +80,7 @@ class TestGetProvisionalPath:
         """Create ProvisionalLoader instance"""
         from application.finalize.provisional_loader import ProvisionalLoader
         from application.grand import ShadowGrandDigestManager
-        from config import DigestConfig
+        from application.config import DigestConfig
 
         config = DigestConfig(plugin_root=temp_plugin_env.plugin_root)
         return ProvisionalLoader(config=config, shadow_manager=ShadowGrandDigestManager(config))
@@ -112,7 +112,7 @@ class TestLoadProvisional:
         """Create ProvisionalLoader instance"""
         from application.finalize.provisional_loader import ProvisionalLoader
         from application.grand import ShadowGrandDigestManager
-        from config import DigestConfig
+        from application.config import DigestConfig
 
         config = DigestConfig(plugin_root=temp_plugin_env.plugin_root)
         return ProvisionalLoader(config=config, shadow_manager=ShadowGrandDigestManager(config))
@@ -167,7 +167,7 @@ class TestLoadOrGenerate:
         """Create ProvisionalLoader instance"""
         from application.finalize.provisional_loader import ProvisionalLoader
         from application.grand import ShadowGrandDigestManager
-        from config import DigestConfig
+        from application.config import DigestConfig
 
         config = DigestConfig(plugin_root=temp_plugin_env.plugin_root)
         return ProvisionalLoader(config=config, shadow_manager=ShadowGrandDigestManager(config))
@@ -224,7 +224,7 @@ class TestBuildIndividualEntry:
         """Create ProvisionalLoader instance"""
         from application.finalize.provisional_loader import ProvisionalLoader
         from application.grand import ShadowGrandDigestManager
-        from config import DigestConfig
+        from application.config import DigestConfig
 
         config = DigestConfig(plugin_root=temp_plugin_env.plugin_root)
         return ProvisionalLoader(config=config, shadow_manager=ShadowGrandDigestManager(config))
@@ -283,7 +283,7 @@ class TestGenerateFromSource:
         """Create ProvisionalLoader instance"""
         from application.finalize.provisional_loader import ProvisionalLoader
         from application.grand import ShadowGrandDigestManager
-        from config import DigestConfig
+        from application.config import DigestConfig
 
         config = DigestConfig(plugin_root=temp_plugin_env.plugin_root)
         return ProvisionalLoader(config=config, shadow_manager=ShadowGrandDigestManager(config))
