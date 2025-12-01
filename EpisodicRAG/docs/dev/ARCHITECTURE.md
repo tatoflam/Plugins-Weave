@@ -30,6 +30,7 @@
 ```text
 ~/.claude/plugins/EpisodicRAG-Plugin@Plugins-Weave/
 ├── .claude-plugin/
+│   ├── CLAUDE.md                        # AIエージェント向け指示
 │   ├── config.json                      # 設定ファイル（@digest-setupで生成）
 │   ├── config.template.json             # 設定テンプレート
 │   ├── last_digest_times.template.json  # Digest時刻テンプレート

@@ -53,6 +53,7 @@ plugins-weave/
 │   └── marketplace.json
 └── EpisodicRAG/                        # プラグイン本体
     ├── .claude-plugin/
+    │   ├── CLAUDE.md                   # AIエージェント向け指示
     │   ├── plugin.json
     │   ├── config.template.json
     │   ├── last_digest_times.template.json
@@ -72,8 +73,10 @@ plugins-weave/
     │   └── test/
     ├── skills/
     │   └── shared/
-    ├── CHANGELOG.md
-    └── CONTRIBUTING.md
+    ├── pyproject.toml
+    ├── README.md / README.en.md
+    ├── CHANGELOG.md / CHANGELOG.en.md
+    └── CONTRIBUTING.md / CONTRIBUTING.en.md
 ```
 
 > 📖 **詳細なディレクトリ構造**: [ARCHITECTURE.md](docs/dev/ARCHITECTURE.md#ディレクトリ構成)

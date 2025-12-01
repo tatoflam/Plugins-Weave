@@ -54,6 +54,7 @@ plugins-weave/
 │   └── marketplace.json
 └── EpisodicRAG/                        # Plugin main body
     ├── .claude-plugin/
+    │   ├── CLAUDE.md                   # AI agent instructions
     │   ├── plugin.json
     │   ├── config.template.json
     │   ├── last_digest_times.template.json
@@ -73,8 +74,10 @@ plugins-weave/
     │   └── test/
     ├── skills/
     │   └── shared/
-    ├── CHANGELOG.md
-    └── CONTRIBUTING.md
+    ├── pyproject.toml
+    ├── README.md / README.en.md
+    ├── CHANGELOG.md / CHANGELOG.en.md
+    └── CONTRIBUTING.md / CONTRIBUTING.en.md
 ```
 
 > 📖 **Detailed Directory Structure**: [ARCHITECTURE.md](docs/dev/ARCHITECTURE.md#directory-structure)
