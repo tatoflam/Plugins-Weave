@@ -94,9 +94,9 @@ Loop追加 → /digest → Loop追加 → /digest → ...
 | Quarterly | ~3 ヶ月 |
 | Annual | ~1 年 |
 | Triennial | ~3 年 |
-| Decadal | ~10 年 |
-| Multi-decadal | ~30 年 |
-| Centurial | ~100 年 |
+| Decadal | ~9 年 |
+| Multi-decadal | ~27 年 |
+| Centurial | ~108 年 |
 
 > 📖 完全な階層テーブルは [用語集](EpisodicRAG/README.md#8階層構造) を参照
 

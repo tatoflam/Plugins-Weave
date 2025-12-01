@@ -1,4 +1,4 @@
-<!-- Last synced: 2025-11-29 -->
+<!-- Last synced: 2025-12-01 (refactored) -->
 [English](README.en.md) | [日本語](README.md)
 
 # EpisodicRAG Plugin - Glossary & Reference
@@ -281,12 +281,10 @@ L00001 added → /digest → L00002 added → /digest → ...
 By following this principle, AI can remember all Loops.
 
 **What NOT to do:**
-
 ```text
-L00001 added → No `/digest` → L00002 added
-                               ↑
-                    At this point, AI doesn't remember L00001
-                    (memory is mottled = fragmented)
+L00001 added → L00002 added → /digest
+                 ↑
+       At this point, AI doesn't remember L00001 (mottled memory)
 ```
 
 ### Threshold
@@ -419,7 +417,8 @@ Examples: 2025-07-01_W0001_CognitiveArchitecture.txt
 
 - [Main README](../README.md) - Project Overview
 - [AI Spec Hub](docs/README.md) - Command, Skill & Agent Specifications
-- [QUICKSTART](docs/user/QUICKSTART.md) - 5-minute Tutorial
+- [QUICKSTART](docs/user/QUICKSTART.en.md) - 5-minute Tutorial
+- [CHEATSHEET](docs/user/CHEATSHEET.en.md) - Quick Reference
 - [GUIDE](docs/user/GUIDE.md) - User Guide
 
 ---

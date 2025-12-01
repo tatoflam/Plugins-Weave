@@ -1,7 +1,7 @@
 <!--
   This file is for GitHub repository landing page display.
   See EpisodicRAG/ directory for detailed documentation.
-  Last synced: 2025-11-29
+  Last synced: 2025-12-01
 -->
 English | [日本語](README.md)
 
@@ -58,7 +58,7 @@ EpisodicRAG is a system that hierarchically digests conversation logs (Loop file
 @digest-setup
 ```
 
-For detailed setup instructions, see [QUICKSTART.md](EpisodicRAG/docs/user/QUICKSTART.md).
+For detailed setup instructions, see [QUICKSTART.en.md](EpisodicRAG/docs/user/QUICKSTART.en.md).
 
 ---
 

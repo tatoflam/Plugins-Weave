@@ -417,6 +417,7 @@ L00001追加 → L00002追加 → /digest
 - [メインREADME](../README.md) - プロジェクト概要
 - [AI Spec Hub](docs/README.md) - コマンド・スキル・エージェント仕様
 - [QUICKSTART](docs/user/QUICKSTART.md) - 5分チュートリアル
+- [CHEATSHEET](docs/user/CHEATSHEET.md) - クイックリファレンス
 - [GUIDE](docs/user/GUIDE.md) - ユーザーガイド
 
 ---
