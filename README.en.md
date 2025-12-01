@@ -36,6 +36,7 @@ EpisodicRAG is a system that hierarchically digests conversation logs (Loop file
 |------------|-------------------|
 | 🚀 **Getting Started** | [QUICKSTART](EpisodicRAG/docs/user/QUICKSTART.en.md) → [Glossary](EpisodicRAG/README.en.md) |
 | 📘 **Daily User** | [GUIDE](EpisodicRAG/docs/user/GUIDE.md) |
+| 📝 **Quick Reference** | [CHEATSHEET](EpisodicRAG/docs/user/CHEATSHEET.en.md) |
 | 🔧 **Customizing Settings** | [digest-config](EpisodicRAG/skills/digest-config/SKILL.md) |
 | 📊 **Checking Status** | [digest-auto](EpisodicRAG/skills/digest-auto/SKILL.md) |
 | ❓ **Troubleshooting** | [FAQ](EpisodicRAG/docs/user/FAQ.md) → [TROUBLESHOOTING](EpisodicRAG/docs/user/TROUBLESHOOTING.md) |
