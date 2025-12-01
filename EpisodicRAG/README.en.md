@@ -269,8 +269,8 @@ flowchart LR
     B --> C[Memory Consolidated]
     C --> A
 
-    style B fill:#90EE90,stroke:#228B22
-    style C fill:#87CEEB,stroke:#4169E1
+    style B fill:#90EE90,stroke:#228B22,color:#000000
+    style C fill:#87CEEB,stroke:#4169E1,color:#000000
 ```
 
 **What to do:**
