@@ -12,6 +12,19 @@ AI/Claudeエージェント向けの技術仕様ハブです。
 
 ---
 
+## 目次
+
+- [⚠️ v4.0.0 Breaking Changes](#️-v400-breaking-changes)
+- [Command Specifications](#command-specifications)
+- [Skill Specifications](#skill-specifications)
+- [Agent Specifications](#agent-specifications)
+- [Quick Reference](#quick-reference)
+- [Learning Resources](#learning-resources)
+- [Developer Documentation](#developer-documentation)
+- [Documentation Map](#documentation-map)
+
+---
+
 ## ⚠️ v4.0.0 Breaking Changes
 
 ### Config層の再編成
@@ -122,21 +135,27 @@ python -m interfaces.digest_auto
 
 ```text
 docs/
-├── README.md              ← 現在地
-├── user/                  ← ユーザー向け
-│   ├── QUICKSTART.md      # 5分スタート
-│   ├── GUIDE.md           # 基本ガイド
-│   ├── ADVANCED.md        # 高度な使い方
-│   ├── CHEATSHEET.md      # 早見表
-│   ├── FAQ.md             # よくある質問
-│   └── TROUBLESHOOTING.md # トラブル解決
+├── README.md                  ← 現在地
+├── user/                      ← ユーザー向け
+│   ├── QUICKSTART.md (.en)    # 5分スタート
+│   ├── GUIDE.md               # 基本ガイド
+│   ├── ADVANCED.md            # 高度な使い方
+│   ├── CHEATSHEET.md (.en)    # 早見表
+│   ├── FAQ.md                 # よくある質問
+│   └── TROUBLESHOOTING.md     # トラブル解決
 │
-└── dev/                   ← 開発者向け
-    ├── ARCHITECTURE.md    # 技術仕様
-    ├── API_REFERENCE.md   # API仕様
-    ├── DESIGN_DECISIONS.md
-    ├── LEARNING_PATH.md
-    └── api/               # Layer別詳細
+└── dev/                       ← 開発者向け
+    ├── ARCHITECTURE.md        # 技術仕様
+    ├── API_REFERENCE.md       # API仕様
+    ├── DESIGN_DECISIONS.md    # 設計判断
+    ├── LEARNING_PATH.md       # 学習パス
+    ├── ERROR_RECOVERY_PATTERNS.md  # エラーリカバリー
+    └── api/                   # Layer別詳細
+        ├── domain.md
+        ├── infrastructure.md
+        ├── application.md
+        ├── interfaces.md
+        └── config.md
 ```
 
 ---
