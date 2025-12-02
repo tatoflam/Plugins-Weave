@@ -201,7 +201,4 @@ python -m interfaces.digest_setup init --config '...' --force
 > 📖 `trusted_external_paths` の詳細は [用語集](../../README.md#trusted_external_paths) を参照
 
 ---
-
-**このスキルは、EpisodicRAG プラグインの初期セットアップを対話的に実行します 🛠️**
-
----
+**EpisodicRAG** by Weave | [GitHub](https://github.com/Bizuayeu/Plugins-Weave)

@@ -13,16 +13,16 @@ A guide to set up EpisodicRAG as quickly as possible and verify it works.
 
 ```mermaid
 flowchart LR
-    A["📦 Step 1\nInstall"] --> B["⚙️ Step 2\nSetup"]
-    B --> C["📝 Step 3\nCreate Loop"]
-    C --> D["🔄 Step 4\n/digest"]
+    A["📦 Step 1: Install"] --> B["⚙️ Step 2: Setup"]
+    B --> C["📝 Step 3: Create Loop"]
+    C --> D["🔄 Step 4: /digest"]
     D --> E["✅ Done"]
 
-    style A fill:#E8F5E9
-    style B fill:#E3F2FD
-    style C fill:#FFF3E0
-    style D fill:#F3E5F5
-    style E fill:#E8F5E9
+    style A fill:#E8F5E9,color:#000000
+    style B fill:#E3F2FD,color:#000000
+    style C fill:#FFF3E0,color:#000000
+    style D fill:#F3E5F5,color:#000000
+    style E fill:#E8F5E9,color:#000000
 ```
 
 ---

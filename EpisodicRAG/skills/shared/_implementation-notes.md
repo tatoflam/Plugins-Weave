@@ -101,4 +101,4 @@ Triennial → Decadal → Multi-decadal → Centurial
 
 ---
 
-*このファイルは開発者向けの内部参照用です。*
+*このファイルはClaude向けの内部参照用です。*

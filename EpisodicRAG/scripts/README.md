@@ -221,3 +221,6 @@ python -c "from interfaces import DigestFinalizerFromShadow; print('OK')"
 - [DESIGN_DECISIONS.md](../docs/dev/DESIGN_DECISIONS.md) - 設計判断
 - [LEARNING_PATH.md](../docs/dev/LEARNING_PATH.md) - Python学習パス
 - [CONTRIBUTING.md](../CONTRIBUTING.md) - 開発参加ガイド
+
+---
+**EpisodicRAG** by Weave | [GitHub](https://github.com/Bizuayeu/Plugins-Weave)

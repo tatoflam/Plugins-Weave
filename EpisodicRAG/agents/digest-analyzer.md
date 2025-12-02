@@ -318,3 +318,4 @@ Grep(pattern="emotional error", path=loops_path, output_mode="files_with_matches
 - `Essences/ShadowGrandDigest.txt` - 未確定の最新記憶
 
 ---
+**EpisodicRAG** by Weave | [GitHub](https://github.com/Bizuayeu/Plugins-Weave)

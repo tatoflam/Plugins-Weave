@@ -121,3 +121,6 @@ EpisodicRAGは依存関係ルールに基づく4層構造を採用していま�
 - [DESIGN_DECISIONS.md](DESIGN_DECISIONS.md) - 設計判断
 - [API_REFERENCE.md](API_REFERENCE.md) - API仕様
 - [CONTRIBUTING.md](../../CONTRIBUTING.md) - 開発ガイド
+
+---
+**EpisodicRAG** by Weave | [GitHub](https://github.com/Bizuayeu/Plugins-Weave)

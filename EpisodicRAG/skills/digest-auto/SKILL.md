@@ -241,7 +241,4 @@ Claudeの動作:
 ```
 
 ---
-
-**このスキルは、EpisodicRAG システムの状態を分析し、最適なアクションを推奨します 📊**
-
----
+**EpisodicRAG** by Weave | [GitHub](https://github.com/Bizuayeu/Plugins-Weave)

@@ -12,18 +12,54 @@
 
 ## 適用ファイル一覧
 
-- `README.md`（ルート）
-- `README.en.md`（ルート - 英語版）
-- `EpisodicRAG/README.md`
-- `EpisodicRAG/README.en.md`
-- `EpisodicRAG/docs/README.md`
-- `EpisodicRAG/docs/user/QUICKSTART.md`
-- `EpisodicRAG/docs/user/GUIDE.md`
-- `EpisodicRAG/docs/user/FAQ.md`
-- `EpisodicRAG/docs/user/ADVANCED.md`
-- `EpisodicRAG/docs/user/TROUBLESHOOTING.md`
-- `EpisodicRAG/docs/dev/ARCHITECTURE.md`
-- `EpisodicRAG/docs/dev/API_REFERENCE.md`
-- `EpisodicRAG/CONTRIBUTING.md`
-- `EpisodicRAG/skills/README.md`
-- `EpisodicRAG/commands/README.md`
+### ルート（plugins-weave/）
+- `README.md`
+- `README.en.md`
+
+### EpisodicRAG/
+- `README.md`
+- `README.en.md`
+- `CONTRIBUTING.md`
+- `CONTRIBUTING.en.md`
+
+### EpisodicRAG/docs/
+- `README.md`
+
+### EpisodicRAG/docs/user/
+- `QUICKSTART.md`
+- `QUICKSTART.en.md`
+- `GUIDE.md`
+- `FAQ.md`
+- `ADVANCED.md`
+- `TROUBLESHOOTING.md`
+- `CHEATSHEET.md`
+- `CHEATSHEET.en.md`
+
+### EpisodicRAG/docs/dev/
+- `ARCHITECTURE.md`
+- `API_REFERENCE.md`
+- `DESIGN_DECISIONS.md`
+- `LEARNING_PATH.md`
+- `ERROR_RECOVERY_PATTERNS.md`
+
+### EpisodicRAG/docs/dev/api/
+- `domain.md`
+- `interfaces.md`
+- `application.md`
+- `config.md`
+- `infrastructure.md`
+
+### EpisodicRAG/scripts/
+- `README.md`
+- `test/TESTING.md`
+
+### EpisodicRAG/agents/
+- `digest-analyzer.md`
+
+### EpisodicRAG/commands/
+- `digest.md`
+
+### EpisodicRAG/skills/
+- `digest-setup/SKILL.md`
+- `digest-config/SKILL.md`
+- `digest-auto/SKILL.md`

@@ -216,3 +216,6 @@
 - [SOLID Principles](https://en.wikipedia.org/wiki/SOLID)
 - [Design Patterns (GoF)](https://en.wikipedia.org/wiki/Design_Patterns)
 - [Python typing.TypedDict](https://docs.python.org/3/library/typing.html#typing.TypedDict)
+
+---
+**EpisodicRAG** by Weave | [GitHub](https://github.com/Bizuayeu/Plugins-Weave)

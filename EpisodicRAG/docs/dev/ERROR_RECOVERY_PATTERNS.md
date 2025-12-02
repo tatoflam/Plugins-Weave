@@ -227,3 +227,6 @@ EpisodicRAGError (Base exception)
 - 実装: `scripts/infrastructure/json_repository.py`
 - テスト: `scripts/test/integration_tests/test_error_recovery.py`
 - 例外定義: `scripts/domain/exceptions.py`
+
+---
+**EpisodicRAG** by Weave | [GitHub](https://github.com/Bizuayeu/Plugins-Weave)

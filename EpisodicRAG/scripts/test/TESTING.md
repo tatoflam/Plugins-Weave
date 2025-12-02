@@ -416,3 +416,6 @@ start htmlcov/index.html # Windows
 > - エラー回復テスト → `test_stateful_workflow.py::ErrorRecoveryStateMachine`
 > - 境界条件テスト → `test_threshold_boundaries.py`
 > - 並行アクセステスト → `test_concurrent_access.py`
+
+---
+**EpisodicRAG** by Weave | [GitHub](https://github.com/Bizuayeu/Plugins-Weave)

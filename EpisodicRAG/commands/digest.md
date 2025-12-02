@@ -339,7 +339,4 @@ Monthly生成まであと4個のWeeklyが必要です。
 ```
 
 ---
-
-**このコマンドは、EpisodicRAGシステムの基本操作を提供します 🟢**
-
----
+**EpisodicRAG** by Weave | [GitHub](https://github.com/Bizuayeu/Plugins-Weave)

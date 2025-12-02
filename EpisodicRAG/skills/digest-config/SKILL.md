@@ -194,7 +194,4 @@ Claudeの動作:
 2. 結果をユーザーに分かりやすく表示
 
 ---
-
-**このスキルは、EpisodicRAG プラグインの設定を対話的に変更します ⚙️**
-
----
+**EpisodicRAG** by Weave | [GitHub](https://github.com/Bizuayeu/Plugins-Weave)
