@@ -125,9 +125,4 @@ With GitHub integration, you can retain and inherit long-term memory after sessi
 
 ---
 
-## Author
-
-**Weave** | [GitHub](https://github.com/Bizuayeu/Plugins-Weave)
-
----
 **EpisodicRAG** by Weave | [GitHub](https://github.com/Bizuayeu/Plugins-Weave)

@@ -123,10 +123,4 @@ GitHub 連携により、セッション終了後も長期記憶を保持・継�
 - 商用利用: 特許権との関係について事前にご相談ください
 
 ---
-
-## 作者
-
-**Weave** | [GitHub](https://github.com/Bizuayeu/Plugins-Weave)
-
----
 **EpisodicRAG** by Weave | [GitHub](https://github.com/Bizuayeu/Plugins-Weave)
