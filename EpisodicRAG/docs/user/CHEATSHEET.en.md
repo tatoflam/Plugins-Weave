@@ -1,5 +1,5 @@
 <!-- Last synced: 2025-12-02 -->
-[EpisodicRAG](../../README.en.md) > [Docs](../README.md) > CHEATSHEET (English)
+[EpisodicRAG](../../README.md) > [Docs](../README.md) > CHEATSHEET (English)
 
 [日本語](CHEATSHEET.md) | English
 

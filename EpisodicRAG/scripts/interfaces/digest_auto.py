@@ -18,6 +18,11 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
+from infrastructure.json_repository import load_json, try_load_json
+
+from interfaces.cli_helpers import output_error, output_json
+
+from domain.exceptions import FileIOError
 from domain.file_constants import (
     CONFIG_FILENAME,
     DIGEST_TIMES_FILENAME,
@@ -102,11 +107,7 @@ class DigestAutoAnalyzer:
 
     def _load_config(self) -> Dict[str, Any]:
         """設定ファイルを読み込む"""
-        if not self.config_file.exists():
-            raise FileNotFoundError("Config file not found. Run @digest-setup first.")
-
-        with open(self.config_file, "r", encoding="utf-8") as f:
-            return json.load(f)
+        return load_json(self.config_file)
 
     def _resolve_base_dir(self, config: Dict[str, Any]) -> Path:
         """base_dirを解決"""
@@ -118,13 +119,7 @@ class DigestAutoAnalyzer:
 
     def _load_json_file(self, file_path: Path) -> Optional[Dict[str, Any]]:
         """JSONファイルを読み込む（存在しない場合はNone）"""
-        if not file_path.exists():
-            return None
-        try:
-            with open(file_path, "r", encoding="utf-8") as f:
-                return json.load(f)
-        except json.JSONDecodeError:
-            return None
+        return try_load_json(file_path, log_on_error=False)
 
     def _extract_file_number(self, filename: str) -> Optional[int]:
         """ファイル名から番号を抽出"""
@@ -248,7 +243,7 @@ class DigestAutoAnalyzer:
                 recommendations=recommendations,
             )
 
-        except FileNotFoundError as e:
+        except FileIOError as e:
             return AnalysisResult(
                 status="error",
                 error=str(e),
@@ -496,20 +491,6 @@ def format_text_report(result: AnalysisResult) -> str:
 def print_text_report(result: AnalysisResult) -> None:
     """テキスト形式でレポートを出力（VSCode対応）"""
     print(format_text_report(result))
-
-
-def output_json(data: Any) -> None:
-    """JSON出力"""
-    print(json.dumps(data, ensure_ascii=False, indent=2))
-
-
-def output_error(error: str, details: Optional[Dict[str, Any]] = None) -> None:
-    """エラー出力"""
-    result: Dict[str, Any] = {"status": "error", "error": error}
-    if details:
-        result["details"] = details
-    print(json.dumps(result, ensure_ascii=False, indent=2))
-    sys.exit(1)
 
 
 def main(plugin_root: Optional[Path] = None) -> None:

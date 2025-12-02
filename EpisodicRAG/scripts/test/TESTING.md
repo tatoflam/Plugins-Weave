@@ -15,6 +15,7 @@
 - [Performance Targets](#performance-targets)
 - [CLI Integration Tests](#cli-integration-tests-v400)
 - [Continuous Integration](#continuous-integration)
+- [Tools Tests](#tools-tests-v410)
 - [Known Gaps](#known-gaps)
 
 ---
@@ -56,19 +57,21 @@ test/
 ├── conftest.py              # 共通フィクスチャ
 ├── test_helpers.py          # テストヘルパー
 ├── test_constants.py        # テスト用定数
-├── domain_tests/            # 純粋なビジネスロジック (17 files)
-├── config_tests/            # Config層3層化対応 (13 files) [v4.0.0+]
-├── application_tests/       # ユースケース (16 files)
+├── domain_tests/            # 純粋なビジネスロジック (30 files)
+├── config_tests/            # Config層3層化対応 (14 files) [v4.0.0+]
+├── application_tests/       # ユースケース (18 files)
 │   ├── grand/               # GrandDigest関連
-│   ├── shadow/              # Shadow関連
+│   ├── shadow/              # Shadow関連（cascade_orchestrator含む）
 │   └── finalize/            # Finalize処理
 │       └── validators/      # バリデータ
-├── infrastructure_tests/    # I/O操作 (10 files)
-├── interfaces_tests/        # エントリポイント (8 files)
+├── infrastructure_tests/    # I/O操作 (11 files)
+│   └── config/              # PathValidatorChain [v4.1.0+]
+├── interfaces_tests/        # エントリポイント (22 files)
 │   └── provisional/         # Provisional処理
 ├── integration_tests/       # E2Eシナリオ (14 files)
-├── cli_integration_tests/   # CLI E2E (3 files) [v4.0.0+]
-└── performance_tests/       # ベンチマーク (1 file)
+├── cli_integration_tests/   # CLI E2E (4 files) [v4.0.0+]
+├── performance_tests/       # ベンチマーク (1 file)
+└── tools_tests/             # 開発ツール (2 files) [v4.1.0+]
 ```
 
 ---
@@ -79,14 +82,15 @@ test/
 
 | 層 | 主なテストファイル | ファイル数 |
 |----|-------------------|-----------|
-| **Domain** | `test_validators.py`, `test_file_naming.py`, `test_level_registry.py`, `test_types.py` | 17 |
-| **Config** | `test_config.py`, `test_path_resolver.py`, `test_threshold_provider.py`, `test_config_validator.py` | 13 |
-| **Infrastructure** | `test_json_repository.py`, `test_file_scanner.py`, `test_logging_config.py` | 10 |
-| **Application** | `test_shadow_*.py`, `test_grand_digest.py`, `test_cascade_processor.py`, `test_persistence.py` | 16 |
-| **Interfaces** | `test_finalize_from_shadow.py`, `test_digest_config.py`, `test_digest_setup.py` | 8 |
+| **Domain** | `test_validators.py`, `test_file_naming.py`, `test_level_registry.py`, `test_formatter_registry.py`, `test_types_imports.py`, `test_level_literals.py` | 30 |
+| **Config** | `test_config.py`, `test_path_resolver.py`, `test_threshold_provider.py`, `test_config_builder.py` | 14 |
+| **Infrastructure** | `test_json_repository.py`, `test_file_scanner.py`, `test_logging_config.py`, `test_path_validators.py` | 11 |
+| **Application** | `test_shadow_*.py`, `test_grand_digest.py`, `test_cascade_orchestrator.py`, `test_persistence.py` | 18 |
+| **Interfaces** | `test_finalize_from_shadow.py`, `test_*_cli_*.py`, `test_setup_*.py`, `test_auto_*.py`, `test_cli_helpers.py` | 22 |
 | **Integration** | `test_e2e_workflow.py`, `test_full_cascade.py`, `test_config_integration.py` | 14 |
-| **CLI Integration** | `test_digest_*_cli.py`, `test_workflow_cli.py` | 3 |
+| **CLI Integration** | `test_digest_*_cli.py`, `test_workflow_cli.py` | 4 |
 | **Performance** | `test_benchmarks.py` | 1 |
+| **Tools** | `test_check_footer.py`, `test_link_checker.py` | 2 |
 
 > 📊 最新のテスト数: `pytest --collect-only | tail -1`
 > 📁 ファイル数確認: `find scripts/test -name "test_*.py" | wc -l`
@@ -336,11 +340,12 @@ v4.0.0で追加されたCLI E2Eテストフレームワーク。subprocess経由
 ```
 cli_integration_tests/
 ├── __init__.py
-├── conftest.py          # CLI専用フィクスチャ
-├── cli_runner.py        # CLIRunner ヘルパークラス
+├── conftest.py              # CLI専用フィクスチャ
+├── cli_runner.py            # CLIRunner ヘルパークラス
 ├── test_digest_setup_cli.py
 ├── test_digest_config_cli.py
-└── test_digest_auto_cli.py
+├── test_digest_auto_cli.py
+└── test_workflow_cli.py     # ワークフロー統合テスト [v4.1.0+]
 ```
 
 ### CLIRunner
@@ -402,6 +407,18 @@ pytest scripts/test/ --cov=. --cov-report=term-missing --cov-report=html
 # HTMLレポート確認
 open htmlcov/index.html  # macOS
 start htmlcov/index.html # Windows
+```
+
+---
+
+## Tools Tests [v4.1.0+]
+
+開発支援ツールのテスト。
+
+```
+tools_tests/
+├── test_check_footer.py     # Digestフッター検証
+└── test_link_checker.py     # ドキュメントリンクチェック
 ```
 
 ---

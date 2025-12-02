@@ -1,4 +1,4 @@
-<!-- Last synced: 2025-12-01 -->
+<!-- Last synced: 2025-12-03 -->
 English | [日本語](CONTRIBUTING.md)
 
 # Contributing to EpisodicRAG Plugin
@@ -23,8 +23,9 @@ This document explains how to set up the development environment, test code chan
 4. [Creating Pull Requests](#creating-pull-requests)
 5. [Coding Standards](#coding-standards)
 6. [Testing](#testing)
-7. [Documentation](#documentation)
-8. [Support](#support)
+7. [Development Tools](#development-tools-v410) - Footer Checker, Link Checker *(v4.1.0+)*
+8. [Documentation](#documentation)
+9. [Support](#support)
 
 ---
 
@@ -48,39 +49,25 @@ There are two ways to test a plugin under development.
 
 #### 1. Verify Directory Structure
 
+> 📖 **Detailed Structure**: [ARCHITECTURE.md](docs/dev/ARCHITECTURE.md#directory-structure)
+
 ```text
 plugins-weave/
 ├── .claude-plugin/                     # Marketplace configuration
 │   └── marketplace.json
 └── EpisodicRAG/                        # Plugin main body
-    ├── .claude-plugin/
-    │   ├── CLAUDE.md                   # AI agent instructions
-    │   ├── plugin.json
-    │   ├── config.template.json
-    │   ├── last_digest_times.template.json
-    │   ├── GrandDigest.template.txt
-    │   └── ShadowGrandDigest.template.txt
-    ├── agents/
-    ├── commands/
-    ├── docs/
+    ├── .claude-plugin/                 # Plugin config & templates
     ├── scripts/                        # Clean Architecture (4 layers)
     │   ├── domain/                     # Core business logic
-    │   │   └── config/                 # Configuration constants & validation
     │   ├── infrastructure/             # External concerns (I/O)
-    │   │   └── config/                 # Configuration file I/O
     │   ├── application/                # Use cases
-    │   │   └── config/                 # DigestConfig (Facade)
     │   ├── interfaces/                 # Entry points
+    │   ├── tools/                      # Development tools (v4.1.0+)
     │   └── test/
-    ├── skills/
-    │   └── shared/
-    ├── pyproject.toml
-    ├── README.md / README.en.md
-    ├── CHANGELOG.md / CHANGELOG.en.md
-    └── CONTRIBUTING.md / CONTRIBUTING.en.md
+    ├── docs/                           # Documentation
+    ├── skills/                         # Skill definitions
+    └── ...
 ```
-
-> 📖 **Detailed Directory Structure**: [ARCHITECTURE.md](docs/dev/ARCHITECTURE.md#directory-structure)
 
 `marketplace.json` is already in place (included in the repository).
 
@@ -361,6 +348,86 @@ For details, see [TROUBLESHOOTING.md](docs/user/TROUBLESHOOTING.md#development-a
 
 ---
 
+## Development Tools *(v4.1.0+)*
+
+The `scripts/tools/` directory contains quality management tools for documentation.
+
+### Footer Checker (check_footer.py)
+
+Verifies that each document's footer matches the format defined in `_footer.md`.
+
+```bash
+cd plugins-weave/EpisodicRAG/scripts
+
+# Run check
+python -m tools.check_footer
+
+# Auto-fix
+python -m tools.check_footer --fix
+
+# Show summary only
+python -m tools.check_footer --quiet
+```
+
+**Example output**:
+```text
+Checking files in: docs/
+
+OK (3):
+  docs/README.md
+  docs/dev/ARCHITECTURE.md
+  docs/dev/DESIGN_DECISIONS.md
+
+MISSING (1):
+  docs/user/NEW_FILE.md
+
+MISMATCH (1):
+  docs/user/OLD_FILE.md
+
+Summary: 3 OK, 1 MISSING, 1 MISMATCH
+```
+
+### Link Checker (link_checker.py)
+
+Validates relative links, anchor links, and composite links within Markdown files.
+
+```bash
+cd plugins-weave/EpisodicRAG/scripts
+
+# Run validation
+python -m tools.link_checker ../docs
+
+# Verbose output
+python -m tools.link_checker ../docs --verbose
+
+# JSON output (for CI/CD)
+python -m tools.link_checker ../docs --json
+```
+
+**Example output**:
+```text
+Checking: docs/dev/ARCHITECTURE.md
+
+BROKEN LINKS:
+  Line 42: [config.md](./config.md)
+    File not found: docs/dev/config.md
+    Suggestion: Did you mean docs/dev/api/config.md?
+
+  Line 85: [#invalid-anchor](#invalid-anchor)
+    Anchor not found in document
+
+Summary: 2 broken links in 1 file
+```
+
+**Features**:
+- Relative link validation (`./file.md`, `../file.md`)
+- Anchor link validation (`#section`)
+- Composite link validation (`file.md#section`)
+- Broken link fix suggestions
+- JSON output (for CI/CD integration)
+
+---
+
 ## Documentation
 
 Update documentation as needed when making code changes:
@@ -401,6 +468,7 @@ Version information's single source of truth is the `version` field in `.claude-
 | `../.claude-plugin/marketplace.json` | `plugins[].version` | Manual sync |
 | `CHANGELOG.md` | `## [x.x.x]` | Manual sync |
 | `../README.md` / `../README.en.md` | Version badge | Manual sync |
+| `docs/README.md` | Version badge | Manual sync |
 | `scripts/domain/version.py` | `__version__` | **Automatic** (dynamic loading) |
 
 > 📊 These syncs are verified by tests in `scripts/test/domain_tests/test_version.py`.

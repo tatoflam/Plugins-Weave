@@ -71,6 +71,18 @@ from domain.types.guards import (
     is_long_short_text,
 )
 
+# Literal types
+from domain.types.level_literals import (
+    AllLevelName,
+    LevelConfigKey,
+    LevelName,
+    LogPrefix,
+    PathConfigKey,
+    ProvisionalSuffix,
+    SourceType,
+    ThresholdKey,
+)
+
 __all__ = [
     # Metadata
     "BaseMetadata",
@@ -105,4 +117,13 @@ __all__ = [
     "is_level_config_data",
     "is_shadow_digest_data",
     "is_long_short_text",
+    # Literal types
+    "LevelName",
+    "AllLevelName",
+    "LevelConfigKey",
+    "SourceType",
+    "ProvisionalSuffix",
+    "PathConfigKey",
+    "ThresholdKey",
+    "LogPrefix",
 ]

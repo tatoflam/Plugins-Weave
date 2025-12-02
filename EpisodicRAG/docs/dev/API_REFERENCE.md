@@ -94,9 +94,13 @@ EpisodicRAGで使用されているデザインパターン一覧：
 | **Repository** | `ShadowIO`, `GrandDigestManager`, `DigestTimesTracker` | データアクセスロジックの抽象化 |
 | **Singleton** | `LevelRegistry` | 階層設定の一元管理（`get_level_registry()`で取得） |
 | **Strategy** | `LevelBehavior`, `StandardLevelBehavior`, `LoopLevelBehavior` | 階層ごとの振る舞いを交換可能に |
-| **Template Method** | `ShadowTemplate` | テンプレート生成の骨格定義 |
-| **Builder** | `RegularDigestBuilder` | 複雑なオブジェクト（RegularDigest）の段階的構築 |
+| **Template Method** | `error_formatter/base.py` | パス正規化などの共通処理を基底クラスで定義 |
+| **Builder** | `RegularDigestBuilder`, `DigestConfigBuilder` *(v4.1.0+)* | 複雑なオブジェクトの段階的構築 |
 | **Factory** | `get_level_registry()`, `get_default_confirm_callback()` | オブジェクト生成の抽象化 |
+| **Composite** | `CompositeErrorFormatter` | カテゴリ別フォーマッタを統合インターフェースで提供 |
+| **Registry** *(v4.1.0+)* | `FormatterRegistry` | エラーフォーマッタの動的登録と取得 |
+| **Orchestrator** *(v4.1.0+)* | `CascadeOrchestrator` | カスケード処理のワークフロー制御と結果構造化 |
+| **Chain of Responsibility** *(v4.1.0+)* | `ChainedLoader`, `PathValidatorChain` | 処理戦略の順次試行・検証ルールの順次適用 |
 
 > 📖 パターン選択の根拠: [DESIGN_DECISIONS.md](DESIGN_DECISIONS.md)
 

@@ -22,9 +22,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **内部リファクタリング**: TypedDict分割、バリデーション統合、新デザインパターン4種追加
+- **内部リファクタリング**: TypedDict分割、Literal型導入、CLI共通ヘルパー統合、バリデーション統合、新デザインパターン4種追加
+
 - **開発ツール**: フッターチェッカー、リンクチェッカー（`scripts/tools/`）
-- **テスト**: 117テスト追加（合計2162テスト）
+
+- **テスト**: 153テスト追加（合計2198テスト）
 
 > 📖 詳細は [DESIGN_DECISIONS.md](docs/dev/DESIGN_DECISIONS.md) を参照
 

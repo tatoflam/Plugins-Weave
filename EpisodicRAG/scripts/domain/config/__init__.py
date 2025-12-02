@@ -12,7 +12,7 @@ Usage:
 """
 
 from domain.config.config_constants import REQUIRED_CONFIG_KEYS, THRESHOLD_KEYS
-from domain.config.validation import collect_type_error
+from domain.validators.helpers import collect_type_error
 
 __all__ = [
     "REQUIRED_CONFIG_KEYS",

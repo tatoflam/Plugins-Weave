@@ -69,9 +69,9 @@ interfaces/       ← application/
 | `version.py` | バージョン定数（`__version__`, `DIGEST_FORMAT_VERSION`） |
 | `constants.py` | `LEVEL_CONFIG`, `PLACEHOLDER_*`, `DEFAULT_THRESHOLDS` |
 | `exceptions.py` | カスタム例外（`EpisodicRAGError`, `ValidationError`, etc.） |
-| `types.py` | TypedDict定義（`BaseMetadata`, `DigestMetadata`, etc.） |
+| `types/` | TypedDict定義パッケージ（`BaseMetadata`, `DigestMetadata`, Literal型等）*(v4.1.0+パッケージ化)* |
 | `file_naming.py` | ファイル命名ユーティリティ（`extract_file_number()`, `format_digest_number()`） |
-| `error_formatter.py` | エラーメッセージの標準化（`ErrorFormatter`） |
+| `error_formatter/` | エラーメッセージの標準化パッケージ（`CompositeErrorFormatter`, `FormatterRegistry`）|
 | `level_registry.py` | レベル固有振る舞いのRegistry（Strategy Pattern） |
 
 ```python
@@ -84,7 +84,7 @@ from domain.level_registry import get_level_registry
 
 | Module | Purpose |
 |--------|---------|
-| `json_repository.py` | JSON読み書き（`load_json`, `save_json`, `load_json_with_template`） |
+| `json_repository/` | JSON操作パッケージ（`load_json`, `save_json`, `ChainedLoader`）|
 | `file_scanner.py` | ファイルスキャン（`scan_files`, `get_max_numbered_file`） |
 | `logging_config.py` | ロギング設定（`log_info`, `log_warning`, `log_error`） |
 | `user_interaction.py` | ユーザー確認プロンプト（`get_default_confirm_callback`） |
@@ -101,7 +101,7 @@ from infrastructure.user_interaction import get_default_confirm_callback
 |---------|---------|
 | `validators.py` | バリデーション関数（`validate_dict`, `is_valid_list`） |
 | `tracking/` | 時間追跡（`DigestTimesTracker`） |
-| `shadow/` | Shadow管理（`ShadowTemplate`, `ShadowUpdater`, `ShadowIO`, `FileDetector`, `CascadeProcessor`, `FileAppender`, `PlaceholderManager`） |
+| `shadow/` | Shadow管理（`ShadowTemplate`, `ShadowUpdater`, `ShadowIO`, `FileDetector`, `CascadeProcessor`, `CascadeOrchestrator` *(v4.1.0+)*, `FileAppender`, `PlaceholderManager`） |
 | `grand/` | GrandDigest管理（`GrandDigestManager`, `ShadowGrandDigestManager`） |
 | `finalize/` | Finalize処理（`ShadowValidator`, `ProvisionalLoader`, `RegularDigestBuilder`, `DigestPersistence`） |
 
@@ -124,6 +124,7 @@ from application.validators import validate_dict, is_valid_list
 | `shadow_state_checker.py` | - | Shadow状態チェッカー |
 | `config_cli.py` | - | 設定CLIエントリーポイント |
 | `interface_helpers.py` | - | ヘルパー関数（`sanitize_filename`, `get_next_digest_number`） |
+| `cli_helpers.py` | - | CLI共通ヘルパー（`output_json`, `output_error`）*(v4.1.0+)* |
 | `provisional/` | - | Provisionalマージ処理（`file_manager`, `input_loader`, `merger`, `validator`） |
 
 ```python
@@ -187,7 +188,8 @@ test/
 ├── config_tests/            # config層テスト（v4.0.0+）
 ├── cli_integration_tests/   # CLI統合テスト（v4.0.0+）
 ├── integration_tests/       # 統合テスト
-└── performance_tests/       # パフォーマンステスト
+├── performance_tests/       # パフォーマンステスト
+└── tools_tests/             # 開発ツールテスト（v4.1.0+）
 ```
 
 ### テスト実行

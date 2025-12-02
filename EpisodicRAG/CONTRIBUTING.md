@@ -48,39 +48,25 @@ EpisodicRAGプラグインの開発に興味を持っていただき、ありが
 
 #### 1. ディレクトリ構造の確認
 
+> 📖 **詳細な構造**: [ARCHITECTURE.md](docs/dev/ARCHITECTURE.md#ディレクトリ構成)
+
 ```text
 plugins-weave/
 ├── .claude-plugin/                     # マーケットプレイス設定
 │   └── marketplace.json
 └── EpisodicRAG/                        # プラグイン本体
-    ├── .claude-plugin/
-    │   ├── CLAUDE.md                   # AIエージェント向け指示
-    │   ├── plugin.json
-    │   ├── config.template.json
-    │   ├── last_digest_times.template.json
-    │   ├── GrandDigest.template.txt
-    │   └── ShadowGrandDigest.template.txt
-    ├── agents/
-    ├── commands/
-    ├── docs/
+    ├── .claude-plugin/                 # プラグイン設定・テンプレート
     ├── scripts/                        # Clean Architecture（4層）
     │   ├── domain/                     # コアビジネスロジック
-    │   │   └── config/                 # 設定定数・バリデーション
     │   ├── infrastructure/             # 外部関心事（I/O）
-    │   │   └── config/                 # 設定ファイルI/O
     │   ├── application/                # ユースケース
-    │   │   └── config/                 # DigestConfig（Facade）
     │   ├── interfaces/                 # エントリーポイント
+    │   ├── tools/                      # 開発ツール (v4.1.0+)
     │   └── test/
-    ├── skills/
-    │   └── shared/
-    ├── pyproject.toml
-    ├── README.md / README.en.md
-    ├── CHANGELOG.md / CHANGELOG.en.md
-    └── CONTRIBUTING.md / CONTRIBUTING.en.md
+    ├── docs/                           # ドキュメント
+    ├── skills/                         # スキル定義
+    └── ...
 ```
-
-> 📖 **詳細なディレクトリ構造**: [ARCHITECTURE.md](docs/dev/ARCHITECTURE.md#ディレクトリ構成)
 
 `marketplace.json`は既に配置済みです（リポジトリに含まれています）。
 
@@ -481,6 +467,7 @@ git status
 | `../.claude-plugin/marketplace.json` | `plugins[].version` | 手動同期 |
 | `CHANGELOG.md` | `## [x.x.x]` | 手動同期 |
 | `../README.md` / `../README.en.md` | バージョンバッジ | 手動同期 |
+| `docs/README.md` | バージョンバッジ | 手動同期 |
 | `scripts/domain/version.py` | `__version__` | **自動**（動的読み込み） |
 
 > 📊 これらの同期は `scripts/test/domain_tests/test_version.py` のテストで検証されます。

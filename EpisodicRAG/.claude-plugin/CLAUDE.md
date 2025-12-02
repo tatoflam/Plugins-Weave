@@ -49,12 +49,10 @@ EpisodicRAG/
 │   └── user/                # ユーザー向け（GUIDE, FAQ等）
 ├── scripts/                 # Python/Bash実装（Clean Architecture）
 │   ├── domain/              # コアビジネスロジック
-│   │   └── config/          # 設定定数・バリデーション
 │   ├── infrastructure/      # 外部関心事
-│   │   └── config/          # 設定ファイルI/O
 │   ├── application/         # ユースケース
-│   │   └── config/          # DigestConfig（Facade）
 │   ├── interfaces/          # エントリーポイント・CLI
+│   ├── tools/               # 開発ツール (v4.1.0+)
 │   └── test/                # ユニットテスト
 ├── skills/                  # スキル仕様
 │   └── shared/              # 共有コンポーネント（SSoT）
@@ -86,7 +84,7 @@ from domain import LEVEL_CONFIG, __version__
 from domain.config import REQUIRED_CONFIG_KEYS
 
 # Infrastructure層
-from infrastructure.config import load_json, save_json
+from infrastructure import load_json, save_json
 
 # Application層
 from application.validators import validate_dict

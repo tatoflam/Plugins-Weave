@@ -23,9 +23,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **Internal Refactoring**: TypedDict split, validation consolidation, 4 new design patterns
+- **Internal Refactoring**: TypedDict split, Literal types, CLI common helpers, validation consolidation, 4 new design patterns
+
 - **Development Tools**: Footer checker, link checker (`scripts/tools/`)
-- **Tests**: 117 tests added (total 2162 tests)
+
+- **Tests**: 153 tests added (total 2198 tests)
 
 > 📖 See [DESIGN_DECISIONS.md](docs/dev/DESIGN_DECISIONS.md) for details
 

@@ -15,6 +15,8 @@ from pathlib import Path
 
 import pytest
 
+from domain.exceptions import FileIOError
+
 
 class TestConfigEditor(unittest.TestCase):
     """ConfigEditor クラスのテスト"""
@@ -240,12 +242,12 @@ class TestConfigEditorErrors(unittest.TestCase):
 
     @pytest.mark.unit
     def test_show_raises_when_config_missing(self):
-        """設定ファイルがない場合に FileNotFoundError"""
+        """設定ファイルがない場合に FileIOError"""
         from interfaces.digest_config import ConfigEditor
 
         editor = ConfigEditor(plugin_root=self.plugin_root)
 
-        with pytest.raises(FileNotFoundError):
+        with pytest.raises(FileIOError):
             editor.show()
 
 

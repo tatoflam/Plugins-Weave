@@ -18,6 +18,9 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+from infrastructure.json_repository import load_json
+
+from domain.exceptions import FileIOError
 from domain.file_constants import CONFIG_FILENAME, PLUGIN_CONFIG_DIR, SHADOW_GRAND_DIGEST_FILENAME
 
 # Windows UTF-8対応（pytest実行時はスキップ）
@@ -75,13 +78,7 @@ class ShadowStateChecker:
 
     def _load_config(self) -> Dict[str, Any]:
         """設定ファイルを読み込む"""
-        if not self.config_file.exists():
-            raise FileNotFoundError(
-                f"Config file not found: {self.config_file}"
-            )
-
-        with open(self.config_file, "r", encoding="utf-8") as f:
-            return json.load(f)
+        return load_json(self.config_file)
 
     def _get_essences_path(self, config: Dict[str, Any]) -> Path:
         """Essencesパスを取得"""
@@ -100,13 +97,7 @@ class ShadowStateChecker:
         if self.shadow_file is None:
             raise ValueError("Shadow file path not set")
 
-        if not self.shadow_file.exists():
-            raise FileNotFoundError(
-                f"ShadowGrandDigest.txt not found: {self.shadow_file}"
-            )
-
-        with open(self.shadow_file, "r", encoding="utf-8") as f:
-            return json.load(f)
+        return load_json(self.shadow_file)
 
     def _has_placeholder(self, text: Optional[str]) -> bool:
         """プレースホルダー有無を判定"""
@@ -194,19 +185,12 @@ class ShadowStateChecker:
                 message=message,
             )
 
-        except FileNotFoundError as e:
+        except FileIOError as e:
             return ShadowStateResult(
                 status="error",
                 level=level,
                 analyzed=False,
                 error=str(e),
-            )
-        except json.JSONDecodeError as e:
-            return ShadowStateResult(
-                status="error",
-                level=level,
-                analyzed=False,
-                error=f"Invalid JSON in shadow file: {e}",
             )
         except Exception as e:
             return ShadowStateResult(

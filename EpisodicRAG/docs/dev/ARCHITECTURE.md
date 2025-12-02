@@ -91,6 +91,7 @@ scripts/
 │   │   ├── __init__.py              # 全型re-export（後方互換性維持）
 │   │   ├── metadata.py              # BaseMetadata, DigestMetadata等
 │   │   ├── level.py                 # LevelConfigData, LevelHierarchyEntry
+│   │   ├── level_literals.py        # Literal型定義（v4.1.0+）
 │   │   ├── text.py                  # LongShortText
 │   │   ├── digest.py                # OverallDigestData, ShadowDigestData等
 │   │   ├── config.py                # ConfigData, PathsConfigData等
@@ -110,10 +111,9 @@ scripts/
 │   ├── validators/                  # バリデーション（v4.1.0+統合）
 │   │   ├── __init__.py              # 公開API
 │   │   └── helpers.py               # validate_type, collect_type_error等
-│   └── config/                      # 設定関連定数・バリデーション
+│   └── config/                      # 設定関連定数
 │       ├── __init__.py
-│       ├── config_constants.py      # REQUIRED_CONFIG_KEYS, THRESHOLD_KEYS
-│       └── validation.py            # collect_type_error
+│       └── config_constants.py      # REQUIRED_CONFIG_KEYS, THRESHOLD_KEYS
 │
 ├── infrastructure/                  # 外部関心事
 │   ├── __init__.py                  # 公開API
@@ -171,6 +171,7 @@ scripts/
 │   ├── finalize_from_shadow.py      # DigestFinalizerFromShadow
 │   ├── save_provisional_digest.py   # ProvisionalDigestSaver
 │   ├── interface_helpers.py         # sanitize_filename, get_next_digest_number
+│   ├── cli_helpers.py               # output_json, output_error (v4.1.0+)
 │   ├── config_cli.py                # 設定CLIエントリーポイント
 │   ├── digest_setup.py              # @digest-setup CLI (v4.0.0+)
 │   ├── digest_config.py             # @digest-config CLI (v4.0.0+)

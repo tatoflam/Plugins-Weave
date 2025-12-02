@@ -39,7 +39,8 @@ from interfaces import (
 5. [ProvisionalDigestSaver](#provisionaldigestsaver)
 6. [Provisionalサブパッケージ](#provisionalサブパッケージinterfacesprovisional)
 7. [ヘルパー関数](#ヘルパー関数interfacesinterface_helperspy)
-8. [ShadowStateChecker（内部CLI）](#shadowstatechecker内部cli)
+8. [CLI共通ヘルパー](#cli共通ヘルパーinterfacescli_helperspy) *(v4.1.0+)*
+9. [ShadowStateChecker（内部CLI）](#shadowstatechecker内部cli)
 
 ---
 
@@ -403,6 +404,62 @@ def get_next_digest_number(digests_path: Path, level: str) -> int
 ```
 
 指定レベルの次のDigest番号を取得。
+
+---
+
+## CLI共通ヘルパー（interfaces/cli_helpers.py）
+
+*(v4.1.0+)*
+
+全CLIツールで使用するJSON出力とエラー出力の共通関数。
+
+```python
+from interfaces.cli_helpers import output_json, output_error
+```
+
+### output_json()
+
+```python
+def output_json(data: Any) -> None
+```
+
+JSON形式で標準出力に出力。`ensure_ascii=False`でUnicode文字をそのまま出力。
+
+```python
+output_json({"status": "ok", "data": result})
+# 出力: {"status": "ok", "data": {...}}
+```
+
+### output_error()
+
+```python
+def output_error(error: str, details: Optional[Dict[str, Any]] = None) -> None
+```
+
+エラーをJSON形式で出力し、終了コード1で終了。
+
+```python
+output_error("Something went wrong", details={"action": "retry"})
+# 出力: {"status": "error", "error": "Something went wrong", "details": {"action": "retry"}}
+# その後 sys.exit(1) で終了
+```
+
+| 関数 | 説明 |
+|------|------|
+| `output_json(data)` | JSON形式で標準出力に出力 |
+| `output_error(error, details=None)` | エラーをJSON形式で出力し、終了コード1で終了 |
+
+**使用例**:
+
+```python
+from interfaces.cli_helpers import output_json, output_error
+
+try:
+    result = process_something()
+    output_json({"status": "ok", "result": result})
+except Exception as e:
+    output_error(str(e), details={"suggestion": "Check configuration"})
+```
 
 ---
 

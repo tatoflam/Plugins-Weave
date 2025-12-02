@@ -202,7 +202,7 @@ class TestShadowStateChecker(unittest.TestCase):
 
         self.assertEqual(result.status, "error")
         self.assertFalse(result.analyzed)
-        self.assertIn("Config file not found", result.error)
+        self.assertIn("config.json", result.error)
 
     @pytest.mark.unit
     def test_check_returns_error_when_shadow_missing(self):
@@ -216,7 +216,7 @@ class TestShadowStateChecker(unittest.TestCase):
 
         self.assertEqual(result.status, "error")
         self.assertFalse(result.analyzed)
-        self.assertIn("ShadowGrandDigest.txt not found", result.error)
+        self.assertIn("ShadowGrandDigest.txt", result.error)
 
     @pytest.mark.unit
     def test_check_detects_null_fields_as_placeholders(self):

@@ -79,8 +79,13 @@ EpisodicRAGは依存関係ルールに基づく4層構造を採用していま�
 | Repository | `application/shadow/` (ShadowIO), `application/grand/` (GrandDigestManager) | データアクセスの抽象化 |
 | Singleton | `domain/level_registry.py` (LevelRegistry) | 設定の一元管理 |
 | Strategy | `domain/level_registry.py` (LevelBehavior) | 振る舞いの交換可能性 |
-| Builder | `application/finalize/` (RegularDigestBuilder) | 複雑なオブジェクト構築 |
+| Template Method | `domain/error_formatter/base.py` | 共通処理の基底クラス定義 |
+| Builder | `application/finalize/` (RegularDigestBuilder), `application/config/` (DigestConfigBuilder) *(v4.1.0+)* | 複雑なオブジェクト構築 |
 | Factory | `domain/level_registry.py` (get_level_registry) | オブジェクト生成の抽象化 |
+| Composite | `domain/error_formatter/` (CompositeErrorFormatter) | 統合インターフェース提供 |
+| Registry *(v4.1.0+)* | `domain/error_formatter/registry.py` (FormatterRegistry) | 動的登録と取得 |
+| Orchestrator *(v4.1.0+)* | `application/shadow/cascade_orchestrator.py` | ワークフロー制御 |
+| Chain of Responsibility *(v4.1.0+)* | `infrastructure/json_repository/chained_loader.py`, `infrastructure/config/path_validators.py` | 処理の順次試行 |
 
 **学習ポイント**:
 - 各パターンの実装ファイルを読む

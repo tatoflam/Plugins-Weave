@@ -19,6 +19,10 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+from infrastructure.json_repository import save_json, try_load_json
+
+from interfaces.cli_helpers import output_error, output_json
+
 from domain.file_constants import (
     CONFIG_FILENAME,
     DIGEST_TIMES_FILENAME,
@@ -84,15 +88,15 @@ class SetupManager:
         # 設定ファイルが存在する場合、ディレクトリもチェック
         directories_exist = False
         if config_exists:
-            try:
-                with open(self.config_file, "r", encoding="utf-8") as f:
-                    config_data = json.load(f)
-                base_dir = self._resolve_base_dir(config_data.get("base_dir", "."))
-                paths = config_data.get("paths", {})
-                loops_dir = base_dir / paths.get("loops_dir", "data/Loops")
-                directories_exist = loops_dir.exists()
-            except (json.JSONDecodeError, KeyError):
-                pass
+            config_data = try_load_json(self.config_file, log_on_error=False)
+            if config_data is not None:
+                try:
+                    base_dir = self._resolve_base_dir(config_data.get("base_dir", "."))
+                    paths = config_data.get("paths", {})
+                    loops_dir = base_dir / paths.get("loops_dir", "data/Loops")
+                    directories_exist = loops_dir.exists()
+                except KeyError:
+                    pass
 
         if config_exists and directories_exist:
             return {
@@ -228,8 +232,7 @@ class SetupManager:
             "levels": config_data.get("levels", {}),
         }
 
-        with open(self.config_file, "w", encoding="utf-8") as f:
-            json.dump(full_config, f, indent=2, ensure_ascii=False)
+        save_json(self.config_file, full_config)
 
         return self.config_file
 
@@ -328,20 +331,6 @@ class SetupManager:
                 return True
 
         return False
-
-
-def output_json(data: Any) -> None:
-    """JSON出力"""
-    print(json.dumps(data, ensure_ascii=False, indent=2))
-
-
-def output_error(error: str, details: Optional[Dict[str, Any]] = None) -> None:
-    """エラー出力"""
-    result: Dict[str, Any] = {"status": "error", "error": error}
-    if details:
-        result["details"] = details
-    print(json.dumps(result, ensure_ascii=False, indent=2))
-    sys.exit(1)
 
 
 def main(plugin_root: Optional[Path] = None) -> None:

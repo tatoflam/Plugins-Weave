@@ -1,7 +1,7 @@
 <!--
   This file is for GitHub repository landing page display.
   See EpisodicRAG/ directory for detailed documentation.
-  Last synced: 2025-12-01
+  Last synced: 2025-12-03
 -->
 English | [日本語](README.md)
 
@@ -96,9 +96,9 @@ For details, see [GUIDE.md](EpisodicRAG/docs/user/GUIDE.md).
 | Quarterly | ~3 months |
 | Annual | ~1 year |
 | Triennial | ~3 years |
-| Decadal | ~10 years |
-| Multi-decadal | ~30 years |
-| Centurial | ~100 years |
+| Decadal | ~9 years |
+| Multi-decadal | ~27 years |
+| Centurial | ~108 years |
 
 > For complete layer table, see [Glossary](EpisodicRAG/README.en.md#8-layer-hierarchy)
 

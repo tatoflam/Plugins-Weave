@@ -139,15 +139,16 @@ TypedDictを使用した型安全な定義。`Dict[str, Any]`の置き換え用�
 
 ```text
 domain/types/
-├── __init__.py     # 全型をre-export（後方互換性維持）
-├── metadata.py     # BaseMetadata, DigestMetadata, DigestMetadataComplete
-├── level.py        # LevelConfigData, LevelHierarchyEntry
-├── text.py         # LongShortText
-├── digest.py       # OverallDigestData, ShadowDigestData, GrandDigestData等
-├── config.py       # ConfigData, PathsConfigData, DigestTimesData等
-├── entry.py        # ProvisionalDigestEntry, ProvisionalDigestFile
-├── guards.py       # is_config_data, is_level_config_data等（型ガード）
-└── utils.py        # as_dict
+├── __init__.py        # 全型をre-export（後方互換性維持）
+├── metadata.py        # BaseMetadata, DigestMetadata, DigestMetadataComplete
+├── level.py           # LevelConfigData, LevelHierarchyEntry
+├── level_literals.py  # Literal型定義（v4.1.0+）
+├── text.py            # LongShortText
+├── digest.py          # OverallDigestData, ShadowDigestData, GrandDigestData等
+├── config.py          # ConfigData, PathsConfigData, DigestTimesData等
+├── entry.py           # ProvisionalDigestEntry, ProvisionalDigestFile
+├── guards.py          # is_config_data, is_level_config_data等（型ガード）
+└── utils.py           # as_dict
 ```
 
 ```python
@@ -198,6 +199,40 @@ class ProvisionalDigestFile(TypedDict):
 | `DigestTimeData` | last_digest_times.jsonの各レベルデータ |
 | `DigestTimesData` | `Dict[str, DigestTimeData]`のエイリアス |
 | `ProvisionalDigestEntry` | Provisional Digestの各エントリ |
+
+### Literal型（v4.1.0+）
+
+`domain/types/level_literals.py`で型安全な文字列リテラルを定義。IDE補完とmypyによる静的型検査が有効になります。
+
+```python
+from domain.types import LevelName, AllLevelName, LevelConfigKey
+```
+
+| 型名 | 説明 | 例 |
+|------|------|-----|
+| `LevelName` | 8階層レベル名 | `"weekly"`, `"monthly"`, `"quarterly"`, ... |
+| `AllLevelName` | Loop含む全レベル | `"loop"`, `"weekly"`, `"monthly"`, ... |
+| `LevelConfigKey` | LEVEL_CONFIG辞書キー | `"prefix"`, `"digits"`, `"dir"`, `"source"`, `"next"`, `"threshold"` |
+| `SourceType` | ソースタイプ | `"loops"`, `"weekly"`, `"monthly"`, ... |
+| `ProvisionalSuffix` | Provisionalファイル接尾辞 | `"_Individual.txt"`, `"_Overall.txt"` |
+| `PathConfigKey` | パス設定キー | `"loops_path"`, `"digests_path"`, `"essences_path"`, ... |
+| `ThresholdKey` | 閾値設定キー | `"weekly_threshold"`, `"monthly_threshold"`, ... |
+| `LogPrefix` | デバッグログプレフィックス | `"[STATE]"`, `"[FILE]"`, `"[VALIDATE]"`, `"[DECISION]"` |
+
+**使用例**:
+
+```python
+from domain.types import LevelName, AllLevelName
+
+def process_level(level: LevelName) -> None:
+    # IDE補完とmypy検査が有効
+    ...
+
+def get_source_type(level: AllLevelName) -> str:
+    if level == "loop":
+        return "Loop files"
+    return f"{level.capitalize()} digests"
+```
 
 ### 主要TypedDictスキーマ
 

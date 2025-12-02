@@ -19,6 +19,11 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
+from infrastructure.json_repository import load_json, save_json
+
+from interfaces.cli_helpers import output_error, output_json
+
+from domain.exceptions import FileIOError
 from domain.file_constants import CONFIG_FILENAME, PLUGIN_CONFIG_DIR
 
 
@@ -40,16 +45,11 @@ class ConfigEditor:
 
     def _load_config(self) -> Dict[str, Any]:
         """設定ファイルを読み込む"""
-        if not self.config_file.exists():
-            raise FileNotFoundError(f"Config file not found: {self.config_file}")
-
-        with open(self.config_file, "r", encoding="utf-8") as f:
-            return json.load(f)
+        return load_json(self.config_file)
 
     def _save_config(self, config_data: Dict[str, Any]) -> None:
         """設定ファイルを保存する"""
-        with open(self.config_file, "w", encoding="utf-8") as f:
-            json.dump(config_data, f, indent=2, ensure_ascii=False)
+        save_json(self.config_file, config_data)
 
     def _resolve_path(self, path_str: str) -> Path:
         """パスを解決して絶対パスを返す"""
@@ -270,20 +270,6 @@ class ConfigEditor:
         }
 
 
-def output_json(data: Any) -> None:
-    """JSON出力"""
-    print(json.dumps(data, ensure_ascii=False, indent=2))
-
-
-def output_error(error: str, details: Optional[Dict[str, Any]] = None) -> None:
-    """エラー出力"""
-    result: Dict[str, Any] = {"status": "error", "error": error}
-    if details:
-        result["details"] = details
-    print(json.dumps(result, ensure_ascii=False, indent=2))
-    sys.exit(1)
-
-
 def main(plugin_root: Optional[Path] = None) -> None:
     """CLIエントリーポイント"""
     parser = argparse.ArgumentParser(
@@ -394,10 +380,8 @@ def main(plugin_root: Optional[Path] = None) -> None:
             parser.print_help()
             sys.exit(1)
 
-    except FileNotFoundError as e:
+    except FileIOError as e:
         output_error(str(e), {"action": "Run @digest-setup first"})
-    except json.JSONDecodeError as e:
-        output_error(f"Config file is corrupted: {e}", {"action": "Run @digest-setup to recreate"})
     except Exception as e:
         output_error(str(e))
 
