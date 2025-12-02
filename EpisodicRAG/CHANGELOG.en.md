@@ -1,5 +1,5 @@
 <!-- Last synced: 2025-12-02 -->
-[English](CHANGELOG.en.md) | [日本語](CHANGELOG.md)
+English | [日本語](CHANGELOG.md)
 
 # Changelog
 

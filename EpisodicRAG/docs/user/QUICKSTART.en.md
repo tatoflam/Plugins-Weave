@@ -1,4 +1,4 @@
-<!-- Last synced: 2025-11-29 -->
+<!-- Last synced: 2025-12-02 -->
 [EpisodicRAG](../../README.md) > [Docs](../README.md) > QUICKSTART (English)
 
 [日本語](QUICKSTART.md) | English
@@ -6,6 +6,13 @@
 # 5-Minute Quickstart
 
 A guide to set up EpisodicRAG as quickly as possible and verify it works.
+
+---
+
+## Prerequisites
+
+- Claude Code or Claude VSCode Extension installed
+- Python 3.x installed
 
 ---
 
@@ -24,13 +31,6 @@ flowchart LR
     style D fill:#F3E5F5,color:#000000
     style E fill:#E8F5E9,color:#000000
 ```
-
----
-
-## Prerequisites
-
-- Claude Code or Claude VSCode Extension installed
-- Python 3.x installed
 
 ---
 

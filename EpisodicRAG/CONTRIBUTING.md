@@ -1,4 +1,4 @@
-[English](CONTRIBUTING.en.md) | [日本語](CONTRIBUTING.md)
+[English](CONTRIBUTING.en.md) | 日本語
 
 # Contributing to EpisodicRAG Plugin
 

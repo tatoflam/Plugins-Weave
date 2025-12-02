@@ -1,5 +1,5 @@
 <!-- Last synced: 2025-12-01 (refactored) -->
-[English](README.en.md) | [日本語](README.md)
+English | [日本語](README.md)
 
 # EpisodicRAG Plugin - Glossary & Reference
 

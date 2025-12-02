@@ -2,27 +2,22 @@
 
 # EpisodicRAG Plugin ユーザーガイド
 
+> **対応バージョン**: v4.0.0+ / ファイルフォーマット 1.0
+
 このガイドでは、EpisodicRAGを日常的に使いこなすための実践的な知識を提供します。
 
 ## 目次
 
-1. [基本原則](#1-基本原則)
-2. [コマンドとスキル](#2-コマンドとスキル)
-3. [日常ワークフロー](#3-日常ワークフロー)
-4. [設定のカスタマイズ](#4-設定のカスタマイズ)
-5. [困ったときは](#5-困ったときは)
+1. [コマンドとスキル](#1-コマンドとスキル)
+2. [日常ワークフロー](#2-日常ワークフロー)
+3. [設定のカスタマイズ](#3-設定のカスタマイズ)
+4. [困ったときは](#4-困ったときは)
+
+> 📖 用語・基本概念は [用語集](../../README.md) を参照
 
 ---
 
-## 1. 基本原則
-
-### 記憶定着サイクル
-
-> 📖 記憶定着サイクルの詳細は [用語集](../../README.md#記憶定着サイクル) を参照
-
----
-
-## 2. コマンドとスキル
+## 1. コマンドとスキル
 
 ### 主なコマンド
 
@@ -39,6 +34,9 @@
 | `@digest-auto` | システム状態確認と推奨アクション | 定期的に、または迷ったとき |
 | `@digest-setup` | 初期セットアップ | 初回のみ |
 | `@digest-config` | 設定変更 | threshold変更したいとき |
+
+> **v4.0.0+**: スキルはPythonスクリプトとしても実行可能:
+> `python -m interfaces.digest_auto` / `digest_setup` / `digest_config`
 
 ### `/digest` の動作
 
@@ -58,9 +56,9 @@
 
 ---
 
-## 3. 日常ワークフロー
+## 2. 日常ワークフロー
 
-### 週次運用パターン
+### 基本サイクル
 
 ```mermaid
 flowchart LR
@@ -73,8 +71,8 @@ flowchart LR
     end
     D --> |次週| A
 
-    style B fill:#90EE90
-    style D fill:#FFD700
+    style B fill:#90EE90,color:#000000
+    style D fill:#FFD700,color:#000000
 ```
 
 **毎日（Loopを追加するたび）:**
@@ -83,56 +81,23 @@ flowchart LR
 2. /digest  # 即座に記憶定着
 ```
 
-**週末（5個揃ったら）:**
-```text
-3. @digest-auto  # 状態確認
-4. /digest weekly  # Weekly Digest確定
-```
-
-### 月次運用パターン
-
-**毎週末:**
-```text
-/digest weekly  # Weekly Digest確定
-```
-
-**月末（5週分揃ったら）:**
+**週末:**
 ```text
 @digest-auto  # 状態確認
-/digest monthly  # Monthly Digest確定
+/digest weekly
 ```
 
-### 完全フロー図
-
-```mermaid
-flowchart TD
-    subgraph Phase1["Phase 1: Loop追加と即時分析"]
-        L1[Loop追加] --> D1["/digest"]
-        D1 --> S1[Shadow更新]
-        S1 --> P1[Provisional蓄積]
-    end
-
-    subgraph Phase2["Phase 2: Weekly確定"]
-        P1 --> |5個揃ったら| DW["/digest weekly"]
-        DW --> R1[Regular Digest作成]
-        R1 --> G1[GrandDigest更新]
-        G1 --> C1[次階層カスケード]
-    end
-
-    subgraph Phase3["Phase 3: Monthly確定"]
-        C1 --> |5 Weekly揃ったら| DM["/digest monthly"]
-        DM --> R2[Regular Digest作成]
-        R2 --> G2[GrandDigest更新]
-    end
-
-    style D1 fill:#90EE90,stroke:#228B22
-    style DW fill:#FFD700,stroke:#DAA520
-    style DM fill:#FF6347,stroke:#DC143C
+**月末（5 Weekly揃ったら）:**
+```text
+/digest weekly   # まず今週分を確定
+/digest monthly  # → 月次へカスケード
 ```
+
+> 📖 詳細なデータフローは [ARCHITECTURE.md](../dev/ARCHITECTURE.md#データフロー) を参照
 
 ---
 
-## 4. 設定のカスタマイズ
+## 3. 設定のカスタマイズ
 
 ### 設定変更方法
 
@@ -142,13 +107,13 @@ flowchart TD
 @digest-config
 ```
 
-対話形式で設定を変更できます。
-
 ### 設定ファイルの場所
 
 ```text
-~/.claude/plugins/EpisodicRAG-Plugin@Plugins-Weave/.claude-plugin/config.json
+{plugin_root}/.claude-plugin/config.json
 ```
+
+> 📖 `plugin_root` の環境別パスは [用語集](../../README.md#パス形式の違い) を参照
 
 ### 主な設定項目
 
@@ -157,26 +122,27 @@ flowchart TD
 | `base_dir` | データ基準ディレクトリ | `"."` |
 | `paths.loops_dir` | Loopファイル配置先 | `"data/Loops"` |
 | `levels.weekly_threshold` | Weekly生成に必要なLoop数 | `5` |
-| `levels.monthly_threshold` | Monthly生成に必要なWeekly数 | `5` |
 
 > 📖 完全な設定仕様は [api/config.md](../dev/api/config.md) を参照
 
-### パス設定について
+### 外部パス設定（v4.0.0+）
 
-データの保存場所は `base_dir` で指定します：
+プラグイン外のパス（Google Drive等）を使用するには `trusted_external_paths` での許可が必要です。
 
-| 設定 | データの保存先 | 用途 |
-|------|--------------|------|
-| `"base_dir": "."` | プラグイン内 `data/` | デフォルト |
-| `"base_dir": "C:/GoogleDrive/..."` | 指定した場所の `data/` | クラウド同期 |
+```json
+{
+  "base_dir": "~/Google Drive/EpisodicRAG",
+  "trusted_external_paths": ["~/Google Drive"]
+}
+```
 
-⚠️ **外部パス使用時の注意**: プラグイン外のパスを使用する場合、先に `trusted_external_paths` で許可設定が必要です。`@digest-config` で対話的に設定できます。
+設定: `@digest-config` → trusted_external_paths を選択
 
-現在の設定確認: `@digest-config`
+> 📖 詳細は [TROUBLESHOOTING.md](TROUBLESHOOTING.md#外部パス設定エラー) を参照
 
 ---
 
-## 5. 困ったときは
+## 4. 困ったときは
 
 ### クイックリファレンス
 

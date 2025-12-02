@@ -1,5 +1,5 @@
 <!-- Last synced: 2025-12-01 -->
-[English](CONTRIBUTING.en.md) | [日本語](CONTRIBUTING.md)
+English | [日本語](CONTRIBUTING.md)
 
 # Contributing to EpisodicRAG Plugin
 

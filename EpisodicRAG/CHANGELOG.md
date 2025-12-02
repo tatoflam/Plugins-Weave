@@ -1,4 +1,4 @@
-[English](CHANGELOG.en.md) | [日本語](CHANGELOG.md)
+[English](CHANGELOG.en.md) | 日本語
 
 # Changelog
 
