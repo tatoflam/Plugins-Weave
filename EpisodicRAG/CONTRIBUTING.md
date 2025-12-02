@@ -304,59 +304,19 @@ v2.0.0 より、`scripts/` は Clean Architecture（4層構造）を採用して
 
 ## テスト
 
-### ユニット/統合テスト実行
+> 📖 **テスト詳細**: テストディレクトリ構造・実行方法は [scripts/README.md](scripts/README.md#tests) を参照
 
-> 📊 最新のテスト数は [CI バッジ](https://github.com/Bizuayeu/Plugins-Weave/actions) を参照してください。
+### クイックスタート
 
 ```bash
 cd plugins-weave/EpisodicRAG/scripts
 
-# 全テスト実行（pytest）- 推奨
+# 全テスト実行
 python -m pytest test/ -v
 
-# unittest形式
-python -m unittest discover -s test -v
-
-# 層別インポート確認
-python -c "from domain import LEVEL_CONFIG, __version__; print(__version__)"
-python -c "from infrastructure import load_json; print('OK')"
-python -c "from application import ShadowGrandDigestManager; print('OK')"
-python -c "from interfaces import DigestFinalizerFromShadow; print('OK')"
-```
-
-### テスト構成
-
-`scripts/test/` にユニット/インテグレーションテストがあります。
-
-#### ファイル命名規則
-
-| パターン | テスト対象 |
-|---------|-----------|
-| `test_{module}.py` | 単一モジュールのユニットテスト |
-| `test_{package}_{class}.py` | パッケージ内クラスのテスト |
-| `test_path_integration.py` | パス解決の統合テスト |
-
-#### 主要テストファイル（層別）
-
-| 層 | テストファイル |
-|----|---------------|
-| Domain | `test_validators.py`, `test_helpers.py` |
-| Infrastructure | `test_json_repository.py`, `test_file_scanner.py` |
-| Application | `test_shadow_*.py`, `test_grand_digest.py`, `test_digest_*.py`, `test_cascade_processor.py` |
-| Interfaces | `test_finalize_from_shadow.py`, `test_save_provisional_digest.py`, `test_interface_helpers.py` |
-| Config | `test_config.py`, `test_path_integration.py` |
-
-#### テスト実行（追加オプション）
-
-```bash
-cd scripts
-
-# 層別テスト
-python -m pytest test/test_validators.py test/test_helpers.py -v  # Domain
-python -m pytest test/test_shadow_*.py -v                         # Shadow関連
-
-# カバレッジ付き
-python -m pytest test/ --cov=. --cov-report=term-missing
+# 層別テスト実行
+python -m pytest test/domain_tests/ -v
+python -m pytest test/config_tests/ -v
 ```
 
 ### 手動テスト

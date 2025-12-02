@@ -305,59 +305,19 @@ Use clear and concise commit messages:
 
 ## Testing
 
-### Running Unit/Integration Tests
+> 📖 **Test Details**: See [scripts/README.md](scripts/README.md#tests) for test directory structure and execution methods.
 
-> 📊 For the latest test count, see the [CI Badge](https://github.com/Bizuayeu/Plugins-Weave/actions).
+### Quick Start
 
 ```bash
 cd plugins-weave/EpisodicRAG/scripts
 
-# Run all tests (pytest) - Recommended
+# Run all tests
 python -m pytest test/ -v
 
-# unittest format
-python -m unittest discover -s test -v
-
-# Layer-by-layer import verification
-python -c "from domain import LEVEL_CONFIG, __version__; print(__version__)"
-python -c "from infrastructure import load_json; print('OK')"
-python -c "from application import ShadowGrandDigestManager; print('OK')"
-python -c "from interfaces import DigestFinalizerFromShadow; print('OK')"
-```
-
-### Test Structure
-
-Unit/integration tests are in `scripts/test/`.
-
-#### File Naming Conventions
-
-| Pattern | Test Target |
-|---------|-------------|
-| `test_{module}.py` | Unit test for single module |
-| `test_{package}_{class}.py` | Test for class in package |
-| `test_path_integration.py` | Path resolution integration test |
-
-#### Main Test Files (By Layer)
-
-| Layer | Test Files |
-|-------|------------|
-| Domain | `test_validators.py`, `test_helpers.py` |
-| Infrastructure | `test_json_repository.py`, `test_file_scanner.py` |
-| Application | `test_shadow_*.py`, `test_grand_digest.py`, `test_digest_*.py`, `test_cascade_processor.py` |
-| Interfaces | `test_finalize_from_shadow.py`, `test_save_provisional_digest.py`, `test_interface_helpers.py` |
-| Config | `test_config.py`, `test_path_integration.py` |
-
-#### Test Execution (Additional Options)
-
-```bash
-cd scripts
-
 # Layer-specific tests
-python -m pytest test/test_validators.py test/test_helpers.py -v  # Domain
-python -m pytest test/test_shadow_*.py -v                         # Shadow-related
-
-# With coverage
-python -m pytest test/ --cov=. --cov-report=term-missing
+python -m pytest test/domain_tests/ -v
+python -m pytest test/config_tests/ -v
 ```
 
 ### Manual Testing

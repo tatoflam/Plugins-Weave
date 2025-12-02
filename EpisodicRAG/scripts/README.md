@@ -28,7 +28,7 @@ scripts/
 │   └── config/       # DigestConfig（Facade）
 ├── interfaces/       # エントリーポイント
 ├── tools/            # 開発ツール（ドキュメント生成など）
-└── test/             # テスト（847テスト）
+└── test/             # テスト
 ```
 
 ### 依存関係ルール
@@ -160,7 +160,9 @@ from application.config import ThresholdProvider
 
 ## Tests
 
-`test/` ディレクトリにユニットテストがあります（**847テスト**）。
+`test/` ディレクトリにユニットテストがあります。
+
+> 📊 最新のテスト数は [CI バッジ](https://github.com/Bizuayeu/Plugins-Weave/actions) を参照してください。
 
 ### テストディレクトリ構造
 
@@ -169,10 +171,12 @@ test/
 ├── conftest.py              # 共通フィクスチャ
 ├── test_constants.py        # 定数テスト
 ├── test_helpers.py          # ヘルパーテスト
-├── domain_tests/            # domain層テスト（config/含む）
-├── infrastructure_tests/    # infrastructure層テスト（config/含む）
-├── application_tests/       # application層テスト（config/含む）
+├── domain_tests/            # domain層テスト
+├── infrastructure_tests/    # infrastructure層テスト
+├── application_tests/       # application層テスト
 ├── interfaces_tests/        # interfaces層テスト
+├── config_tests/            # config層テスト（v4.0.0+）
+├── cli_integration_tests/   # CLI統合テスト（v4.0.0+）
 ├── integration_tests/       # 統合テスト
 └── performance_tests/       # パフォーマンステスト
 ```
