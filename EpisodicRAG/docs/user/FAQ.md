@@ -62,9 +62,24 @@ EpisodicRAGプラグインに関するよくある質問と回答集です。
 
 ### Q: パスが正しく解決されません
 
-**A**: `@digest-config` で設定を確認・修正。`base_dir`がプラグインルート基準であることを確認。
+**A**: `@digest-config` で設定を確認・修正。確認ポイント：
+
+1. **base_dir**: 相対パス（プラグインルート基準）または絶対パス（`~/`展開サポート）
+2. **trusted_external_paths**: 外部パス使用時はホワイトリスト登録が必要（v4.0.0+）
 
 > 📖 詳細: [用語集](../../README.md#基本概念)、[api/config.md](../dev/api/config.md#configjson-詳細仕様)
+
+### Q: trusted_external_pathsとは何ですか？
+
+**A**: v4.0.0で導入されたセキュリティ機能です。プラグインディレクトリ外のファイル（例：`~/DEV/Identity.md`）にアクセスする場合、config.jsonで明示的にホワイトリスト登録が必要です。
+
+```json
+{
+  "trusted_external_paths": ["~/DEV/Identity.md"]
+}
+```
+
+> 📖 詳細: [用語集](../../README.md#trusted_external_paths)、[TROUBLESHOOTING.md](TROUBLESHOOTING.md#外部パスアクセスエラー)
 
 ---
 
@@ -72,11 +87,11 @@ EpisodicRAGプラグインに関するよくある質問と回答集です。
 
 ### Q: Loopファイルの命名規則は？
 
-**A**: `L[連番]_[タイトル].txt` の形式です（連番は5桁ゼロ埋め）。
+**A**: `L[5桁連番]_[タイトル].txt` の形式です。
 
-**例**: `L00001_認知アーキテクチャ論.txt`
+**例**: `L00001_認知アーキテクチャ論.txt`、`L00225_プロジェクト振り返り.txt`
 
-> 📖 詳細（正規表現・連番ルール）は [用語集 > ファイル命名規則](../../README.md#ファイル命名規則) を参照
+> 📖 詳細（正規表現・連番ルール）: [用語集](../../README.md#ファイル命名規則)
 
 ### Q: `/digest`と`/digest weekly`の違いは？
 
@@ -98,8 +113,8 @@ flowchart TB
 
     S1 -.->|蓄積| D2
 
-    style D1 fill:#90EE90
-    style D2 fill:#FFD700
+    style D1 fill:#90EE90,color:#000000
+    style D2 fill:#FFD700,color:#000000
 ```
 
 > 📖 実行フロー・データフローの詳細は [GUIDE.md > /digestの動作](GUIDE.md#digest-の動作) を参照
@@ -149,12 +164,12 @@ flowchart TB
 
 **A**: 以下のディレクトリをバックアップしてください（優先順）：
 
-1. `Loops/` - 元データ（**最重要**）
-2. `Essences/` - GrandDigest, ShadowGrandDigest
+1. `{loops_dir}/` - 元データ（**最重要**）
+2. `{essences_dir}/` - GrandDigest, ShadowGrandDigest
 3. `.claude-plugin/config.json` - 設定
 4. `.claude-plugin/last_digest_times.json` - 状態追跡
 
-> 💡 Loops/さえあれば他は再構築可能です。
+> 💡 `{loops_dir}/` さえあれば他は再構築可能です。
 
 ### Q: ShadowGrandDigestが破損した場合の復旧方法は？
 
@@ -243,6 +258,18 @@ flowchart TB
 
 > 📖 詳細: [ARCHITECTURE.md](../dev/ARCHITECTURE.md#テスト)、[CONTRIBUTING.md](../../CONTRIBUTING.md#テスト)
 
+### Q: スキルをCLIで直接実行できますか？
+
+**A**: はい。v4.0.0からスキルはPythonスクリプトとしても実行可能です。
+
+| スキル | CLIコマンド |
+|--------|-------------|
+| @digest-setup | `python -m interfaces.digest_setup` |
+| @digest-config | `python -m interfaces.digest_config` |
+| @digest-auto | `python -m interfaces.digest_auto` |
+
+> 📖 詳細: 各スキルの [SKILL.md](../../skills/) を参照
+
 ### Q: ドキュメント内で特定のキーワードを検索したい
 
 **A**: GitHubの検索機能またはローカル検索を使用してください。
@@ -267,6 +294,7 @@ Ctrl+Shift+F → plugins-weave フォルダで検索
 - [CHEATSHEET.md](CHEATSHEET.md) - コマンド早見表
 - [TROUBLESHOOTING.md](TROUBLESHOOTING.md) - 詳細なトラブルシューティング
 - [ARCHITECTURE.md](../dev/ARCHITECTURE.md) - 技術仕様
+- [CHANGELOG.md](../../CHANGELOG.md) - バージョン別変更履歴
 
 ---
 **EpisodicRAG** by Weave | [GitHub](https://github.com/Bizuayeu/Plugins-Weave)

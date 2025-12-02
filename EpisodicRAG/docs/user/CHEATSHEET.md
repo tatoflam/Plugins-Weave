@@ -1,6 +1,6 @@
 [EpisodicRAG](../../README.md) > [Docs](../README.md) > CHEATSHEET
 
-[English](CHEATSHEET.en.md) | 日本語
+[English](CHEATSHEET.en.md) | [日本語](CHEATSHEET.md)
 
 # EpisodicRAG クイックリファレンス
 

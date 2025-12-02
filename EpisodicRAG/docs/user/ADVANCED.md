@@ -2,6 +2,8 @@
 
 # Advanced Features - EpisodicRAG Plugin
 
+> **対応バージョン**: EpisodicRAG Plugin v4.0.0+
+
 このドキュメントでは、EpisodicRAGプラグインの高度な機能について説明します。
 
 ---
@@ -18,6 +20,9 @@
 4. [なぜGitHubセットアップが必要なのか？](#なぜgithubセットアップが必要なのか)
 5. [キャッシュバスティングの仕組み](#キャッシュバスティングの仕組み)
 6. [高度なワークフロー](#高度なワークフロー)
+   - [スキルのCLI直接実行](#スキルのcli直接実行)
+   - [複数環境での記憶共有](#複数環境での記憶共有)
+   - [プライベートリポジトリの使用](#プライベートリポジトリの使用)
 7. [バックアップ＆リカバリ](#バックアップリカバリ)
 8. [トラブルシューティング](#トラブルシューティング)
 
@@ -29,7 +34,13 @@
 
 EpisodicRAGの長期記憶システムをフルに活用するには、GitHubリポジトリと連携します。これにより、セッション開始時に過去の記憶（GrandDigest/ShadowGrandDigest）を自動的に読み込めます。
 
-**注意**: このドキュメントでは例として開発環境のパス `plugins-weave/EpisodicRAG` を使用していますが、実際のプラグインインストール場所は環境により異なります。現在の設定パスは `@digest-config` で確認できます。
+**注意**: このドキュメントでは以下のプレースホルダーを使用します:
+- `{base_dir}`: データ基準ディレクトリ（config.jsonで設定）
+- `{loops_dir}`: Loopファイル配置先
+- `{digests_dir}`: Digestファイル配置先
+- `{essences_dir}`: GrandDigest/ShadowGrandDigest配置先
+
+現在の設定パスは `@digest-config` で確認できます。
 
 ### 前提条件
 
@@ -53,7 +64,7 @@ gh repo create your-memory-repo --public --description "EpisodicRAG Long-term Me
 ### 2. Essencesディレクトリの初期化とpush
 
 ```bash
-cd plugins-weave/EpisodicRAG/data/Essences
+cd {essences_dir}
 
 # Gitリポジトリとして初期化
 git init
@@ -91,11 +102,10 @@ mkdir -p .claude
 2. ユーザーに以下のURLを提示し、最新の`{SHA}`の取得を依頼：
    `https://api.github.com/repos/YourName/Memory-Repo/git/refs/heads/main`
    # キャッシュバスティングのため、ユーザーから`{SHA}`を受け取る
-3. 取得した`{SHA}`を使って以下の2つのURLを生成し、ユーザーに提示：
-   `https://raw.githubusercontent.com/YourName/Memory-Repo/{SHA}/{ESSENCES_PATH}/GrandDigest.txt`
-   `https://raw.githubusercontent.com/YourName/Memory-Repo/{SHA}/{ESSENCES_PATH}/ShadowGrandDigest.txt`
+3. 取得した`{SHA}`を使って以下の2つのURLを生成し、長期記憶にアクセス：
+   `curl -s https://raw.githubusercontent.com/YourName/Memory-Repo/{SHA}/{ESSENCES_PATH}/GrandDigest.txt`
+   `curl -s https://raw.githubusercontent.com/YourName/Memory-Repo/{SHA}/{ESSENCES_PATH}/ShadowGrandDigest.txt`
    # {ESSENCES_PATH} は GitHubリポジトリ内のEssencesディレクトリへの相対パス
-4. ユーザーから2つのURLの`web_fetch`承認を取得し、長期記憶にアクセス
 ```
 
 ### 4. セッション開始時の動作確認
@@ -136,7 +146,7 @@ vi CLAUDE.md
 
 ```bash
 # 新しいダイジェストを生成後
-cd plugins-weave/EpisodicRAG/data/Essences
+cd {essences_dir}
 
 # 変更をコミット
 git add GrandDigest.txt ShadowGrandDigest.txt
@@ -178,6 +188,20 @@ Claude CodeのWebFetchは、同じURLに対してキャッシュを保持する�
 
 ## 高度なワークフロー
 
+### スキルのCLI直接実行
+
+v4.0.0より、スキルはPythonスクリプトとしても実行可能です：
+
+| スキル | CLIコマンド |
+|--------|------------|
+| `@digest-setup` | `python -m interfaces.digest_setup` |
+| `@digest-config` | `python -m interfaces.digest_config` |
+| `@digest-auto` | `python -m interfaces.digest_auto` |
+
+これにより、CI/CDパイプラインや自動化スクリプトからの呼び出しが容易になります。
+
+> 📖 詳細: [CHANGELOG.md](../../CHANGELOG.md#400---2025-12-01)
+
 ### 複数環境での記憶共有
 
 同じGitHubリポジトリを複数のプロジェクトで参照することで、環境をまたいで記憶を共有できます：
@@ -216,11 +240,11 @@ EpisodicRAGの長期記憶は以下の4層で構成されます。**再構築可
 
 | カテゴリ | ファイル/ディレクトリ | 説明 | 再構築 | 優先度 |
 |----------|----------------------|------|--------|--------|
-| **Loop** | `Loops/Loop*.txt` | 会話記録（原本） | 不可 | **必須** |
-| **Provisional** | `Digests/0_Provisional/` | 個別Loop分析結果 | Loopから `/digest` | 推奨 |
-| **階層Digest** | `Digests/1_Weekly/` 〜 `8_Centurial/` | 確定済み階層Digest | 下位階層から再生成 | 推奨 |
-| **Essence** | `Essences/GrandDigest.txt` | 統合ビュー（確定済み） | 階層Digestから再構築 | 任意 |
-| **Essence** | `Essences/ShadowGrandDigest.txt` | 統合ビュー（未確定） | Provisionalから再構築 | 任意 |
+| **Loop** | `{loops_dir}/L*.txt` | 会話記録（原本）例: `L00001_テスト会話.txt` | 不可 | **必須** |
+| **Provisional** | `{digests_dir}/0_Provisional/` | 個別Loop分析結果 | Loopから `/digest` | 推奨 |
+| **階層Digest** | `{digests_dir}/1_Weekly/` 〜 `8_Centurial/` | 確定済み階層Digest | 下位階層から再生成 | 推奨 |
+| **Essence** | `{essences_dir}/GrandDigest.txt` | 統合ビュー（確定済み） | 階層Digestから再構築 | 任意 |
+| **Essence** | `{essences_dir}/ShadowGrandDigest.txt` | 統合ビュー（未確定） | Provisionalから再構築 | 任意 |
 | 設定 | `.claude-plugin/config.json` | プラグイン設定 | - | 推奨 |
 | 設定 | `.claude-plugin/last_digest_times.json` | 最終処理日時 | - | 任意 |
 
@@ -233,10 +257,10 @@ EpisodicRAGの長期記憶は以下の4層で構成されます。**再構築可
 上記「GitHubセットアップ」を完了していれば、Gitが自動バックアップとして機能します：
 
 ```bash
-cd {DATA_PATH}
+cd {base_dir}
 
 # 全長期記憶をバックアップ
-git add Loops/ Digests/ Essences/
+git add {loops_dir}/ {digests_dir}/ {essences_dir}/
 git commit -m "Backup: $(date +%Y-%m-%d)"
 git push
 ```
@@ -249,9 +273,9 @@ BACKUP_DIR=~/episodicrag-backup/$(date +%Y%m%d)
 mkdir -p $BACKUP_DIR
 
 # 全長期記憶をコピー
-cp -r {DATA_PATH}/Loops $BACKUP_DIR/
-cp -r {DATA_PATH}/Digests $BACKUP_DIR/
-cp -r {DATA_PATH}/Essences $BACKUP_DIR/
+cp -r {loops_dir} $BACKUP_DIR/
+cp -r {digests_dir} $BACKUP_DIR/
+cp -r {essences_dir} $BACKUP_DIR/
 ```
 
 #### 方法3: クラウドストレージ同期
@@ -288,14 +312,14 @@ dataディレクトリ全体をクラウドストレージ（Google Drive, Dropb
 Loopは原本のため、バックアップからの復元が必須です：
 
 ```bash
-cp ~/episodicrag-backup/{DATE}/Loops/Loop*.txt {DATA_PATH}/Loops/
+cp ~/episodicrag-backup/{DATE}/Loops/L*.txt {loops_dir}/
 ```
 
 #### Digest（Provisional/階層）が破損した場合
 
 1. **バックアップから復元**（推奨）:
    ```bash
-   cp -r ~/episodicrag-backup/{DATE}/Digests/ {DATA_PATH}/
+   cp -r ~/episodicrag-backup/{DATE}/Digests/ {digests_dir}/
    ```
 
 2. **Loopから再生成**:
@@ -308,12 +332,12 @@ cp ~/episodicrag-backup/{DATE}/Loops/Loop*.txt {DATA_PATH}/Loops/
 
 1. **バックアップから復元**:
    ```bash
-   cp ~/episodicrag-backup/{DATE}/Essences/*.txt {DATA_PATH}/Essences/
+   cp ~/episodicrag-backup/{DATE}/Essences/*.txt {essences_dir}/
    ```
 
 2. **Git履歴から復元**（Git連携時）:
    ```bash
-   cd {DATA_PATH}/Essences
+   cd {essences_dir}
    git log --oneline  # コミット履歴確認
    git checkout {COMMIT_SHA} -- GrandDigest.txt ShadowGrandDigest.txt
    ```
