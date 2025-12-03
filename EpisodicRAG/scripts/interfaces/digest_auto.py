@@ -367,7 +367,7 @@ class DigestAutoAnalyzer:
                 source_type=source,
             )
 
-            if current >= threshold:
+            if status.ready:
                 generatable.append(status)
             else:
                 insufficient.append(status)
