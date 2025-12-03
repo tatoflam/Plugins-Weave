@@ -701,7 +701,7 @@ Plugin外ディレクトリへのアクセスを制御するセキュリティ�
 - **デフォルト**: `[]`（空配列、plugin_root内のみ許可）
 - **用途**: 外部パスを`base_dir`に指定する場合に明示的許可が必要
 
-> 📖 詳細は [DESIGN_DECISIONS.md#trusted_external_paths](DESIGN_DECISIONS.md#trusted_external_pathsv400) を参照
+> 📖 詳細は [DESIGN_DECISIONS.md#trusted_external_paths](DESIGN_DECISIONS.md#trustedexternalpathsv400) を参照
 
 ---
 

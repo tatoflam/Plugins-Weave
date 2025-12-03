@@ -249,7 +249,9 @@ def mock_digest_config(temp_plugin_env: TempPluginEnvironment) -> MagicMock:
         完全なモックが必要な場合はunittest.mockを使用。
         このフィクスチャは実際のファイルシステム上に環境を作成。
     """
-    mock = MagicMock()
+    from application.config import DigestConfig
+
+    mock = MagicMock(spec=DigestConfig)
     mock.plugin_root = temp_plugin_env.plugin_root
     mock.loops_path = temp_plugin_env.loops_path
     mock.digests_path = temp_plugin_env.digests_path

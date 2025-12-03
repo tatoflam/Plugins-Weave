@@ -6,7 +6,7 @@
 
 **基盤**
 - [DigestConfigへの依存](#digestconfigへの依存)
-- [外部パスアクセス（trusted_external_paths）](#外部パスアクセスtrusted_external_paths)
+- [外部パスアクセス（trusted_external_paths）](#外部パスアクセスtrustedexternalpaths)
 
 **例外・検証**
 - [エラーハンドリング](#エラーハンドリング)

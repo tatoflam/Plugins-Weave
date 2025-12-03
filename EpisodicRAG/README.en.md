@@ -1,4 +1,4 @@
-<!-- Last synced: 2025-12-03 (language policy added) -->
+<!-- Last synced: 2025-12-03 (CONCEPT.en.md references added) -->
 English | [日本語](README.md)
 
 # EpisodicRAG Plugin - Glossary & Reference
@@ -133,6 +133,8 @@ Types of Digests:
 
 ## Memory Structure
 
+> 📖 Concept explanation: [CONCEPT.en.md - Three-Layer System](CONCEPT.en.md#three-layer-system)
+
 ### GrandDigest
 **Definition**: JSON file storing finalized long-term memory
 
@@ -197,6 +199,8 @@ Types of Digests:
 
 ## 8-Layer Hierarchy
 
+> 📖 Concept explanation: [CONCEPT.en.md - 8-Layer Structure](CONCEPT.en.md#8-layer-structure)
+
 EpisodicRAG manages memory across 8 hierarchical layers (approximately 108 years):
 
 | Layer | Prefix | Time Scale | Default Threshold | Cumulative Loops |
@@ -237,6 +241,9 @@ Multi-decadal (4) → Centurial Digest
 ## Processes & Operations
 
 ### Mottled Memory (まだらボケ)
+
+> 📖 Concept explanation: [CONCEPT.en.md - The Patchy Memory Problem](CONCEPT.en.md#the-patchy-memory-problem)
+
 **Definition**: A state where AI cannot remember the contents of Loops (fragmented memory)
 
 #### The Essence of EpisodicRAG
@@ -269,6 +276,8 @@ L00001 added → No `/digest` → L00002 added
 **Countermeasure**: Re-run `/digest` to complete analysis
 
 ### Memory Consolidation Cycle
+
+> 📖 Concept explanation: [CONCEPT.en.md - Memory Consolidation Cycle](CONCEPT.en.md#memory-consolidation-cycle)
 
 EpisodicRAG's most important principle is to **run `/digest` each time you add a Loop**.
 
@@ -408,7 +417,7 @@ Examples: W0001_CognitiveArchitecture.txt
 
 | Term | Section |
 |------|---------|
-| base_dir | [Basic Concepts](#base_dir) |
+| base_dir | [Basic Concepts](#basedir) |
 | Cascade | [8-Layer Hierarchy](#hierarchical-cascade) |
 | Digest | [Basic Concepts](#digest) |
 | Essences | [Basic Concepts](#essences) |
@@ -417,7 +426,7 @@ Examples: W0001_CognitiveArchitecture.txt
 | Mottled Memory | [Processes & Operations](#mottled-memory-まだらボケ) |
 | paths | [Basic Concepts](#paths) |
 | Placeholder | [Processes & Operations](#placeholder) |
-| plugin_root | [Basic Concepts](#plugin_root) |
+| plugin_root | [Basic Concepts](#pluginroot) |
 | Provisional Digest | [Memory Structure](#provisional-digest) |
 | Regular Digest | [Memory Structure](#regular-digest) |
 | ShadowGrandDigest | [Memory Structure](#shadowgranddigest) |
