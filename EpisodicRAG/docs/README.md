@@ -14,7 +14,7 @@ AI/Claudeエージェント向けの技術仕様ハブです。
 
 ## 目次
 
-- [⚠️ v4.0.0 Breaking Changes](#v400-breaking-changes)
+- [v4.0.0 Breaking Changes](#v400-breaking-changes)
 - [Command Specifications](#command-specifications)
 - [Skill Specifications](#skill-specifications)
 - [Agent Specifications](#agent-specifications)
@@ -25,7 +25,7 @@ AI/Claudeエージェント向けの技術仕様ハブです。
 
 ---
 
-## ⚠️ v4.0.0 Breaking Changes
+## v4.0.0 Breaking Changes
 
 ### Config層の再編成
 インポートパスが変更されました:
@@ -73,6 +73,8 @@ python -m interfaces.digest_auto
 ## Shared Concepts
 
 > 📖 用語・共通概念は [EpisodicRAG/README.md](../README.md) を参照
+>
+> 📖 設計思想・哲学は [CONCEPT.md](../CONCEPT.md) を参照
 
 ---
 

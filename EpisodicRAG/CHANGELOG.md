@@ -22,11 +22,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **CONCEPT.md / CONCEPT.en.md**: コンセプトドキュメント新規作成（日英同期 210行/210行）
+
 - **内部リファクタリング**: TypedDict分割、Literal型導入、CLI共通ヘルパー統合、バリデーション統合、新デザインパターン4種追加
 
 - **開発ツール**: フッターチェッカー、リンクチェッカー（`scripts/tools/`）
-
-- **CONCEPT.md / CONCEPT.en.md**: コンセプトドキュメント新規作成（日英同期 210行/210行）
 
 > 📖 詳細は [DESIGN_DECISIONS.md](docs/dev/DESIGN_DECISIONS.md) を参照
 
@@ -169,7 +169,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-<details>
+<details id="archive-v2x-and-earlier">
 <summary>Archive (v2.x and earlier)</summary>
 
 ## [2.3.0] - 2025-11-28

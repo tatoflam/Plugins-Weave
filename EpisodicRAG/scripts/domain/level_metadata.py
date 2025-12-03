@@ -47,6 +47,18 @@ class LevelMetadata:
         dir: digests_path以下のサブディレクトリ名
         source: この階層を生成する際の入力元
         next_level: 確定時にカスケードする上位階層（None = 最上位）
+
+    Example:
+        >>> metadata = LevelMetadata(
+        ...     name="weekly",
+        ...     prefix="W",
+        ...     digits=4,
+        ...     dir="1_Weekly",
+        ...     source="loops",
+        ...     next_level="monthly"
+        ... )
+        >>> metadata.prefix
+        'W'
     """
 
     name: str

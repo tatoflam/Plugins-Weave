@@ -91,6 +91,12 @@ class GrandDigestManager:
             GrandDigestData: 以下の構造を持つ辞書
                 - metadata: {last_updated: str, version: str}
                 - major_digests: {level: {overall_digest: None}, ...}
+
+        Example:
+            >>> manager = GrandDigestManager(config)
+            >>> template = manager.get_template()
+            >>> list(template["major_digests"].keys())
+            ['weekly', 'monthly', 'quarterly', ...]
         """
         return {
             "metadata": {
@@ -109,6 +115,12 @@ class GrandDigestManager:
 
         Raises:
             FileIOError: ファイルの読み書きに失敗した場合
+
+        Example:
+            >>> manager = GrandDigestManager(config)
+            >>> data = manager.load_or_create()
+            >>> "major_digests" in data
+            True
         """
         return load_json_with_template(
             target_file=self.grand_digest_file,
@@ -125,6 +137,11 @@ class GrandDigestManager:
 
         Raises:
             FileIOError: ファイル書き込みに失敗した場合
+
+        Example:
+            >>> manager = GrandDigestManager(config)
+            >>> data = manager.load_or_create()
+            >>> manager.save(data)
         """
         save_json(self.grand_digest_file, as_dict(data))
 
@@ -141,6 +158,11 @@ class GrandDigestManager:
 
         Raises:
             DigestError: GrandDigest.txtのフォーマットが不正、またはレベルが無効な場合
+
+        Example:
+            >>> manager = GrandDigestManager(config)
+            >>> manager.update_digest("weekly", "W0042", overall_digest)
+            # GrandDigest.txt の weeklyセクションが更新される
         """
         grand_data = self.load_or_create()
 

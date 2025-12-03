@@ -40,6 +40,10 @@ class ValidationErrorFormatter(BaseErrorFormatter):
 
         Returns:
             フォーマットされたエラーメッセージ
+
+        Example:
+            >>> formatter.invalid_type("user_id", "int", "hello")
+            'user_id: expected int, got str'
         """
         return f"{context}: expected {expected}, got {type(actual).__name__}"
 
@@ -54,6 +58,10 @@ class ValidationErrorFormatter(BaseErrorFormatter):
 
         Returns:
             フォーマットされたエラーメッセージ
+
+        Example:
+            >>> formatter.validation_error("email", "invalid format", "not-an-email")
+            "Validation failed for 'email': invalid format (got: not-an-email)"
         """
         if value is not None:
             return f"Validation failed for '{field}': {reason} (got: {value})"
@@ -68,5 +76,9 @@ class ValidationErrorFormatter(BaseErrorFormatter):
 
         Returns:
             フォーマットされたエラーメッセージ
+
+        Example:
+            >>> formatter.empty_collection("individual_digests")
+            'individual_digests cannot be empty'
         """
         return f"{context} cannot be empty"

@@ -34,7 +34,15 @@ class DigestTimesTracker:
         return {level: {"timestamp": "", "last_processed": None} for level in LEVEL_NAMES}
 
     def load_or_create(self) -> DigestTimesData:
-        """最終ダイジェスト生成時刻を読み込む（存在しなければテンプレートから初期化）"""
+        """
+        最終ダイジェスト生成時刻を読み込む（存在しなければテンプレートから初期化）
+
+        Example:
+            >>> tracker = DigestTimesTracker(config)
+            >>> data = tracker.load_or_create()
+            >>> "weekly" in data
+            True
+        """
         return load_json_with_template(
             target_file=self.last_digest_file,
             template_file=self.template_file,
@@ -52,6 +60,10 @@ class DigestTimesTracker:
 
         Returns:
             抽出・フォーマットされた連番リスト（無効な入力は空リスト）
+
+        Example:
+            >>> tracker.extract_file_numbers("weekly", ["L00186.txt", "L00187.txt"])
+            ['L00186', 'L00187']
         """
         # 早期リターン: None、空、または無効な型
         if not input_files or not is_valid_list(input_files):
@@ -86,6 +98,11 @@ class DigestTimesTracker:
         Args:
             level: ダイジェストレベル
             input_files: 処理したファイル名のリスト（オプション）
+
+        Example:
+            >>> tracker = DigestTimesTracker(config)
+            >>> tracker.save("weekly", ["L00186.txt", "L00187.txt"])
+            # last_digest_times.json が更新される
         """
         # 空リスト警告
         if input_files is not None and len(input_files) == 0:

@@ -49,6 +49,11 @@ class ThresholdProvider:
 
         Raises:
             ConfigError: 不正なレベル名の場合
+
+        Example:
+            >>> provider = ThresholdProvider(config)
+            >>> provider.get_threshold("weekly")
+            5
         """
         if level not in LEVEL_CONFIG:
             raise ConfigError(invalid_level_message(level, list(LEVEL_NAMES)))
@@ -71,40 +76,88 @@ class ThresholdProvider:
 
     @property
     def weekly_threshold(self) -> int:
-        """週次thresholdを取得"""
+        """
+        週次thresholdを取得
+
+        Example:
+            >>> provider.weekly_threshold
+            5
+        """
         return self.get_threshold("weekly")
 
     @property
     def monthly_threshold(self) -> int:
-        """月次thresholdを取得"""
+        """
+        月次thresholdを取得
+
+        Example:
+            >>> provider.monthly_threshold
+            4
+        """
         return self.get_threshold("monthly")
 
     @property
     def quarterly_threshold(self) -> int:
-        """四半期thresholdを取得"""
+        """
+        四半期thresholdを取得
+
+        Example:
+            >>> provider.quarterly_threshold
+            3
+        """
         return self.get_threshold("quarterly")
 
     @property
     def annual_threshold(self) -> int:
-        """年次thresholdを取得"""
+        """
+        年次thresholdを取得
+
+        Example:
+            >>> provider.annual_threshold
+            4
+        """
         return self.get_threshold("annual")
 
     @property
     def triennial_threshold(self) -> int:
-        """3年thresholdを取得"""
+        """
+        3年thresholdを取得
+
+        Example:
+            >>> provider.triennial_threshold
+            3
+        """
         return self.get_threshold("triennial")
 
     @property
     def decadal_threshold(self) -> int:
-        """10年thresholdを取得"""
+        """
+        10年thresholdを取得
+
+        Example:
+            >>> provider.decadal_threshold
+            3
+        """
         return self.get_threshold("decadal")
 
     @property
     def multi_decadal_threshold(self) -> int:
-        """数十年thresholdを取得"""
+        """
+        数十年thresholdを取得
+
+        Example:
+            >>> provider.multi_decadal_threshold
+            3
+        """
         return self.get_threshold("multi_decadal")
 
     @property
     def centurial_threshold(self) -> int:
-        """100年thresholdを取得"""
+        """
+        100年thresholdを取得
+
+        Example:
+            >>> provider.centurial_threshold
+            10
+        """
         return self.get_threshold("centurial")

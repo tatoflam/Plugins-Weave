@@ -80,6 +80,11 @@ class ConfigValidator:
 
         Returns:
             エラーメッセージのリスト（問題がなければ空リスト）
+
+        Example:
+            >>> errors = validator.validate_all()
+            >>> if errors:
+            ...     print("Validation failed:", errors)
         """
         errors: List[str] = []
         errors.extend(self.validate_required_keys())
@@ -95,6 +100,11 @@ class ConfigValidator:
 
         Returns:
             エラーメッセージのリスト
+
+        Example:
+            >>> errors = validator.validate_required_keys()
+            >>> len(errors)  # 全ての必須キーがあれば0
+            0
         """
         errors: List[str] = []
         for key in self.REQUIRED_KEYS:
@@ -108,6 +118,11 @@ class ConfigValidator:
 
         Returns:
             エラーメッセージのリスト
+
+        Example:
+            >>> errors = validator.validate_paths()
+            >>> len(errors)  # パス設定が正しければ0
+            0
         """
         errors: List[str] = []
 
@@ -127,6 +142,11 @@ class ConfigValidator:
 
         Returns:
             エラーメッセージのリスト
+
+        Example:
+            >>> errors = validator.validate_thresholds()
+            >>> len(errors)  # 閾値が正の整数であれば0
+            0
         """
         errors: List[str] = []
 
@@ -152,6 +172,11 @@ class ConfigValidator:
 
         Returns:
             エラーメッセージのリスト
+
+        Example:
+            >>> errors = validator.validate_trusted_external_paths()
+            >>> len(errors)  # リスト形式で各要素が文字列なら0
+            0
         """
         errors: List[str] = []
         config_dict = as_dict(self.config)
@@ -192,6 +217,11 @@ class ConfigValidator:
 
         Returns:
             エラーメッセージのリスト（問題がなければ空リスト）
+
+        Example:
+            >>> errors = validator.validate_directory_structure()
+            >>> "Loops directory missing" in errors[0] if errors else False
+            False
         """
         errors: List[str] = []
 
@@ -227,6 +257,12 @@ class ConfigValidator:
 
         Returns:
             エラーメッセージのリスト
+
+        Example:
+            >>> validator.validate_level_config("weekly")
+            []
+            >>> validator.validate_level_config("unknown")
+            ["Unknown level: 'unknown'"]
         """
         errors: List[str] = []
 
@@ -250,6 +286,10 @@ class ConfigValidator:
 
         Returns:
             全ての検証をパスした場合True
+
+        Example:
+            >>> validator.is_valid()
+            True
         """
         return len(self.validate_all()) == 0
 

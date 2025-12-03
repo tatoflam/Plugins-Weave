@@ -72,16 +72,36 @@ class LevelRegistry:
     - 新しい振る舞い: LevelBehaviorを継承して登録
 
     Singleton: get_level_registry()でアクセス
+
+    Example:
+        >>> registry = get_level_registry()
+        >>> registry.get_metadata("weekly").prefix
+        'W'
     """
 
     def __init__(self) -> None:
-        """Registryを初期化し、LEVEL_CONFIGからレベルを登録"""
+        """
+        Registryを初期化し、LEVEL_CONFIGからレベルを登録
+
+        Example:
+            >>> registry = LevelRegistry()
+            >>> "weekly" in registry.get_level_names()
+            True
+        """
         self._levels: Dict[str, tuple[LevelMetadata, LevelBehavior]] = {}
         self._prefix_to_level: Dict[str, str] = {}
         self._initialize_from_config()
 
     def _initialize_from_config(self) -> None:
-        """LEVEL_CONFIGからレベルを登録"""
+        """
+        LEVEL_CONFIGからレベルを登録
+
+        Example:
+            >>> registry = LevelRegistry()
+            >>> # _initialize_from_config()は__init__で自動呼び出し
+            >>> registry.get_all_level_names()
+            ['weekly', 'monthly', 'quarterly', ..., 'loop']
+        """
         for level_name, config in LEVEL_CONFIG.items():
             # Extract values with proper type casting
             next_val = config["next"]
@@ -116,6 +136,11 @@ class LevelRegistry:
             name: レベル名
             metadata: レベルメタデータ
             behavior: レベルの振る舞い
+
+        Example:
+            >>> registry = LevelRegistry()
+            >>> # 内部メソッドのため通常は直接呼び出さない
+            >>> # _initialize_from_config()経由で自動的に呼び出される
         """
         self._levels[name] = (metadata, behavior)
         self._prefix_to_level[metadata.prefix] = name
@@ -188,6 +213,11 @@ class LevelRegistry:
 
         Returns:
             全レベル名のリスト
+
+        Example:
+            >>> registry = get_level_registry()
+            >>> 'loop' in registry.get_all_level_names()
+            True
         """
         return list(self._levels.keys())
 
@@ -200,6 +230,12 @@ class LevelRegistry:
 
         Returns:
             プレフィックスのリスト（長さ降順）
+
+        Example:
+            >>> registry = get_level_registry()
+            >>> prefixes = registry.get_all_prefixes()
+            >>> prefixes[0]  # 最長プレフィックスが先頭
+            'MD'
         """
         return sorted(self._prefix_to_level.keys(), key=len, reverse=True)
 
@@ -212,6 +248,13 @@ class LevelRegistry:
 
         Returns:
             レベル名、または見つからない場合None
+
+        Example:
+            >>> registry = get_level_registry()
+            >>> registry.get_level_by_prefix("W")
+            'weekly'
+            >>> registry.get_level_by_prefix("X")
+            None
         """
         return self._prefix_to_level.get(prefix)
 
@@ -224,6 +267,13 @@ class LevelRegistry:
 
         Returns:
             カスケードする場合True
+
+        Example:
+            >>> registry = get_level_registry()
+            >>> registry.should_cascade("weekly")
+            True
+            >>> registry.should_cascade("centennial")
+            False
         """
         return self.get_behavior(level).should_cascade()
 
@@ -235,6 +285,12 @@ class LevelRegistry:
 
         Returns:
             正規表現パターン文字列（例: "MD|W|M|Q|A|T|D|C|L"）
+
+        Example:
+            >>> registry = get_level_registry()
+            >>> pattern = registry.build_prefix_pattern()
+            >>> 'MD|' in pattern  # MDが先頭付近
+            True
         """
         prefixes = self.get_all_prefixes()
         return "|".join(re.escape(p) for p in prefixes)
@@ -281,6 +337,10 @@ def reset_level_registry() -> None:
     Registryをリセット（テスト用）
 
     テスト間でRegistryの状態をクリアするために使用。
+
+    Example:
+        >>> reset_level_registry()  # Singletonインスタンスをリセット
+        >>> registry = get_level_registry()  # 新しいインスタンスが作成される
     """
     global _registry
     _registry = None

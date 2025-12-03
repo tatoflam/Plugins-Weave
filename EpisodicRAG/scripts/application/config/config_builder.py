@@ -94,6 +94,10 @@ class DigestConfigBuilder:
 
         Returns:
             self (fluent interface)
+
+        Example:
+            >>> builder = DigestConfigBuilder().with_plugin_root(Path("/my/plugin"))
+            >>> config = builder.build()
         """
         self._plugin_root = path
         return self
@@ -109,6 +113,10 @@ class DigestConfigBuilder:
 
         Returns:
             self (fluent interface)
+
+        Example:
+            >>> mock_loader = MockConfigLoader()
+            >>> config = DigestConfigBuilder().with_custom_loader(mock_loader).build()
         """
         self._config_loader = loader
         return self
@@ -124,6 +132,10 @@ class DigestConfigBuilder:
 
         Returns:
             self (fluent interface)
+
+        Example:
+            >>> mock_resolver = MockPathResolver()
+            >>> config = DigestConfigBuilder().with_custom_path_resolver(mock_resolver).build()
         """
         self._path_resolver = resolver
         return self
@@ -140,6 +152,11 @@ class DigestConfigBuilder:
 
         Raises:
             ConfigError: 構築に失敗した場合
+
+        Example:
+            >>> config = DigestConfigBuilder().with_plugin_root(Path("/plugin")).build()
+            >>> config.plugin_root
+            Path('/plugin')
         """
         # 遅延インポート（循環参照回避）
         from application.config.config_validator import ConfigValidator

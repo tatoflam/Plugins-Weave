@@ -49,6 +49,10 @@ class ShadowValidator:
             collection_validator: コレクション検証（DIによるテスト容易化）
             file_number_validator: ファイル番号検証（DIによるテスト容易化）
             formatter: エラーフォーマッタ（DIによるテスト容易化）
+
+        Example:
+            >>> validator = ShadowValidator(shadow_manager)
+            >>> shadow = validator.validate_and_get_shadow("weekly", "2025年11月")
         """
         self.shadow_manager = shadow_manager
         self.confirm_callback = confirm_callback or get_default_confirm_callback()
@@ -127,6 +131,10 @@ class ShadowValidator:
 
         Raises:
             ValidationError: source_filesの形式が不正な場合
+
+        Example:
+            >>> validator.validate_shadow_content("weekly", ["L00186.txt", "L00187.txt"])
+            # ValidationError if invalid
         """
         fatal_errors, warnings, numbers = self._collect_validation_errors(level, source_files)
 

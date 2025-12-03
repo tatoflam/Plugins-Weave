@@ -49,7 +49,7 @@ There are two ways to test a plugin under development.
 
 #### 1. Verify Directory Structure
 
-> 📖 Detailed Structure: [ARCHITECTURE.md](docs/dev/ARCHITECTURE.md#directory-structure)
+> 📖 Detailed Structure: [ARCHITECTURE.md](docs/dev/ARCHITECTURE.md#ディレクトリ構成)
 
 ```text
 plugins-weave/
@@ -344,7 +344,7 @@ git status
 3. **Edit configuration on the installed plugin side**
    - Installation location: `~/.claude/plugins/EpisodicRAG-Plugin@Plugins-Weave/`
 
-For details, see [TROUBLESHOOTING.md](docs/user/TROUBLESHOOTING.md#development-and-installation-environment-mixing).
+For details, see [TROUBLESHOOTING.md](docs/user/TROUBLESHOOTING.md#開発環境とインストール環境の混在).
 
 ---
 

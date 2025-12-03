@@ -205,6 +205,11 @@ class ProvisionalLoader:
 
         Returns:
             individual_digestsのリスト
+
+        Example:
+            >>> individuals = loader.generate_from_source("monthly", shadow_digest)
+            >>> len(individuals)
+            5
         """
         source_files = shadow_digest.get("source_files", [])
         source_dir = self._get_source_path_for_level(level)

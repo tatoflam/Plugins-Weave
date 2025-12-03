@@ -46,6 +46,10 @@ class ShadowGrandDigestManager:
 
         Args:
             config: DigestConfig インスタンス（省略時は自動生成）
+
+        Example:
+            >>> manager = ShadowGrandDigestManager()
+            >>> manager.update_shadow_for_new_loops()
         """
         # 設定を読み込み
         if config is None:
@@ -89,6 +93,9 @@ class ShadowGrandDigestManager:
 
         Note:
             ShadowUpdater.add_files_to_shadow() に委譲。
+
+        Example:
+            >>> manager.add_files_to_shadow("weekly", [Path("L00186.txt")])
         """
         return self._updater.add_files_to_shadow(level, new_files)
 
@@ -101,6 +108,9 @@ class ShadowGrandDigestManager:
 
         Note:
             ShadowUpdater.clear_shadow_level() に委譲。
+
+        Example:
+            >>> manager.clear_shadow_level("weekly")
         """
         self._updater.clear_shadow_level(level)
 
@@ -114,6 +124,11 @@ class ShadowGrandDigestManager:
         Returns:
             OverallDigestData: Shadowダイジェストデータ
             None: レベルにデータが存在しない場合
+
+        Example:
+            >>> digest = manager.get_shadow_digest_for_level("weekly")
+            >>> digest["source_files"]
+            ["L00186.txt", "L00187.txt"]
         """
         return self._updater.get_shadow_digest_for_level(level)
 
@@ -126,6 +141,9 @@ class ShadowGrandDigestManager:
 
         Note:
             ShadowUpdater.promote_shadow_to_grand() に委譲。
+
+        Example:
+            >>> manager.promote_shadow_to_grand("weekly")
         """
         self._updater.promote_shadow_to_grand(level)
 
@@ -136,6 +154,9 @@ class ShadowGrandDigestManager:
         Note:
             ShadowUpdater.update_shadow_for_new_loops() に委譲。
             Loopsディレクトリから新規ファイルを検出し、weekly Shadowに追加。
+
+        Example:
+            >>> manager.update_shadow_for_new_loops()
         """
         self._updater.update_shadow_for_new_loops()
 
@@ -149,6 +170,9 @@ class ShadowGrandDigestManager:
         Note:
             ShadowUpdater.cascade_update_on_digest_finalize() に委譲。
             確定レベルをクリアし、上位レベルのShadowを更新。
+
+        Example:
+            >>> manager.cascade_update_on_digest_finalize("weekly")
         """
         self._updater.cascade_update_on_digest_finalize(level)
 

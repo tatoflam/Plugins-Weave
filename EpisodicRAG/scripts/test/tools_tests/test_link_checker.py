@@ -291,6 +291,150 @@ class TestMarkdownLinkChecker:
 
         assert len(results) == 0
 
+    def test_nakaguro_stripped_from_anchor(self, temp_docs_dir) -> None:
+        """中黒（・）がアンカーから除去されることを確認（GitHub互換）"""
+        # Setup - 見出しに中黒があるが、アンカーは中黒なしで参照
+        file1 = temp_docs_dir / "index.md"
+        file1.write_text(
+            "# 導入・セットアップ\n\n[リンク](#導入セットアップ)",
+            encoding="utf-8",
+        )
+
+        # Execute
+        checker = MarkdownLinkChecker(temp_docs_dir)
+        results = checker.check_all()
+
+        # Verify - GitHubと同じく中黒を除去するのでVALID
+        assert len(results) == 1
+        assert results[0].status == LinkStatus.VALID.value
+
+    def test_nakaguro_in_link_not_auto_stripped(self, temp_docs_dir) -> None:
+        """中黒を含むアンカーリンクは自動除去されない（GitHub互換の厳密モード）
+
+        GitHubでは見出しからアンカーを生成する際に中黒を除去するが、
+        リンクのアンカー部分は変換されない。そのため、中黒を含むリンクは
+        中黒なしのアンカーとマッチしない。
+        """
+        # Setup - 見出しには中黒あり、アンカーにも中黒あり
+        file1 = temp_docs_dir / "index.md"
+        file1.write_text(
+            "# マルチユーザー・同時アクセス\n\n[リンク](#マルチユーザー・同時アクセス)",
+            encoding="utf-8",
+        )
+
+        # Execute
+        checker = MarkdownLinkChecker(temp_docs_dir)
+        results = checker.check_all()
+
+        # Verify - リンクの中黒は除去されないのでANCHOR_MISSING
+        # 正しいリンクは (#マルチユーザー同時アクセス) とすべき
+        assert len(results) == 1
+        assert results[0].status == LinkStatus.ANCHOR_MISSING.value
+
+    def test_details_tag_id_attribute(self, temp_docs_dir) -> None:
+        """<details>タグのid属性が認識されることを確認（lychee互換）"""
+        # Setup
+        file1 = temp_docs_dir / "index.md"
+        file1.write_text(
+            '<details id="archive-section">\n<summary>Archive</summary>\n</details>\n\n[Link](#archive-section)',
+            encoding="utf-8",
+        )
+
+        # Execute
+        checker = MarkdownLinkChecker(temp_docs_dir)
+        results = checker.check_all()
+
+        # Verify
+        assert len(results) == 1
+        assert results[0].status == LinkStatus.VALID.value
+
+    def test_html_id_in_other_elements(self, temp_docs_dir) -> None:
+        """任意のHTML要素のid属性が認識される"""
+        # Setup
+        file1 = temp_docs_dir / "index.md"
+        file1.write_text(
+            '<div id="custom-anchor"></div>\n\n[Custom](#custom-anchor)',
+            encoding="utf-8",
+        )
+
+        # Execute
+        checker = MarkdownLinkChecker(temp_docs_dir)
+        results = checker.check_all()
+
+        # Verify
+        assert len(results) == 1
+        assert results[0].status == LinkStatus.VALID.value
+
+    def test_links_in_code_block_skipped(self, temp_docs_dir) -> None:
+        """コードブロック内のリンクはスキップされる"""
+        # Setup - コードブロック内に意図的に壊れたリンクを含む
+        file1 = temp_docs_dir / "index.md"
+        file1.write_text(
+            "# Doc\n\n```text\n[broken](./nonexistent.md)\n```\n\n[valid](index.md)",
+            encoding="utf-8",
+        )
+
+        # Execute
+        checker = MarkdownLinkChecker(temp_docs_dir)
+        results = checker.check_all()
+
+        # Verify - コードブロック外のリンクのみ検出
+        assert len(results) == 1
+        assert results[0].status == LinkStatus.VALID.value
+        assert results[0].link_target == "index.md"
+
+    def test_links_in_fenced_code_block_with_language(self, temp_docs_dir) -> None:
+        """言語指定付きコードブロック内のリンクもスキップされる"""
+        # Setup
+        file1 = temp_docs_dir / "index.md"
+        file1.write_text(
+            "# Doc\n\n```markdown\n[example](./example.md)\n```\n\n[real](index.md)",
+            encoding="utf-8",
+        )
+
+        # Execute
+        checker = MarkdownLinkChecker(temp_docs_dir)
+        results = checker.check_all()
+
+        # Verify
+        assert len(results) == 1
+        assert results[0].link_target == "index.md"
+
+    def test_links_in_inline_code_span_skipped(self, temp_docs_dir) -> None:
+        """インラインコードスパン（`...`）内のリンクはスキップされる"""
+        # Setup - バッククォート内にリンク構文がある
+        file1 = temp_docs_dir / "index.md"
+        file1.write_text(
+            "# Doc\n\nExample: `[link](./broken.md)` is code\n\n[real](index.md)",
+            encoding="utf-8",
+        )
+
+        # Execute
+        checker = MarkdownLinkChecker(temp_docs_dir)
+        results = checker.check_all()
+
+        # Verify - インラインコード外のリンクのみ検出
+        assert len(results) == 1
+        assert results[0].status == LinkStatus.VALID.value
+        assert results[0].link_target == "index.md"
+
+    def test_links_in_table_code_span_skipped(self, temp_docs_dir) -> None:
+        """テーブル内のインラインコードスパン内リンクもスキップされる"""
+        # Setup - SSoTドキュメントのような形式
+        file1 = temp_docs_dir / "index.md"
+        file1.write_text(
+            "# Doc\n\n| Col1 | Col2 |\n|------|------|\n| info | `[例](../../nonexistent.md)` |\n\n[real](index.md)",
+            encoding="utf-8",
+        )
+
+        # Execute
+        checker = MarkdownLinkChecker(temp_docs_dir)
+        results = checker.check_all()
+
+        # Verify
+        assert len(results) == 1
+        assert results[0].link_target == "index.md"
+
 
 class TestCheckSummary:
     """CheckSummary のテスト"""

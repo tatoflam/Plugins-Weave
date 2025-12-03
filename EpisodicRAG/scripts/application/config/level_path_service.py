@@ -37,6 +37,11 @@ class LevelPathService:
 
         Raises:
             ConfigError: 不正なレベル名の場合
+
+        Example:
+            >>> service = LevelPathService(Path("/digests"))
+            >>> service.get_level_dir("weekly")
+            Path('/digests/1_Weekly')
         """
         if level not in LEVEL_CONFIG:
             raise ConfigError(invalid_level_message(level, list(LEVEL_NAMES)))
@@ -55,5 +60,10 @@ class LevelPathService:
 
         Raises:
             ValueError: 不正なレベル名の場合
+
+        Example:
+            >>> service = LevelPathService(Path("/digests"))
+            >>> service.get_provisional_dir("weekly")
+            Path('/digests/1_Weekly/Provisional')
         """
         return self.get_level_dir(level) / "Provisional"

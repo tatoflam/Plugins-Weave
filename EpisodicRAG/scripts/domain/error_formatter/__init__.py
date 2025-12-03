@@ -113,6 +113,11 @@ class CompositeErrorFormatter:
 
         Args:
             project_root: プロジェクトルートパス（相対パス変換の基準）
+
+        Example:
+            >>> formatter = CompositeErrorFormatter(Path("/project"))
+            >>> formatter.config.invalid_level("xyz")
+            "Invalid level: 'xyz'"
         """
         self._project_root = project_root
 
@@ -188,6 +193,10 @@ class CompositeErrorFormatter:
 
         Raises:
             KeyError: カテゴリが未登録の場合
+
+        Example:
+            >>> formatter.get_formatter("config").invalid_level("xyz")
+            "Invalid level: 'xyz'"
         """
         return self._registry.get(category)
 
@@ -200,6 +209,10 @@ class CompositeErrorFormatter:
 
         Returns:
             登録済みならTrue
+
+        Example:
+            >>> formatter.has_formatter("config")
+            True
         """
         return self._registry.has(category)
 
@@ -212,6 +225,10 @@ class CompositeErrorFormatter:
 
         Returns:
             相対パス文字列
+
+        Example:
+            >>> formatter.format_path(Path("/project/data/file.json"))
+            'data/file.json'
         """
         # どのサブフォーマッタでも同じ結果なので、configを使用
         return self.config.format_path(path)
@@ -237,6 +254,11 @@ def get_error_formatter(project_root: Optional[Path] = None) -> CompositeErrorFo
 
     Returns:
         CompositeErrorFormatterインスタンス
+
+    Example:
+        >>> formatter = get_error_formatter()
+        >>> formatter.config.invalid_level("xyz")
+        "Invalid level: 'xyz'"
     """
     global _default_formatter
     if _default_formatter is None or project_root is not None:
@@ -248,6 +270,10 @@ def get_error_formatter(project_root: Optional[Path] = None) -> CompositeErrorFo
 def reset_error_formatter() -> None:
     """
     デフォルトフォーマッターをリセット（テスト用）
+
+    Example:
+        >>> reset_error_formatter()  # キャッシュをクリア
+        >>> formatter = get_error_formatter()  # 新しいインスタンスが作成される
     """
     global _default_formatter
     _default_formatter = None

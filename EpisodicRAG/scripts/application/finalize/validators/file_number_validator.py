@@ -54,6 +54,11 @@ class FileNumberValidator:
             (numbers, errors) のタプル
             - numbers: 抽出に成功した番号のリスト
             - errors: 抽出に失敗したファイルのエラーメッセージリスト
+
+        Example:
+            >>> validator = FileNumberValidator()
+            >>> validator.extract_numbers(["L00186.txt", "L00187.txt"])
+            ([186, 187], [])
         """
         numbers: List[int] = []
         errors: List[str] = []
@@ -86,6 +91,13 @@ class FileNumberValidator:
 
         Returns:
             連番の場合True、そうでない場合False
+
+        Example:
+            >>> validator = FileNumberValidator()
+            >>> validator.check_consecutive([1, 2, 3])
+            True
+            >>> validator.check_consecutive([1, 3, 5])
+            False
         """
         if len(numbers) <= 1:
             return True
@@ -106,6 +118,13 @@ class FileNumberValidator:
 
         Returns:
             警告メッセージのリスト（連番の場合は空）
+
+        Example:
+            >>> validator = FileNumberValidator()
+            >>> validator.validate_consecutive([1, 2, 3], ["L00001.txt", "L00002.txt", "L00003.txt"])
+            []
+            >>> validator.validate_consecutive([1, 3], ["L00001.txt", "L00003.txt"])
+            ["Non-consecutive files detected: [1, 3]"]
         """
         if not numbers:
             return []

@@ -129,6 +129,10 @@ class DigestPersistence:
 
         Raises:
             DigestError: overall_digestが無効な場合、またはGrandDigest更新に失敗した場合
+
+        Example:
+            >>> persistence.update_grand_digest("weekly", regular_digest, "W0042")
+            # GrandDigest.txt の weeklyセクションが更新される
         """
         _logger.info(f"[Step 2] GrandDigest.txt更新: {level}")
         overall_digest = regular_digest.get("overall_digest")

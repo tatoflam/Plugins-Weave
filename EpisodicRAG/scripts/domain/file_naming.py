@@ -35,6 +35,10 @@ def set_registry(registry: LevelRegistryProtocol) -> None:
     Note:
         この関数を呼び出すことで、遅延インポートを回避できる。
         テスト時にモックを注入する際にも使用可能。
+
+    Example:
+        >>> from domain.level_registry import get_level_registry
+        >>> set_registry(get_level_registry())
     """
     global _registry_instance
     _registry_instance = registry
@@ -45,6 +49,9 @@ def reset_registry() -> None:
     Registryをリセット（テスト用）
 
     テスト間でRegistryの状態をクリアするために使用。
+
+    Example:
+        >>> reset_registry()  # グローバルRegistryをNoneにリセット
     """
     global _registry_instance
     _registry_instance = None
@@ -59,6 +66,11 @@ def _get_registry() -> LevelRegistryProtocol:
 
     Returns:
         LevelRegistryProtocolインスタンス
+
+    Example:
+        >>> registry = _get_registry()
+        >>> registry.get_level_names()
+        ['loop', 'weekly', 'monthly', ...]
     """
     global _registry_instance
     if _registry_instance is not None:

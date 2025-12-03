@@ -28,6 +28,11 @@ class PlaceholderManager:
         Args:
             overall_digest: overall_digestデータ
             total_files: 総ファイル数
+
+        Example:
+            >>> manager = PlaceholderManager()
+            >>> manager.update_or_preserve(digest_data, 5)
+            # PLACEHOLDER状態なら初期化、既存分析があれば保持
         """
         abstract = overall_digest.get("abstract", "")
         is_placeholder = not abstract or (

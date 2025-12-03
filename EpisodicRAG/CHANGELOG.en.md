@@ -23,11 +23,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **CONCEPT.md / CONCEPT.en.md**: New concept documentation (Japanese/English synced, 210 lines each)
+
 - **Internal Refactoring**: TypedDict split, Literal types, CLI common helpers, validation consolidation, 4 new design patterns
 
 - **Development Tools**: Footer checker, link checker (`scripts/tools/`)
-
-- **CONCEPT.md / CONCEPT.en.md**: New concept documentation (Japanese/English synced, 210 lines each)
 
 > 📖 See [DESIGN_DECISIONS.md](docs/dev/DESIGN_DECISIONS.md) for details
 
@@ -170,7 +170,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-<details>
+<details id="archive-v2x-and-earlier">
 <summary>Archive (v2.x and earlier)</summary>
 
 ## [2.3.0] - 2025-11-28

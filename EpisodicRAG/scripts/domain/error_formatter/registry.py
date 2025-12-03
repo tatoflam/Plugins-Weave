@@ -83,6 +83,10 @@ class FormatterRegistry:
 
         Raises:
             TypeError: formatterがBaseErrorFormatterを継承していない場合
+
+        Example:
+            >>> registry = FormatterRegistry(project_root)
+            >>> registry.register("config", ConfigErrorFormatter(project_root))
         """
         if not isinstance(formatter, BaseErrorFormatter):
             raise TypeError(
@@ -102,6 +106,11 @@ class FormatterRegistry:
 
         Raises:
             KeyError: カテゴリが未登録の場合
+
+        Example:
+            >>> formatter = registry.get("config")
+            >>> formatter.invalid_level("xyz")
+            "Invalid level: 'xyz'"
         """
         if category not in self._formatters:
             raise KeyError(
@@ -119,6 +128,12 @@ class FormatterRegistry:
 
         Returns:
             登録済みフォーマッタ、または None
+
+        Example:
+            >>> registry.get_or_none("config")  # 登録済み
+            <ConfigErrorFormatter>
+            >>> registry.get_or_none("unknown")  # 未登録
+            None
         """
         return self._formatters.get(category)
 
@@ -131,6 +146,12 @@ class FormatterRegistry:
 
         Returns:
             登録済みならTrue
+
+        Example:
+            >>> registry.has("config")
+            True
+            >>> registry.has("unknown")
+            False
         """
         return category in self._formatters
 
@@ -140,6 +161,10 @@ class FormatterRegistry:
 
         Returns:
             カテゴリ名のリスト
+
+        Example:
+            >>> registry.categories()
+            ['config', 'file', 'validation', 'digest']
         """
         return list(self._formatters.keys())
 
@@ -155,6 +180,12 @@ class FormatterRegistry:
 
         Raises:
             AttributeError: カテゴリが未登録の場合
+
+        Example:
+            >>> registry = FormatterRegistry(project_root)
+            >>> registry.register("config", ConfigErrorFormatter(project_root))
+            >>> registry.config.invalid_level("xyz")  # 動的属性アクセス
+            "Invalid level: 'xyz'"
         """
         # _formatters自体へのアクセスは通常の属性アクセス
         if name.startswith("_"):

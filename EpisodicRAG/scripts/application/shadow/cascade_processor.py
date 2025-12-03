@@ -118,6 +118,11 @@ class CascadeProcessor:
 
         Returns:
             overall_digestデータ、またはNone
+
+        Example:
+            >>> digest = processor.get_shadow_digest_for_level("weekly")
+            >>> digest["source_files"]
+            ['L00186.txt', 'L00187.txt', ...]
         """
         shadow_data = self.shadow_io.load_or_create()
         overall_digest = shadow_data["latest_digests"][level]["overall_digest"]
@@ -143,6 +148,10 @@ class CascadeProcessor:
 
         Args:
             level: レベル名
+
+        Example:
+            >>> processor.promote_shadow_to_grand("weekly")
+            # ログ出力: 昇格準備完了: 5ファイル
         """
         digest = self.get_shadow_digest_for_level(level)
 
@@ -160,6 +169,10 @@ class CascadeProcessor:
 
         Args:
             level: レベル名
+
+        Example:
+            >>> processor.clear_shadow_level("weekly")
+            # ShadowGrandDigestのweeklyセクションがリセットされる
         """
         shadow_data = self.shadow_io.load_or_create()
 
@@ -183,6 +196,10 @@ class CascadeProcessor:
 
         Args:
             level: レベル名
+
+        Example:
+            >>> processor.cascade_update_on_digest_finalize("weekly")
+            # weekly確定 → monthlyのShadowに新規ファイル追加 → weeklyのShadowクリア
         """
         _logger.info(f"[Step 3] ShadowGrandDigestカスケード処理: レベル {level}")
         _logger.state("cascade_update", starting_for_level=level)

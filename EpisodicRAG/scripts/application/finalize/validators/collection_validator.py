@@ -44,6 +44,13 @@ class CollectionValidator:
 
         Returns:
             エラーメッセージのリスト（空の場合は検証成功）
+
+        Example:
+            >>> validator = CollectionValidator()
+            >>> validator.validate_list(["a", "b"], "files")
+            []
+            >>> validator.validate_list("not a list", "files")
+            ["Expected list for 'files', got str"]
         """
         if not is_valid_list(data):
             return [self.formatter.validation.invalid_type(context, "list", data)]
@@ -59,6 +66,13 @@ class CollectionValidator:
 
         Returns:
             エラーメッセージのリスト（空の場合は検証成功）
+
+        Example:
+            >>> validator = CollectionValidator()
+            >>> validator.validate_non_empty(["a"], "files")
+            []
+            >>> validator.validate_non_empty([], "files")
+            ["'files' cannot be empty"]
         """
         if not data:
             return [self.formatter.validation.empty_collection(context)]
@@ -74,6 +88,13 @@ class CollectionValidator:
 
         Returns:
             エラーメッセージのリスト（空の場合は検証成功）
+
+        Example:
+            >>> validator = CollectionValidator()
+            >>> validator.validate_list_and_non_empty(["a", "b"], "files")
+            []
+            >>> validator.validate_list_and_non_empty([], "files")
+            ["'files' cannot be empty"]
         """
         errors = self.validate_list(data, context)
         if errors:

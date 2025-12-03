@@ -135,6 +135,12 @@ def is_valid_str(data: Any) -> TypeGuard[str]:
 
     Returns:
         dataがstrならTrue
+
+    Example:
+        >>> is_valid_str("hello")
+        True
+        >>> is_valid_str(123)
+        False
     """
     return isinstance(data, str)
 
@@ -153,6 +159,12 @@ def is_valid_int(data: Any) -> TypeGuard[int]:
 
     Returns:
         dataがintならTrue
+
+    Example:
+        >>> is_valid_int(42)
+        True
+        >>> is_valid_int("42")
+        False
     """
     return isinstance(data, int)
 
@@ -171,6 +183,12 @@ def get_dict_or_empty(data: Any) -> Dict[str, Any]:
 
     Returns:
         dataがdictならdata、そうでなければ{}
+
+    Example:
+        >>> get_dict_or_empty({"key": "value"})
+        {'key': 'value'}
+        >>> get_dict_or_empty(None)
+        {}
     """
     return get_or_default(data, dict, dict)
 
@@ -184,6 +202,12 @@ def get_list_or_empty(data: Any) -> List[Any]:
 
     Returns:
         dataがlistならdata、そうでなければ[]
+
+    Example:
+        >>> get_list_or_empty([1, 2, 3])
+        [1, 2, 3]
+        >>> get_list_or_empty("not a list")
+        []
     """
     return get_or_default(data, list, list)
 
@@ -197,5 +221,11 @@ def get_str_or_empty(data: Any) -> str:
 
     Returns:
         dataがstrならdata、そうでなければ""
+
+    Example:
+        >>> get_str_or_empty("hello")
+        'hello'
+        >>> get_str_or_empty(123)
+        ''
     """
     return get_or_default(data, str, str)

@@ -40,6 +40,10 @@ class ConfigErrorFormatter(BaseErrorFormatter):
 
         Returns:
             フォーマットされたエラーメッセージ
+
+        Example:
+            >>> formatter.invalid_level("xyz", ["weekly", "monthly"])
+            "Invalid level: 'xyz'. Valid levels: weekly, monthly"
         """
         if valid_levels:
             return f"Invalid level: '{level}'. Valid levels: {', '.join(valid_levels)}"
@@ -54,6 +58,10 @@ class ConfigErrorFormatter(BaseErrorFormatter):
 
         Returns:
             フォーマットされたエラーメッセージ
+
+        Example:
+            >>> formatter.unknown_level("invalid")
+            "Unknown level: 'invalid'"
         """
         return f"Unknown level: '{level}'"
 
@@ -66,6 +74,10 @@ class ConfigErrorFormatter(BaseErrorFormatter):
 
         Returns:
             フォーマットされたエラーメッセージ
+
+        Example:
+            >>> formatter.config_key_missing("base_dir")
+            "Required configuration key missing: 'base_dir'"
         """
         return f"Required configuration key missing: '{key}'"
 
@@ -80,6 +92,10 @@ class ConfigErrorFormatter(BaseErrorFormatter):
 
         Returns:
             フォーマットされたエラーメッセージ
+
+        Example:
+            >>> formatter.config_invalid_value("timeout", "int", "abc")
+            "Invalid configuration value for 'timeout': expected int, got str"
         """
         return f"Invalid configuration value for '{key}': expected {expected}, got {type(actual).__name__}"
 
@@ -92,6 +108,10 @@ class ConfigErrorFormatter(BaseErrorFormatter):
 
         Returns:
             フォーマットされたエラーメッセージ
+
+        Example:
+            >>> formatter.config_section_missing("paths")
+            "'paths' section missing in config.json"
         """
         return f"'{section}' section missing in config.json"
 
@@ -105,5 +125,9 @@ class ConfigErrorFormatter(BaseErrorFormatter):
 
         Returns:
             フォーマットされたエラーメッセージ
+
+        Example:
+            >>> formatter.initialization_failed("ConfigLoader", ValueError("missing key"))
+            'Failed to initialize ConfigLoader: missing key'
         """
         return f"Failed to initialize {component}: {error}"

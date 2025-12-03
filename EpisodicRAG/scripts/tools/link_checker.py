@@ -130,9 +130,26 @@ class MarkdownLinkChecker:
             return file_results
 
         lines = content.split("\n")
+        in_code_block = False
 
         for line_num, line in enumerate(lines, start=1):
+            # コードブロック（```）の開始/終了を追跡
+            if line.strip().startswith("```"):
+                in_code_block = not in_code_block
+                continue
+
+            # コードブロック内のリンクはスキップ
+            if in_code_block:
+                continue
+
+            # インラインコードスパン（`...`）の位置を特定
+            code_spans = self._find_code_spans(line)
+
             for match in self.LINK_PATTERN.finditer(line):
+                # インラインコード内のリンクはスキップ
+                if self._is_in_code_span(match.start(), match.end(), code_spans):
+                    continue
+
                 link_text = match.group(1)
                 link_target = match.group(2)
 
@@ -299,12 +316,23 @@ class MarkdownLinkChecker:
             slug = self._slugify(heading_text)
             headings.add(slug)
 
+        # HTML id属性も抽出（<details id="..."> 等、lychee互換）
+        id_pattern = re.compile(r'id=["\']([^"\']+)["\']')
+        for match in id_pattern.finditer(content):
+            headings.add(match.group(1).lower())
+
         self._heading_cache[file_path] = headings
         return headings
 
     def _slugify(self, text: str) -> str:
         """
         見出しテキストをスラッグ化（GitHub風）
+
+        GitHub's algorithm (per github-slugger):
+        1. Lowercase
+        2. Remove punctuation (including CJK punctuation like ・)
+        3. Replace whitespace with hyphens
+        4. Strip leading/trailing hyphens
 
         Args:
             text: 見出しテキスト
@@ -315,8 +343,9 @@ class MarkdownLinkChecker:
         # 小文字化
         slug = text.lower()
 
-        # 特殊文字を除去（日本語は保持）
-        slug = re.sub(r"[^\w\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF\s-]", "", slug)
+        # 特殊文字を除去（日本語は保持、中黒U+30FBは除外）
+        # Katakana range split: U+30A0-30FA (letters), skip U+30FB (nakaguro), U+30FC-30FF (marks)
+        slug = re.sub(r"[^\w\u3040-\u309F\u30A0-\u30FA\u30FC-\u30FF\u4E00-\u9FFF\s-]", "", slug)
 
         # スペースをハイフンに（各スペースを個別に置換、GitHubと同じ動作）
         slug = re.sub(r"\s", "-", slug)
@@ -328,6 +357,50 @@ class MarkdownLinkChecker:
         slug = slug.strip("-")
 
         return slug
+
+    def _find_code_spans(self, line: str) -> List[tuple]:
+        """
+        行内のインラインコードスパン（`...`）の位置を特定
+
+        Args:
+            line: 検査する行
+
+        Returns:
+            (start, end) タプルのリスト
+        """
+        spans = []
+        in_code = False
+        start = 0
+
+        i = 0
+        while i < len(line):
+            if line[i] == '`':
+                if not in_code:
+                    in_code = True
+                    start = i
+                else:
+                    spans.append((start, i + 1))
+                    in_code = False
+            i += 1
+
+        return spans
+
+    def _is_in_code_span(self, start: int, end: int, code_spans: List[tuple]) -> bool:
+        """
+        指定範囲がコードスパン内にあるかを判定
+
+        Args:
+            start: マッチの開始位置
+            end: マッチの終了位置
+            code_spans: コードスパンの位置リスト
+
+        Returns:
+            コードスパン内ならTrue
+        """
+        for span_start, span_end in code_spans:
+            if span_start <= start < span_end:
+                return True
+        return False
 
     def _suggest_correction(self, source_file: Path, broken_target: str) -> Optional[str]:
         """

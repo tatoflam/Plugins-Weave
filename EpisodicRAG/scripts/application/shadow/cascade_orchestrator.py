@@ -156,6 +156,13 @@ class CascadeOrchestrator:
 
         Returns:
             CascadeResult: 全ステップの結果を含む
+
+        Example:
+            >>> result = orchestrator.execute_cascade("weekly")
+            >>> result.success
+            True
+            >>> len(result.steps)
+            4
         """
         _logger.info(f"[Orchestrator] カスケード処理を開始: レベル {level}")
 

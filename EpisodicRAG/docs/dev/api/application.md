@@ -659,7 +659,7 @@ print(config.loops_path)
 print(config.weekly_threshold)
 ```
 
-詳細なAPI仕様は [config.md](config.md#digestconfig-クラスapplicationconfig__init__py) を参照。
+詳細なAPI仕様は [config.md](config.md#digestconfig-クラス) を参照。
 
 ### DigestConfigBuilder *(v4.1.0+)*
 

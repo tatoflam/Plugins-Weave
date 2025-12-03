@@ -113,6 +113,10 @@ class ShadowUpdater:
         Note:
             ダイジェスト確定後にShadowをクリアする際に使用。
             source_files、overall_digestをテンプレート状態にリセット。
+
+        Example:
+            >>> updater.clear_shadow_level("weekly")
+            # shadow["weekly"]がテンプレート状態にリセットされる
         """
         return self._cascade_processor.clear_shadow_level(level)
 
@@ -126,6 +130,11 @@ class ShadowUpdater:
         Returns:
             OverallDigestData: Shadowダイジェストデータ
             None: レベルにデータが存在しない場合
+
+        Example:
+            >>> digest = updater.get_shadow_digest_for_level("weekly")
+            >>> digest["source_files"]
+            ["L00186.txt", "L00187.txt"]
         """
         return self._cascade_processor.get_shadow_digest_for_level(level)
 
@@ -139,6 +148,10 @@ class ShadowUpdater:
         Note:
             GrandDigest.txtの該当レベルにShadowの内容をコピー。
             通常は finalize_from_shadow.py から呼び出される。
+
+        Example:
+            >>> updater.promote_shadow_to_grand("weekly")
+            # ShadowのweeklyセクションがGrandDigestにコピーされる
         """
         return self._cascade_processor.promote_shadow_to_grand(level)
 
@@ -153,6 +166,10 @@ class ShadowUpdater:
             - 新規ファイルがない場合は何も行わない
             - Shadowファイルが存在しない場合は自動作成
             - 追加後、Claude分析待ちのプレースホルダーが設定される
+
+        Example:
+            >>> updater.update_shadow_for_new_loops()
+            # 新規Loopファイルがweekly Shadowに追加される
         """
         # Shadowファイルを読み込み（存在しなければ作成）
         self.shadow_io.load_or_create()

@@ -38,6 +38,10 @@ class DigestErrorFormatter(BaseErrorFormatter):
 
         Returns:
             フォーマットされたエラーメッセージ
+
+        Example:
+            >>> formatter.digest_not_found("weekly", "W0042")
+            "Digest not found: level='weekly', id='W0042'"
         """
         return f"Digest not found: level='{level}', id='{identifier}'"
 
@@ -50,6 +54,10 @@ class DigestErrorFormatter(BaseErrorFormatter):
 
         Returns:
             フォーマットされたエラーメッセージ
+
+        Example:
+            >>> formatter.shadow_empty("weekly")
+            "Shadow digest for level 'weekly' has no source files"
         """
         return f"Shadow digest for level '{level}' has no source files"
 
@@ -64,5 +72,9 @@ class DigestErrorFormatter(BaseErrorFormatter):
 
         Returns:
             フォーマットされたエラーメッセージ
+
+        Example:
+            >>> formatter.cascade_error("weekly", "monthly", "threshold not met")
+            "Cascade failed from 'weekly' to 'monthly': threshold not met"
         """
         return f"Cascade failed from '{from_level}' to '{to_level}': {reason}"

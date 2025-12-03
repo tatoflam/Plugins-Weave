@@ -41,6 +41,10 @@ class FileErrorFormatter(BaseErrorFormatter):
 
         Returns:
             フォーマットされたエラーメッセージ
+
+        Example:
+            >>> formatter.file_not_found(Path("/project/data/missing.json"))
+            'File not found: data/missing.json'
         """
         return f"File not found: {self.format_path(path)}"
 
@@ -53,6 +57,10 @@ class FileErrorFormatter(BaseErrorFormatter):
 
         Returns:
             フォーマットされたエラーメッセージ
+
+        Example:
+            >>> formatter.file_already_exists(Path("/project/data/existing.json"))
+            'File already exists: data/existing.json'
         """
         return f"File already exists: {self.format_path(path)}"
 
@@ -67,6 +75,10 @@ class FileErrorFormatter(BaseErrorFormatter):
 
         Returns:
             フォーマットされたエラーメッセージ
+
+        Example:
+            >>> formatter.file_io_error("read", Path("data.json"), PermissionError("denied"))
+            'Failed to read data.json: denied'
         """
         return f"Failed to {operation} {self.format_path(path)}: {error}"
 
@@ -79,6 +91,10 @@ class FileErrorFormatter(BaseErrorFormatter):
 
         Returns:
             フォーマットされたエラーメッセージ
+
+        Example:
+            >>> formatter.directory_not_found(Path("/project/missing_dir"))
+            'Directory not found: missing_dir'
         """
         return f"Directory not found: {self.format_path(path)}"
 
@@ -92,6 +108,10 @@ class FileErrorFormatter(BaseErrorFormatter):
 
         Returns:
             フォーマットされたエラーメッセージ
+
+        Example:
+            >>> formatter.directory_creation_failed(Path("new_dir"), PermissionError("denied"))
+            'Failed to create directory new_dir: denied'
         """
         return f"Failed to create directory {self.format_path(path)}: {error}"
 
@@ -105,5 +125,9 @@ class FileErrorFormatter(BaseErrorFormatter):
 
         Returns:
             フォーマットされたエラーメッセージ
+
+        Example:
+            >>> formatter.invalid_json(Path("config.json"), JSONDecodeError(...))
+            'Invalid JSON in config.json: Expecting value...'
         """
         return f"Invalid JSON in {self.format_path(path)}: {error}"

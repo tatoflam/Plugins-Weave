@@ -113,6 +113,11 @@ class ShadowIO:
 
         Args:
             data: 保存するデータ
+
+        Example:
+            >>> data = shadow_io.load_or_create()
+            >>> data["latest_digests"]["weekly"]["source_files"].append("new.txt")
+            >>> shadow_io.save(data)  # metadata.last_updatedが自動更新される
         """
         log_debug(f"{LOG_PREFIX_FILE} save: {self.shadow_digest_file}")
         log_debug(f"{LOG_PREFIX_VALIDATE} data_keys: {list(data.keys())}")

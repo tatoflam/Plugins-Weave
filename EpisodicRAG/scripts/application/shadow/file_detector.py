@@ -64,6 +64,12 @@ class FileDetector:
 
         Raises:
             ValueError: 不明なソースタイプの場合
+
+        Example:
+            >>> detector.get_source_path("weekly")
+            Path('/project/Loops')
+            >>> detector.get_source_path("monthly")
+            Path('/project/Digests/1_Weekly')
         """
         # 統一メソッドを使用
         return self.config.get_source_dir(level)

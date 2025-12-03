@@ -176,6 +176,10 @@ class FileAppender:
         Args:
             level: レベル名
             new_files: 追加するファイルのリスト
+
+        Example:
+            >>> appender.add_files_to_shadow("weekly", [Path("L00186.txt")])
+            # shadow["weekly"]["source_files"]に"L00186.txt"が追加される
         """
         shadow_data = self.shadow_io.load_or_create()
         overall_digest = self._ensure_overall_digest_initialized(shadow_data, level)

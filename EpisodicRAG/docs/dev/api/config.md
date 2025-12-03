@@ -42,7 +42,7 @@ from infrastructure.config import (
 2. [ConfigData型定義](#configdata型定義)
    - [ConfigData（config.json全体構造）](#configdataconfigjson全体構造)
    - [PathsConfigData / LevelsConfigData](#pathsconfigdata--levelsconfigdata)
-3. [DigestConfig クラス](#digestconfig-クラスapplicationconfig__init__py)
+3. [DigestConfig クラス](#digestconfig-クラス)
    - [プロパティ（パス関連）](#プロパティパス関連)
    - [プロパティ（閾値関連）](#プロパティ閾値関連)
    - [メソッド](#メソッド)
@@ -258,7 +258,9 @@ class LevelsConfigData(TypedDict, total=False):
 
 ---
 
-## DigestConfig クラス（application/config/__init__.py）
+## DigestConfig クラス
+
+> 📍 `application/config/__init__.py`
 
 ```python
 class DigestConfig:

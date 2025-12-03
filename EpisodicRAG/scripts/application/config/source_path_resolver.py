@@ -57,6 +57,12 @@ class SourcePathResolver:
 
         Raises:
             ConfigError: 無効なlevelが指定された場合
+
+        Example:
+            >>> resolver.get_source_dir("weekly")  # Loopファイルが入力
+            Path('/loops')
+            >>> resolver.get_source_dir("monthly")  # Weeklyが入力
+            Path('/digests/1_Weekly')
         """
         if level not in LEVEL_CONFIG:
             raise ConfigError(f"Invalid level: '{level}'. Valid levels: {', '.join(LEVEL_NAMES)}")
@@ -80,6 +86,12 @@ class SourcePathResolver:
 
         Raises:
             ConfigError: 無効なlevelが指定された場合
+
+        Example:
+            >>> resolver.get_source_pattern("weekly")
+            'L*.txt'
+            >>> resolver.get_source_pattern("monthly")
+            'W*.txt'
         """
         if level not in LEVEL_CONFIG:
             raise ConfigError(f"Invalid level: '{level}'. Valid levels: {', '.join(LEVEL_NAMES)}")

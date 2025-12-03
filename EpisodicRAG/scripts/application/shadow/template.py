@@ -38,6 +38,12 @@ class ShadowTemplate:
         Returns:
             プレースホルダーを含むoverall_digest構造体
 
+        Example:
+            >>> template = ShadowTemplate(["weekly", "monthly"])
+            >>> digest = template.create_empty_overall_digest()
+            >>> "<!-- PLACEHOLDER" in digest["abstract"]
+            True
+
         Note:
             戻り値の型はOverallDigestDataですが、実際にはプレースホルダー文字列が含まれます。
             Claudeによる分析後に正しい値に置き換えられます。
@@ -58,6 +64,12 @@ class ShadowTemplate:
 
         Returns:
             ShadowGrandDigestの初期テンプレート構造
+
+        Example:
+            >>> template = ShadowTemplate(["weekly", "monthly"])
+            >>> data = template.get_template()
+            >>> list(data["latest_digests"].keys())
+            ['weekly', 'monthly']
         """
         return {
             "metadata": {
