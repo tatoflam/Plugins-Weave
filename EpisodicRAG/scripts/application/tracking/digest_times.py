@@ -89,7 +89,7 @@ class DigestTimesTracker:
         """
         # 空リスト警告
         if input_files is not None and len(input_files) == 0:
-            log_warning(f"Empty input_files list for level: {level}")
+            log_warning(f"入力ファイルリストが空です: レベル {level}")
 
         times = self.load_or_create()
 
@@ -101,6 +101,6 @@ class DigestTimesTracker:
         times[level] = {"timestamp": datetime.now().isoformat(), "last_processed": last_processed}
         save_json(self.last_digest_file, times)
 
-        _logger.info(f"Updated last_digest_times.json for level: {level}")
+        _logger.info(f"last_digest_times.json更新完了: レベル {level}")
         if last_processed:
-            _logger.info(f"Last processed: {last_processed}")
+            _logger.info(f"最終処理番号: {last_processed}")

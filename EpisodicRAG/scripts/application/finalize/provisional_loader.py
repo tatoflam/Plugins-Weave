@@ -102,7 +102,7 @@ class ProvisionalLoader:
         individual_digests = provisional_data.get("individual_digests", [])
         log_debug(f"{LOG_PREFIX_STATE} loaded_digests_count: {len(individual_digests)}")
         _logger.info(
-            f"Loaded {len(individual_digests)} individual digests from {provisional_path.name}"
+            f"{provisional_path.name}から{len(individual_digests)}件の個別ダイジェスト読込完了"
         )
 
         return individual_digests, provisional_path
@@ -135,7 +135,7 @@ class ProvisionalLoader:
 
         # Provisionalファイルが存在しない場合、source_filesから自動生成
         log_debug(f"{LOG_PREFIX_DECISION} provisional_not_found: generating from source files")
-        _logger.info("No Provisional digest found, generating from source files...")
+        _logger.info("Provisionalダイジェストなし、ソースファイルから自動生成中...")
         individual_digests = self.generate_from_source(level, shadow_digest)
 
         return individual_digests, None
@@ -183,7 +183,7 @@ class ProvisionalLoader:
             log_debug(f"{LOG_PREFIX_FILE} skipped (read failed): {source_file}")
             return None
 
-        _logger.info(f"Auto-generated individual digest from {source_file}")
+        _logger.info(f"個別ダイジェスト自動生成: {source_file}")
         return self._build_individual_entry(source_file, source_data)
 
     def generate_from_source(
@@ -216,9 +216,9 @@ class ProvisionalLoader:
         # スキップ数の計算とログ出力
         skipped_count = len(source_files) - len(individual_digests)
         if skipped_count > 0:
-            log_warning(f"Skipped {skipped_count}/{len(source_files)} files due to errors")
+            log_warning(f"エラーにより{skipped_count}/{len(source_files)}ファイルをスキップ")
 
         _logger.info(
-            f"Auto-generated {len(individual_digests)} individual digests from source files"
+            f"ソースファイルから{len(individual_digests)}件の個別ダイジェストを自動生成"
         )
         return individual_digests

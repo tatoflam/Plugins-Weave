@@ -174,4 +174,4 @@ class GrandDigestManager:
 
         # 保存
         self.save(cast(GrandDigestData, grand_data))
-        _logger.info(f"Updated GrandDigest.txt for level: {level}")
+        _logger.info(f"GrandDigest.txt更新完了: レベル {level}")

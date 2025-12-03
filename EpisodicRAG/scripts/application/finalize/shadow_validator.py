@@ -176,7 +176,7 @@ class ShadowValidator:
         shadow_digest = self.shadow_manager.get_shadow_digest_for_level(level)
 
         if shadow_digest is None:
-            _logger.info("Run 'python -m application.grand.shadow_grand_digest' to update shadow first")
+            _logger.info("先に 'python -m application.grand.shadow_grand_digest' でShadowを更新してください")
             formatter = get_error_formatter()
             raise DigestError(formatter.digest.digest_not_found(level, "shadow"))
 
@@ -251,5 +251,5 @@ class ShadowValidator:
         # 5. digest_type検証（分析完了確認）
         self._validate_digest_type(shadow_digest)
 
-        _logger.info(f"Shadow digest contains {len(source_files)} source file(s)")
+        _logger.info(f"Shadowダイジェストのソースファイル数: {len(source_files)}件")
         return shadow_digest

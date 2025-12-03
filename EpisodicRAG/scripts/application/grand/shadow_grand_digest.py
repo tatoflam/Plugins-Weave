@@ -159,17 +159,17 @@ def main() -> None:
     manager = ShadowGrandDigestManager(config)
 
     _logger.info(LOG_SEPARATOR)
-    _logger.info("ShadowGrandDigest Update - New Loop Detection")
+    _logger.info("ShadowGrandDigest更新 - 新規Loop検出")
     _logger.info(LOG_SEPARATOR)
 
     # 新しいLoopファイルの検出と追加
     manager.update_shadow_for_new_loops()
 
     _logger.info(LOG_SEPARATOR)
-    _logger.info("Placeholder added to ShadowGrandDigest.weekly")
+    _logger.info("ShadowGrandDigest.weeklyにプレースホルダー追加完了")
     _logger.info(LOG_SEPARATOR)
-    log_warning("[!] WARNING: Claude analysis required immediately!")
-    log_warning("Without analysis, memory fragmentation (madaraboke) occurs.")
+    log_warning("[!] 警告: Claudeによる即時分析が必要です！")
+    log_warning("分析なしでは記憶の断片化（まだらボケ）が発生します。")
     _logger.info(LOG_SEPARATOR)
 
 

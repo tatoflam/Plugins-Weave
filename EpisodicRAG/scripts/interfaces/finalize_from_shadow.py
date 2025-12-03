@@ -172,11 +172,11 @@ class DigestFinalizerFromShadow:
             FileIOError: ファイルI/Oに失敗した場合
         """
         _logger.info(LOG_SEPARATOR)
-        _logger.info(f"Finalize Digest from Shadow: {level.upper()}")
+        _logger.info(f"Shadowからダイジェスト確定: {level.upper()}")
         _logger.info(LOG_SEPARATOR)
 
         # ===== 処理1: RegularDigest作成 =====
-        _logger.info("[Step 1] Creating RegularDigest from Shadow...")
+        _logger.info("[Step 1] ShadowからRegularDigest作成中...")
 
         # Shadowデータの検証と取得（例外を投げる）
         shadow_digest = self._validator.validate_and_get_shadow(level, weave_title)
@@ -213,7 +213,7 @@ class DigestFinalizerFromShadow:
         )
 
         _logger.info(LOG_SEPARATOR)
-        _logger.info("Digest finalization completed!")
+        _logger.info("ダイジェスト確定処理完了！")
         _logger.info(LOG_SEPARATOR)
 
 

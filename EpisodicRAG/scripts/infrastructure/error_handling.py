@@ -106,7 +106,7 @@ def safe_cleanup(
 
     def on_error(e: Exception) -> None:
         if log_on_error:
-            log_warning(f"Failed to {context}: {e}")
+            log_warning(f"{context}に失敗: {e}")
 
     result = safe_file_operation(cleanup_func, context, on_error=on_error)
     return result is None  # Noneが返る = on_errorが呼ばれた = 失敗

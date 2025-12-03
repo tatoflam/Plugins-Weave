@@ -160,11 +160,11 @@ class FileAppender:
         overall_raw = digest_data.get("overall_digest")
         overall = overall_raw if isinstance(overall_raw, dict) else {}
 
-        _logger.info(f"Read digest content from {file_path.name}")
+        _logger.info(f"ダイジェスト内容を読込: {file_path.name}")
         _logger.info(f"      - digest_type: {overall.get('digest_type', 'N/A')}")
-        _logger.info(f"      - keywords: {len(overall.get('keywords', []))} items")
-        _logger.info(f"      - abstract: {len(overall.get('abstract', ''))} chars")
-        _logger.info(f"      - impression: {len(overall.get('impression', ''))} chars")
+        _logger.info(f"      - keywords: {len(overall.get('keywords', []))}件")
+        _logger.info(f"      - abstract: {len(overall.get('abstract', ''))}文字")
+        _logger.info(f"      - impression: {len(overall.get('impression', ''))}文字")
 
     def add_files_to_shadow(self, level: str, new_files: List[Path]) -> None:
         """

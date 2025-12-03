@@ -122,11 +122,11 @@ class ProvisionalDigestSaver:
         current_num = self.file_manager.get_current_digest_number(level)
 
         if current_num is None:
-            log_warning("--append specified but no existing Provisional found. Creating new file.")
+            log_warning("--append指定されましたが既存Provisionalがありません。新規ファイルを作成します。")
             return get_next_digest_number(self.config.digests_path, level), individual_digests
 
         _logger.info(
-            f"Appending to existing Provisional: {format_digest_number(level, current_num)}_Individual.txt"
+            f"既存Provisionalに追加: {format_digest_number(level, current_num)}_Individual.txt"
         )
 
         # Load and merge with existing data
@@ -215,23 +215,23 @@ Note: JSONはファイルまたは--stdinで渡してください。
 
         # Empty list warning
         if len(individual_digests) == 0:
-            log_warning("No individual digests to save. Creating empty Provisional file.")
+            log_warning("保存する個別ダイジェストがありません。空のProvisionalファイルを作成します。")
 
-        _logger.info(f"Loaded {len(individual_digests)} individual digests")
+        _logger.info(f"個別ダイジェスト {len(individual_digests)}件を読込")
 
         # Save ProvisionalDigest
         saved_path = saver.save_provisional(args.level, individual_digests, append=args.append)
 
         _logger.info("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-        _logger.info("ProvisionalDigest saved successfully")
+        _logger.info("ProvisionalDigest保存完了")
         _logger.info("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-        _logger.info(f"Path: {saved_path}")
-        _logger.info(f"Individual digests: {len(individual_digests)}")
+        _logger.info(f"パス: {saved_path}")
+        _logger.info(f"個別ダイジェスト: {len(individual_digests)}件")
         if args.append:
-            _logger.info("Mode: Append (merged with existing file)")
+            _logger.info("モード: 追加（既存ファイルとマージ）")
         else:
-            _logger.info("Mode: New file")
-        _logger.info("Next step:")
+            _logger.info("モード: 新規作成")
+        _logger.info("次のステップ:")
         _logger.info(f'  python finalize_from_shadow.py {args.level} "TITLE"')
         _logger.info("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
 

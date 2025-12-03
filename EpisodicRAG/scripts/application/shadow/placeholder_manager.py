@@ -43,9 +43,9 @@ class PlaceholderManager:
                 "所感・展望", limits['impression_chars']
             )
             overall_digest["keywords"] = create_placeholder_keywords(limits["keyword_count"])
-            _logger.info(f"Initialized placeholder for {total_files} file(s)")
+            _logger.info(f"プレースホルダー初期化: {total_files}ファイル")
         else:
-            _logger.info(f"Preserved existing analysis (now {total_files} file(s) total)")
+            _logger.info(f"既存分析を保持（現在 {total_files}ファイル）")
             _logger.info(
-                f"Claude should re-analyze all {total_files} files to integrate new content"
+                f"Claudeによる全{total_files}ファイルの再分析が必要（新規コンテンツ統合）"
             )

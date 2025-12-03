@@ -48,7 +48,7 @@ class DigestMerger:
         for new_digest in new_digests:
             source_file = new_digest["source_file"]
             if source_file in merged_dict:
-                _logger.info(f"Overwriting existing digest: {source_file}")
+                _logger.info(f"既存ダイジェストを上書き: {source_file}")
             merged_dict[source_file] = new_digest
 
         return list(merged_dict.values())

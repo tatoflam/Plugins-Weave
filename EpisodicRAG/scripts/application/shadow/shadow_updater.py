@@ -154,10 +154,10 @@ class ShadowUpdater:
         new_files = self.file_detector.find_new_files("weekly")
 
         if not new_files:
-            _logger.info("No new Loop files found")
+            _logger.info("新規Loopファイルなし")
             return
 
-        _logger.info(f"Found {len(new_files)} new Loop file(s):")
+        _logger.info(f"新規Loopファイル {len(new_files)}件検出:")
 
         # Shadowに増分追加
         self.add_files_to_shadow("weekly", new_files)

@@ -120,7 +120,7 @@ class TestPromoteShadowToGrand:
     def test_logs_when_no_digest(self, cascade_processor, caplog):
         """Shadowダイジェストがない場合、ログ出力のみ"""
         cascade_processor.promote_shadow_to_grand("weekly")
-        assert "No shadow digest to promote" in caplog.text
+        assert "昇格対象のShadowダイジェストなし" in caplog.text
 
     @pytest.mark.integration
     def test_logs_ready_for_promotion(self, cascade_processor, caplog):
@@ -134,7 +134,7 @@ class TestPromoteShadowToGrand:
         cascade_processor.shadow_io.save(shadow_data)
 
         cascade_processor.promote_shadow_to_grand("weekly")
-        assert "Shadow digest ready for promotion: 2 file(s)" in caplog.text
+        assert "昇格準備完了: 2ファイル" in caplog.text
 
 
 # =============================================================================
@@ -170,7 +170,7 @@ class TestClearShadowLevel:
     def test_clear_logs_message(self, cascade_processor, caplog):
         """クリア時にログを出力"""
         cascade_processor.clear_shadow_level("monthly")
-        assert "Cleared ShadowGrandDigest for level: monthly" in caplog.text
+        assert "ShadowGrandDigestクリア完了: レベル monthly" in caplog.text
 
 
 # =============================================================================
@@ -186,8 +186,8 @@ class TestCascadeUpdateOnDigestFinalize:
         """カスケード処理の開始・終了をログ出力"""
         cascade_processor.cascade_update_on_digest_finalize("weekly")
 
-        assert "[Step 3] ShadowGrandDigest cascade for level: weekly" in caplog.text
-        assert "[Step 3] Cascade completed for level: weekly" in caplog.text
+        assert "[Step 3] ShadowGrandDigestカスケード処理: レベル weekly" in caplog.text
+        assert "[Step 3] カスケード処理完了: レベル weekly" in caplog.text
 
     @pytest.mark.integration
     def test_cascade_clears_current_level(self, cascade_processor):
@@ -212,7 +212,7 @@ class TestCascadeUpdateOnDigestFinalize:
     def test_cascade_centurial_logs_top_level(self, cascade_processor, caplog):
         """Centurialレベルは次レベルがないため、top levelログ出力"""
         cascade_processor.cascade_update_on_digest_finalize("centurial")
-        assert "No next level for centurial (top level)" in caplog.text
+        assert "centurialに上位レベルなし（最上位）" in caplog.text
 
     @pytest.mark.integration
     def test_cascade_detects_new_files_for_next_level(
@@ -267,7 +267,7 @@ class TestCascadeProcessorEdgeCases:
 
         # 各レベルのログが出力されていること
         for level in levels:
-            assert f"cascade for level: {level}" in caplog.text
+            assert f"カスケード処理: レベル {level}" in caplog.text
 
 
 # =============================================================================
@@ -289,7 +289,7 @@ class TestGetShadowDigestTypeChecks:
         result = cascade_processor.get_shadow_digest_for_level("weekly")
 
         assert result is None
-        assert "No shadow digest for level: weekly" in caplog.text
+        assert "Shadowダイジェストなし: レベル weekly" in caplog.text
 
     @pytest.mark.unit
     def test_get_shadow_digest_with_none(self, cascade_processor, caplog):
@@ -301,7 +301,7 @@ class TestGetShadowDigestTypeChecks:
         result = cascade_processor.get_shadow_digest_for_level("weekly")
 
         assert result is None
-        assert "No shadow digest for level: weekly" in caplog.text
+        assert "Shadowダイジェストなし: レベル weekly" in caplog.text
 
     @pytest.mark.unit
     def test_get_shadow_digest_with_invalid_type(self, cascade_processor, caplog):
@@ -314,7 +314,7 @@ class TestGetShadowDigestTypeChecks:
         result = cascade_processor.get_shadow_digest_for_level("weekly")
 
         assert result is None
-        assert "No shadow digest for level: weekly" in caplog.text
+        assert "Shadowダイジェストなし: レベル weekly" in caplog.text
 
     @pytest.mark.unit
     def test_promote_with_invalid_overall_digest(self, cascade_processor, caplog):
@@ -326,4 +326,4 @@ class TestGetShadowDigestTypeChecks:
         # 例外が発生しないことを確認
         cascade_processor.promote_shadow_to_grand("weekly")
 
-        assert "No shadow digest to promote for level: weekly" in caplog.text
+        assert "昇格対象のShadowダイジェストなし: レベル weekly" in caplog.text

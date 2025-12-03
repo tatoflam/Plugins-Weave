@@ -94,7 +94,7 @@ class DigestPersistence:
 
         # 既存ファイルチェック
         if final_path.exists():
-            log_warning(f"File already exists: {final_path}")
+            log_warning(f"ファイルが既に存在します: {final_path}")
             log_debug(f"{LOG_PREFIX_DECISION} prompting for overwrite confirmation")
             if not self.confirm_callback("Overwrite?"):
                 raise ValidationError("User cancelled overwrite")
@@ -107,7 +107,7 @@ class DigestPersistence:
             formatter = get_error_formatter()
             raise FileIOError(formatter.file.file_io_error("save", final_path, e))
 
-        _logger.info(f"RegularDigest saved: {final_path}")
+        _logger.info(f"RegularDigest保存完了: {final_path}")
         return final_path
 
     def update_grand_digest(
@@ -124,7 +124,7 @@ class DigestPersistence:
         Raises:
             DigestError: overall_digestが無効な場合、またはGrandDigest更新に失敗した場合
         """
-        _logger.info(f"[Step 2] Updating GrandDigest.txt for {level}")
+        _logger.info(f"[Step 2] GrandDigest.txt更新: {level}")
         overall_digest = regular_digest.get("overall_digest")
         if not overall_digest or not is_valid_dict(overall_digest):
             formatter = get_error_formatter()
@@ -153,11 +153,11 @@ class DigestPersistence:
         log_debug(f"{LOG_PREFIX_DECISION} should_cascade({level}): {should_cascade}")
 
         if should_cascade:
-            _logger.info("[Step 3] Processing ShadowGrandDigest cascade")
+            _logger.info("[Step 3] ShadowGrandDigestカスケード処理")
             log_debug(f"{LOG_PREFIX_STATE} starting cascade for level={level}")
             self.shadow_manager.cascade_update_on_digest_finalize(level)
         else:
-            _logger.info(f"[Step 3] Skipped ({level} is top level, no cascade needed)")
+            _logger.info(f"[Step 3] スキップ（{level}は最上位、カスケード不要）")
 
     def _update_digest_times(self, level: str, source_files: List[str]) -> None:
         """
@@ -167,7 +167,7 @@ class DigestPersistence:
             level: ダイジェストレベル
             source_files: ソースファイルリスト
         """
-        _logger.info(f"[Step 4] Updating last_digest_times.json for {level}")
+        _logger.info(f"[Step 4] last_digest_times.json更新: {level}")
         self.times_tracker.save(level, source_files)
 
     def _cleanup_provisional_file(self, provisional_file: Optional[Path]) -> None:
@@ -181,13 +181,13 @@ class DigestPersistence:
             try:
                 provisional_file.unlink()
                 _logger.info(
-                    f"[Step 5] Removed Provisional digest after merge: {provisional_file.name}"
+                    f"[Step 5] マージ後のProvisional削除完了: {provisional_file.name}"
                 )
             except (FileNotFoundError, PermissionError, IsADirectoryError) as e:
                 # FileNotFoundError: 競合状態でファイルが既に削除された場合
                 # PermissionError: ファイルがロックされている場合
                 # IsADirectoryError: パスがディレクトリを指している場合
-                log_warning(f"Failed to remove Provisional digest: {e}")
+                log_warning(f"Provisionalダイジェストの削除に失敗: {e}")
 
     def process_cascade_and_cleanup(
         self, level: str, source_files: List[str], provisional_file_to_delete: Optional[Path]

@@ -126,7 +126,7 @@ class CascadeProcessor:
         _logger.validation("overall_digest", is_valid=is_valid_overall_digest(overall_digest))
 
         if not is_valid_overall_digest(overall_digest):
-            _logger.info(f"No shadow digest for level: {level}")
+            _logger.info(f"Shadowダイジェストなし: レベル {level}")
             return None
 
         # is_valid_overall_digest は TypeGuard なので、
@@ -147,11 +147,11 @@ class CascadeProcessor:
         digest = self.get_shadow_digest_for_level(level)
 
         if not digest:
-            _logger.info(f"No shadow digest to promote for level: {level}")
+            _logger.info(f"昇格対象のShadowダイジェストなし: レベル {level}")
             return
 
         file_count = len(digest.get("source_files", []))
-        _logger.info(f"Shadow digest ready for promotion: {file_count} file(s)")
+        _logger.info(f"昇格準備完了: {file_count}ファイル")
         # 実際の昇格処理はfinalize_from_shadow.pyで実行される
 
     def clear_shadow_level(self, level: str) -> None:
@@ -169,7 +169,7 @@ class CascadeProcessor:
         )
 
         self.shadow_io.save(shadow_data)
-        _logger.info(f"Cleared ShadowGrandDigest for level: {level}")
+        _logger.info(f"ShadowGrandDigestクリア完了: レベル {level}")
 
     def cascade_update_on_digest_finalize(self, level: str) -> None:
         """
@@ -184,7 +184,7 @@ class CascadeProcessor:
         Args:
             level: レベル名
         """
-        _logger.info(f"[Step 3] ShadowGrandDigest cascade for level: {level}")
+        _logger.info(f"[Step 3] ShadowGrandDigestカスケード処理: レベル {level}")
         _logger.state("cascade_update", starting_for_level=level)
 
         # 1. Shadow → Grand 昇格の確認
@@ -199,7 +199,7 @@ class CascadeProcessor:
             _logger.file_op(f"find_new_files({next_level})", found=len(new_files))
 
             if new_files:
-                _logger.info(f"Found {len(new_files)} new file(s) for {next_level}:")
+                _logger.info(f"新規ファイル {len(new_files)}件検出: {next_level}")
                 file_names = [f.name for f in new_files[:5]]
                 suffix = "..." if len(new_files) > 5 else ""
                 _logger.file_op("new_files", names=f"{file_names}{suffix}")
@@ -207,9 +207,9 @@ class CascadeProcessor:
                 # 3. 次のレベルのShadowに増分追加
                 self.file_appender.add_files_to_shadow(next_level, new_files)
         else:
-            _logger.info(f"No next level for {level} (top level)")
+            _logger.info(f"{level}に上位レベルなし（最上位）")
 
         # 4. 現在のレベルのShadowをクリア
         self.clear_shadow_level(level)
 
-        _logger.info(f"[Step 3] Cascade completed for level: {level}")
+        _logger.info(f"[Step 3] カスケード処理完了: レベル {level}")

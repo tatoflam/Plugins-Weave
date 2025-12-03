@@ -110,12 +110,12 @@ def validate_provisional_structure(data: Any) -> List[IndividualDigestData]:
     from infrastructure import log_warning
 
     if not is_valid_dict(data):
-        log_warning("Invalid existing data format, ignoring")
+        log_warning("既存データ形式が不正、無視します")
         return []
 
     individual_digests = data.get("individual_digests", [])
     if not is_valid_list(individual_digests):
-        log_warning("Invalid individual_digests format, ignoring")
+        log_warning("individual_digests形式が不正、無視します")
         return []
 
     return individual_digests

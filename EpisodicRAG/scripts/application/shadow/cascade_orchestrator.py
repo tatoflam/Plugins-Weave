@@ -157,7 +157,7 @@ class CascadeOrchestrator:
         Returns:
             CascadeResult: 全ステップの結果を含む
         """
-        _logger.info(f"[Orchestrator] Starting cascade for level: {level}")
+        _logger.info(f"[Orchestrator] カスケード処理を開始: レベル {level}")
 
         steps: List[CascadeStepResult] = []
         success = True
@@ -177,7 +177,7 @@ class CascadeOrchestrator:
                 CascadeStepResult(
                     step_name="detect",
                     status=CascadeStepStatus.SKIPPED,
-                    message=f"No next level for {level} (top level)",
+                    message=f"{level}に上位レベルなし（最上位）",
                 )
             )
 
@@ -190,7 +190,7 @@ class CascadeOrchestrator:
                 CascadeStepResult(
                     step_name="add",
                     status=CascadeStepStatus.SKIPPED,
-                    message="No files to add" if next_level else "No next level",
+                    message="追加ファイルなし" if next_level else "上位レベルなし",
                 )
             )
 
@@ -207,8 +207,8 @@ class CascadeOrchestrator:
         )
 
         _logger.info(
-            f"[Orchestrator] Cascade completed for level: {level}, "
-            f"files processed: {result.total_files_processed}"
+            f"[Orchestrator] カスケード処理完了: レベル {level}、"
+            f"処理ファイル数: {result.total_files_processed}"
         )
 
         return result
@@ -220,7 +220,7 @@ class CascadeOrchestrator:
         Note: 実際の昇格処理はfinalize_from_shadow.pyで実行される。
         ここでは確認のみ。
         """
-        _logger.info(f"[Step 1/4] Checking shadow promotion for: {level}")
+        _logger.info(f"[Step 1/4] Shadow昇格確認: {level}")
 
         digest = self.cascade_processor.get_shadow_digest_for_level(level)
 
@@ -228,14 +228,14 @@ class CascadeOrchestrator:
             return CascadeStepResult(
                 step_name="promote",
                 status=CascadeStepStatus.NO_DATA,
-                message=f"No shadow digest to promote for level: {level}",
+                message=f"昇格対象のShadowダイジェストなし: レベル {level}",
             )
 
         file_count = len(digest.get("source_files", []))
         return CascadeStepResult(
             step_name="promote",
             status=CascadeStepStatus.SUCCESS,
-            message=f"Shadow digest ready for promotion: {file_count} file(s)",
+            message=f"昇格準備完了: {file_count}ファイル",
             files_processed=file_count,
             details={"source_files_count": file_count},
         )
@@ -247,7 +247,7 @@ class CascadeOrchestrator:
         Returns:
             Tuple of (step result, list of new files)
         """
-        _logger.info(f"[Step 2/4] Detecting new files for: {next_level}")
+        _logger.info(f"[Step 2/4] 新規ファイル検出: {next_level}")
 
         new_files = self.file_detector.find_new_files(next_level)
 
@@ -255,7 +255,7 @@ class CascadeOrchestrator:
             result = CascadeStepResult(
                 step_name="detect",
                 status=CascadeStepStatus.NO_DATA,
-                message=f"No new files found for level: {next_level}",
+                message=f"新規ファイルなし: レベル {next_level}",
             )
             return result, []
 
@@ -265,7 +265,7 @@ class CascadeOrchestrator:
         result = CascadeStepResult(
             step_name="detect",
             status=CascadeStepStatus.SUCCESS,
-            message=f"Found {len(new_files)} new file(s) for {next_level}",
+            message=f"新規ファイル {len(new_files)}件検出: {next_level}",
             files_processed=len(new_files),
             details={
                 "new_files_count": len(new_files),
@@ -278,14 +278,14 @@ class CascadeOrchestrator:
         """
         Step 3: 次レベルのShadowにファイル追加
         """
-        _logger.info(f"[Step 3/4] Adding {len(new_files)} file(s) to shadow: {next_level}")
+        _logger.info(f"[Step 3/4] Shadowにファイル追加中: {len(new_files)}件 → {next_level}")
 
         self.file_appender.add_files_to_shadow(next_level, new_files)
 
         return CascadeStepResult(
             step_name="add",
             status=CascadeStepStatus.SUCCESS,
-            message=f"Added {len(new_files)} file(s) to shadow for {next_level}",
+            message=f"Shadowにファイル追加完了: {len(new_files)}件 → {next_level}",
             files_processed=len(new_files),
             details={"added_count": len(new_files)},
         )
@@ -294,12 +294,12 @@ class CascadeOrchestrator:
         """
         Step 4: 現在レベルのShadowをクリア
         """
-        _logger.info(f"[Step 4/4] Clearing shadow for: {level}")
+        _logger.info(f"[Step 4/4] Shadowクリア: {level}")
 
         self.cascade_processor.clear_shadow_level(level)
 
         return CascadeStepResult(
             step_name="clear",
             status=CascadeStepStatus.SUCCESS,
-            message=f"Cleared shadow for level: {level}",
+            message=f"Shadowクリア完了: レベル {level}",
         )
