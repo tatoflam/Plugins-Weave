@@ -19,6 +19,7 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+from domain.constants import LEVEL_CONFIG
 from domain.file_constants import (
     CONFIG_FILENAME,
     DIGEST_TIMES_FILENAME,
@@ -47,17 +48,8 @@ class SetupResult:
 class SetupManager:
     """セットアップマネージャー"""
 
-    # 8階層のディレクトリ構成
-    LEVEL_DIRS = [
-        "1_Weekly",
-        "2_Monthly",
-        "3_Quarterly",
-        "4_Annual",
-        "5_Triennial",
-        "6_Decadal",
-        "7_Multi-decadal",
-        "8_Centurial",
-    ]
+    # 8階層のディレクトリ構成（LEVEL_CONFIGからSSoTとして生成）
+    LEVEL_DIRS = [cfg["dir"] for cfg in LEVEL_CONFIG.values()]
 
     def __init__(self, plugin_root: Optional[Path] = None):
         """

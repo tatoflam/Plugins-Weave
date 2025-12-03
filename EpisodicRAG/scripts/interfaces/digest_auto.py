@@ -12,11 +12,13 @@ Usage:
 """
 
 import argparse
+import re
 import sys
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
+from domain.constants import LEVEL_CONFIG, LEVEL_NAMES
 from domain.exceptions import FileIOError
 from domain.file_constants import (
     CONFIG_FILENAME,
@@ -66,28 +68,7 @@ class AnalysisResult:
 class DigestAutoAnalyzer:
     """健全性診断クラス"""
 
-    # 階層の親子関係
-    LEVEL_HIERARCHY = {
-        "weekly": {"source": "loops", "threshold_key": "weekly_threshold"},
-        "monthly": {"source": "weekly", "threshold_key": "monthly_threshold"},
-        "quarterly": {"source": "monthly", "threshold_key": "quarterly_threshold"},
-        "annual": {"source": "quarterly", "threshold_key": "annual_threshold"},
-        "triennial": {"source": "annual", "threshold_key": "triennial_threshold"},
-        "decadal": {"source": "triennial", "threshold_key": "decadal_threshold"},
-        "multi_decadal": {"source": "decadal", "threshold_key": "multi_decadal_threshold"},
-        "centurial": {"source": "multi_decadal", "threshold_key": "centurial_threshold"},
-    }
-
-    LEVEL_ORDER = [
-        "weekly",
-        "monthly",
-        "quarterly",
-        "annual",
-        "triennial",
-        "decadal",
-        "multi_decadal",
-        "centurial",
-    ]
+    # 階層の親子関係とレベル順序は domain.constants.LEVEL_CONFIG, LEVEL_NAMES を使用
 
     def __init__(self, plugin_root: Optional[Path] = None):
         """
@@ -120,8 +101,6 @@ class DigestAutoAnalyzer:
 
     def _extract_file_number(self, filename: str) -> Optional[int]:
         """ファイル名から番号を抽出"""
-        import re
-
         # L00001, W0001, M001 などのパターンにマッチ
         match = re.search(r"[A-Z]+(\d+)", filename)
         if match:
@@ -284,7 +263,7 @@ class DigestAutoAnalyzer:
         placeholders = []
         latest_digests = shadow_data.get("latest_digests", {})
 
-        for level in self.LEVEL_ORDER:
+        for level in LEVEL_NAMES:
             level_data = latest_digests.get(level, {})
             overall_digest = level_data.get("overall_digest")
 
@@ -302,7 +281,7 @@ class DigestAutoAnalyzer:
         gaps = {}
         latest_digests = shadow_data.get("latest_digests", {})
 
-        for level in self.LEVEL_ORDER:
+        for level in LEVEL_NAMES:
             level_data = latest_digests.get(level, {})
             overall_digest = level_data.get("overall_digest")
 
@@ -343,11 +322,12 @@ class DigestAutoAnalyzer:
         # 各階層のファイル数をカウント
         level_counts: Dict[str, int] = {}
 
-        for level in self.LEVEL_ORDER:
-            hierarchy = self.LEVEL_HIERARCHY[level]
-            source = hierarchy["source"]
-            threshold_key = hierarchy["threshold_key"]
-            threshold = levels_config.get(threshold_key, 5)
+        for level in LEVEL_NAMES:
+            level_cfg = LEVEL_CONFIG[level]
+            source = level_cfg["source"]
+            # 設定ファイルのthreshold_keyまたはLEVEL_CONFIGのデフォルト値を使用
+            threshold_key = f"{level}_threshold"
+            threshold = levels_config.get(threshold_key, level_cfg["threshold"])
 
             if source == "loops":
                 # Loopファイル数（未処理含む）
@@ -396,17 +376,7 @@ class DigestAutoAnalyzer:
 
     def _get_level_dir(self, digests_path: Path, level: str) -> Path:
         """階層のディレクトリパスを取得"""
-        level_dirs = {
-            "weekly": "1_Weekly",
-            "monthly": "2_Monthly",
-            "quarterly": "3_Quarterly",
-            "annual": "4_Annual",
-            "triennial": "5_Triennial",
-            "decadal": "6_Decadal",
-            "multi_decadal": "7_Multi-decadal",
-            "centurial": "8_Centurial",
-        }
-        return digests_path / level_dirs.get(level, level)
+        return digests_path / LEVEL_CONFIG[level]["dir"]
 
 
 def format_text_report(result: AnalysisResult) -> str:
