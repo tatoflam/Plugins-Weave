@@ -10,16 +10,9 @@ Usage:
     from domain.constants import LEVEL_CONFIG, LEVEL_NAMES, PLACEHOLDER_LIMITS
 """
 
-from typing import Dict
+from typing import Dict, List
 
-# TypedDictを使わず、構造をコメントで明示（domain層は外部依存なし）
-# LevelConfigData構造:
-#   prefix    - ファイル名プレフィックス（例: W0001, M001, MD01）
-#   digits    - 番号の桁数（例: W0001は4桁）
-#   dir       - digests_path 以下のサブディレクトリ名
-#   source    - この階層を生成する際の入力元（"loops" または下位階層名）
-#   next      - 確定時にカスケードする上位階層（None = 最上位）
-#   threshold - このレベルでダイジェスト生成に必要なソースファイル数
+from domain.types.level import LevelConfigData, LevelHierarchyEntry
 
 
 # =============================================================================
@@ -40,7 +33,7 @@ SOURCE_TYPE_LOOPS = "loops"  # Loopファイルをソースとするレベル（
 # 共通定数: レベル設定（Single Source of Truth）
 # =============================================================================
 
-LEVEL_CONFIG: Dict[str, Dict[str, object]] = {
+LEVEL_CONFIG: Dict[str, LevelConfigData] = {
     "weekly": {
         "prefix": "W",
         "digits": 4,
@@ -180,7 +173,7 @@ def create_placeholder_keywords(count: int) -> list:
     return [f"{PLACEHOLDER_MARKER}: keyword{i}{PLACEHOLDER_END}" for i in range(1, count + 1)]
 
 
-def build_level_hierarchy() -> Dict[str, Dict[str, object]]:
+def build_level_hierarchy() -> Dict[str, LevelHierarchyEntry]:
     """
     LEVEL_CONFIGからレベル階層辞書を構築（Single Source of Truth）
 
@@ -188,7 +181,7 @@ def build_level_hierarchy() -> Dict[str, Dict[str, object]]:
     複数箇所で同一パターンの辞書構築が必要な場合はこの関数を使用する。
 
     Returns:
-        Dict[str, Dict[str, object]]: レベル名をキー、{"source": str, "next": Optional[str]}を値とする辞書
+        Dict[str, LevelHierarchyEntry]: レベル名をキー、{"source": str, "next": Optional[str]}を値とする辞書
 
     Example:
         hierarchy = build_level_hierarchy()
@@ -199,5 +192,6 @@ def build_level_hierarchy() -> Dict[str, Dict[str, object]]:
         # }
     """
     return {
-        level: {"source": cfg["source"], "next": cfg["next"]} for level, cfg in LEVEL_CONFIG.items()
+        level: LevelHierarchyEntry(source=cfg["source"], next=cfg["next"])
+        for level, cfg in LEVEL_CONFIG.items()
     }

@@ -14,7 +14,7 @@ class LevelConfigData(TypedDict):
     LEVEL_CONFIG の各レベル設定の型
 
     Example:
-        {"prefix": "W", "digits": 4, "dir": "1_Weekly", "source": "loops", "next": "monthly"}
+        {"prefix": "W", "digits": 4, "dir": "1_Weekly", "source": "loops", "next": "monthly", "threshold": 5}
     """
 
     prefix: str
@@ -22,6 +22,7 @@ class LevelConfigData(TypedDict):
     dir: str
     source: str
     next: Optional[str]
+    threshold: int
 
 
 class LevelHierarchyEntry(TypedDict):
