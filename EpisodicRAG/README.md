@@ -443,6 +443,7 @@ EpisodicRAGドキュメントの多言語対応方針：
 ## 関連ドキュメント
 
 - [メインREADME](../README.md) - プロジェクト概要
+- [CONCEPT](CONCEPT.md) - 設計思想・哲学
 - [AI Spec Hub](docs/README.md) - コマンド・スキル・エージェント仕様
 - [QUICKSTART](docs/user/QUICKSTART.md) - 5分チュートリアル
 - [CHEATSHEET](docs/user/CHEATSHEET.md) - クイックリファレンス

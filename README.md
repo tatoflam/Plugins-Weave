@@ -40,8 +40,12 @@ EpisodicRAG は、会話ログ（Loop ファイル）を階層的にダイジェ
 | 📊 **統計・状態を確認したい** | [digest-auto](EpisodicRAG/skills/digest-auto/SKILL.md) |
 | ❓ **問題が発生した** | [FAQ](EpisodicRAG/docs/user/FAQ.md) → [TROUBLESHOOTING](EpisodicRAG/docs/user/TROUBLESHOOTING.md) |
 | 🛠️ **開発に参加する** | [CONTRIBUTING](EpisodicRAG/CONTRIBUTING.md) → [ARCHITECTURE](EpisodicRAG/docs/dev/ARCHITECTURE.md) |
+| 💡 **設計思想を理解したい** | [CONCEPT](EpisodicRAG/CONCEPT.md) |
 | 🤖 **AI/Claude 仕様** | [AI Spec Hub](EpisodicRAG/docs/README.md) |
 | 📋 **変更履歴を確認** | [CHANGELOG](EpisodicRAG/CHANGELOG.md) |
+
+> **Note**: 主要ドキュメントは英語版も提供しています。
+> 詳細は [言語ポリシー](EpisodicRAG/README.md#言語ポリシー) を参照してください。
 
 ---
 

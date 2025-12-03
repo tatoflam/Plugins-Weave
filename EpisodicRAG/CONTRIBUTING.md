@@ -48,7 +48,7 @@ EpisodicRAGプラグインの開発に興味を持っていただき、ありが
 
 #### 1. ディレクトリ構造の確認
 
-> 📖 **詳細な構造**: [ARCHITECTURE.md](docs/dev/ARCHITECTURE.md#ディレクトリ構成)
+> 📖 詳細な構造: [ARCHITECTURE.md](docs/dev/ARCHITECTURE.md#ディレクトリ構成)
 
 ```text
 plugins-weave/
@@ -240,9 +240,9 @@ bash scripts/generate_digest_auto.sh
 
 v2.0.0 より、`scripts/` は Clean Architecture（4層構造）を採用しています。
 
-> 📖 **詳細仕様**: 層構造・依存関係ルール・推奨インポートパスは [ARCHITECTURE.md](docs/dev/ARCHITECTURE.md#clean-architecture) を参照
+> 📖 詳細仕様: 層構造・依存関係ルール・推奨インポートパスは [ARCHITECTURE.md](docs/dev/ARCHITECTURE.md#clean-architecture) を参照
 >
-> 📖 **アーキテクチャ選択理由**: [DESIGN_DECISIONS.md](docs/dev/DESIGN_DECISIONS.md)
+> 📖 アーキテクチャ選択理由: [DESIGN_DECISIONS.md](docs/dev/DESIGN_DECISIONS.md)
 
 **v4.0.0での変更**: 設定管理機能（config）は各層のサブディレクトリに分散配置されています:
 - `domain/config/` - 設定定数、バリデーションヘルパー
@@ -293,7 +293,7 @@ v2.0.0 より、`scripts/` は Clean Architecture（4層構造）を採用して
 
 ## テスト
 
-> 📖 **テスト詳細**: テストディレクトリ構造・実行方法は [scripts/README.md](scripts/README.md#tests) を参照
+> 📖 テスト詳細: テストディレクトリ構造・実行方法は [scripts/README.md](scripts/README.md#tests) を参照
 
 ### クイックスタート
 
@@ -396,6 +396,18 @@ Summary: 2 broken links in 1 file
 - 複合リンク（`file.md#section`）の検証
 - 壊れたリンクの修正案提示
 - JSON出力（CI/CD統合用）
+
+### Pre-commit 検証
+
+ドキュメント変更をコミットする前に、以下を実行してください:
+
+```bash
+cd plugins-weave/EpisodicRAG/scripts
+python -m tools.check_footer --quiet
+python -m tools.link_checker ../docs --quiet
+```
+
+両ツールがエラーなく完了することを確認してください。
 
 ---
 

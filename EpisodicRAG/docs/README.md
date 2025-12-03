@@ -6,9 +6,9 @@
 
 AI/Claudeエージェント向けの技術仕様ハブです。
 
-> 📖 **ユーザー向けドキュメント**は [プロジェクト README](../../README.md) を参照してください。
+> 📖 ユーザー向けドキュメント: [プロジェクト README](../../README.md)
 >
-> 📖 **開発参加ガイド**は [CONTRIBUTING.md](../CONTRIBUTING.md) を参照してください。
+> 📖 開発参加ガイド: [CONTRIBUTING.md](../CONTRIBUTING.md)
 
 ---
 

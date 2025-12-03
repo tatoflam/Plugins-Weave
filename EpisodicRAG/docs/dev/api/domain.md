@@ -36,7 +36,7 @@ from domain import (
 - [型定義](#型定義domaintypes) - TypedDict、スキーマ *(v4.1.0: パッケージ化)*
 
 **バリデーション**
-- [バリデーションヘルパー](#バリデーションヘルパーdomainvalidatorshelperspy) - 共通検証関数 *(v4.1.0+)*
+- [バリデーションヘルパー](#バリデーションヘルパーdomainvalidatorshelperspy-v410) - 共通検証関数 *(v4.1.0+)*
 
 **ファイル・階層操作**
 - [関数](#関数domainfile_namingpy) - ファイル命名、番号抽出

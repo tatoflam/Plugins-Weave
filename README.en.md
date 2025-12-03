@@ -35,14 +35,18 @@ EpisodicRAG is a system that hierarchically digests conversation logs (Loop file
 | You are... | Documents to Read |
 |------------|-------------------|
 | 🚀 **Getting Started** | [QUICKSTART](EpisodicRAG/docs/user/QUICKSTART.en.md) → [Glossary](EpisodicRAG/README.en.md) |
-| 📘 **Daily User** | [GUIDE](EpisodicRAG/docs/user/GUIDE.md) |
+| 📘 **Daily User** | [GUIDE](EpisodicRAG/docs/user/GUIDE.md) *(Japanese)* |
 | 📝 **Quick Reference** | [CHEATSHEET](EpisodicRAG/docs/user/CHEATSHEET.en.md) |
-| 🔧 **Customizing Settings** | [digest-config](EpisodicRAG/skills/digest-config/SKILL.md) |
-| 📊 **Checking Status** | [digest-auto](EpisodicRAG/skills/digest-auto/SKILL.md) |
-| ❓ **Troubleshooting** | [FAQ](EpisodicRAG/docs/user/FAQ.md) → [TROUBLESHOOTING](EpisodicRAG/docs/user/TROUBLESHOOTING.md) |
-| 🛠️ **Contributing** | [CONTRIBUTING](EpisodicRAG/CONTRIBUTING.md) → [ARCHITECTURE](EpisodicRAG/docs/dev/ARCHITECTURE.md) |
-| 🤖 **AI/Claude Specs** | [AI Spec Hub](EpisodicRAG/docs/README.md) |
-| 📋 **Changelog** | [CHANGELOG](EpisodicRAG/CHANGELOG.md) |
+| 🔧 **Customizing Settings** | [digest-config](EpisodicRAG/skills/digest-config/SKILL.md) *(Japanese)* |
+| 📊 **Checking Status** | [digest-auto](EpisodicRAG/skills/digest-auto/SKILL.md) *(Japanese)* |
+| ❓ **Troubleshooting** | [FAQ](EpisodicRAG/docs/user/FAQ.md) → [TROUBLESHOOTING](EpisodicRAG/docs/user/TROUBLESHOOTING.md) *(Japanese)* |
+| 🛠️ **Contributing** | [CONTRIBUTING](EpisodicRAG/CONTRIBUTING.md) → [ARCHITECTURE](EpisodicRAG/docs/dev/ARCHITECTURE.md) *(Japanese)* |
+| 💡 **Understanding Design Philosophy** | [CONCEPT](EpisodicRAG/CONCEPT.en.md) |
+| 🤖 **AI/Claude Specs** | [AI Spec Hub](EpisodicRAG/docs/README.md) *(Japanese)* |
+| 📋 **Changelog** | [CHANGELOG](EpisodicRAG/CHANGELOG.md) *(Japanese)* |
+
+> **Note**: Documents marked *(Japanese)* are available in Japanese only.
+> Per our [AI-First Documentation Policy](EpisodicRAG/README.en.md#language-policy), AI agents can understand and translate Japanese content on-the-fly.
 
 ---
 
@@ -83,7 +87,7 @@ By following this principle, AI can remember all Loops.
 | `@digest-setup` | Initial setup |
 | `@digest-config` | Change settings |
 
-For details, see [GUIDE.md](EpisodicRAG/docs/user/GUIDE.md).
+For details, see [GUIDE.md](EpisodicRAG/docs/user/GUIDE.md) *(Japanese)*.
 
 ---
 
@@ -108,7 +112,7 @@ For details, see [GUIDE.md](EpisodicRAG/docs/user/GUIDE.md).
 
 With GitHub integration, you can retain and inherit long-term memory after session ends.
 
-→ [ADVANCED.md](EpisodicRAG/docs/user/ADVANCED.md)
+→ [ADVANCED.md](EpisodicRAG/docs/user/ADVANCED.md) *(Japanese)*
 
 ---
 

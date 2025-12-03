@@ -445,6 +445,7 @@ Multilingual documentation policy for EpisodicRAG:
 ## Related Documents
 
 - [Main README](../README.md) - Project Overview
+- [CONCEPT](CONCEPT.en.md) - Design Philosophy
 - [AI Spec Hub](docs/README.md) - Command, Skill & Agent Specifications
 - [QUICKSTART](docs/user/QUICKSTART.en.md) - 5-minute Tutorial
 - [CHEATSHEET](docs/user/CHEATSHEET.en.md) - Quick Reference

@@ -39,12 +39,12 @@ from application.shadow import (
 
 1. [バリデーション（validators.py）](#バリデーションapplicationvalidatorspy)
 2. [Shadow管理（shadow/）](#shadow管理applicationshadow)
-   - [CascadeOrchestrator](#cascadeorchestrator) *(v4.1.0+)*
+   - [CascadeOrchestrator](#cascadeorchestrator-v410) *(v4.1.0+)*
 3. [GrandDigest管理（grand/）](#granddigest管理applicationgrand)
 4. [Finalize処理（finalize/）](#finalize処理applicationfinalize)
 5. [時間追跡（tracking/）](#時間追跡applicationtracking)
 6. [設定管理（config/）](#設定管理applicationconfig)
-   - [DigestConfigBuilder](#digestconfigbuilder) *(v4.1.0+)*
+   - [DigestConfigBuilder](#digestconfigbuilder-v410) *(v4.1.0+)*
 
 ---
 

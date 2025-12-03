@@ -50,7 +50,7 @@ from infrastructure.config import (
 **エラー・設定・その他**
 - [エラーハンドリング](#エラーハンドリングinfrastructureerror_handlingpy) - 安全なファイル操作
 - [設定管理](#設定管理infrastructureconfig) - ConfigLoader, PathResolver *(v4.0.0+)*
-- [パス検証](#パス検証infrastructureconfigpath_validatorspy) - PathValidatorChain *(v4.1.0+)*
+- [パス検証](#パス検証infrastructureconfigpath_validatorspy-v410) - PathValidatorChain *(v4.1.0+)*
 - [ユーザーインタラクション](#ユーザーインタラクションinfrastructureuser_interactionpy) - 確認コールバック
 
 ---

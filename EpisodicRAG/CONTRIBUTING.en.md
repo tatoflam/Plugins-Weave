@@ -49,7 +49,7 @@ There are two ways to test a plugin under development.
 
 #### 1. Verify Directory Structure
 
-> 📖 **Detailed Structure**: [ARCHITECTURE.md](docs/dev/ARCHITECTURE.md#directory-structure)
+> 📖 Detailed Structure: [ARCHITECTURE.md](docs/dev/ARCHITECTURE.md#directory-structure)
 
 ```text
 plugins-weave/
@@ -241,9 +241,9 @@ bash scripts/generate_digest_auto.sh
 
 Since v2.0.0, `scripts/` adopts Clean Architecture (4-layer structure).
 
-> 📖 **Detailed Specification**: Layer structure, dependency rules, and recommended import paths at [ARCHITECTURE.md](docs/dev/ARCHITECTURE.md#clean-architecture)
+> 📖 Detailed Specification: Layer structure, dependency rules, and recommended import paths at [ARCHITECTURE.md](docs/dev/ARCHITECTURE.md#clean-architecture)
 >
-> 📖 **Architecture Selection Rationale**: [DESIGN_DECISIONS.md](docs/dev/DESIGN_DECISIONS.md)
+> 📖 Architecture Selection Rationale: [DESIGN_DECISIONS.md](docs/dev/DESIGN_DECISIONS.md)
 
 **v4.0.0 Changes**: Configuration management (config) is distributed across subdirectories of each layer:
 - `domain/config/` - Configuration constants, validation helpers
@@ -294,7 +294,7 @@ Use clear and concise commit messages:
 
 ## Testing
 
-> 📖 **Test Details**: See [scripts/README.md](scripts/README.md#tests) for test directory structure and execution methods.
+> 📖 Test Details: See [scripts/README.md](scripts/README.md#tests) for test directory structure and execution methods.
 
 ### Quick Start
 
@@ -425,6 +425,18 @@ Summary: 2 broken links in 1 file
 - Composite link validation (`file.md#section`)
 - Broken link fix suggestions
 - JSON output (for CI/CD integration)
+
+### Pre-commit Verification
+
+Before committing documentation changes, run the following:
+
+```bash
+cd plugins-weave/EpisodicRAG/scripts
+python -m tools.check_footer --quiet
+python -m tools.link_checker ../docs --quiet
+```
+
+Ensure both tools complete without errors.
 
 ---
 
