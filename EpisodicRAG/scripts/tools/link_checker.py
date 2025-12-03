@@ -90,8 +90,7 @@ class MarkdownLinkChecker:
 
     # アンカーのみパターン（lychee互換：先頭ハイフン許可、アンダースコア除外）
     ANCHOR_ONLY_PATTERN = re.compile(
-        r"^#[-a-z0-9\u3040-\u309F\u30A0-\u30FA\u30FC-\u30FF\u4E00-\u9FFF]+$",
-        re.IGNORECASE
+        r"^#[-a-z0-9\u3040-\u309F\u30A0-\u30FA\u30FC-\u30FF\u4E00-\u9FFF]+$", re.IGNORECASE
     )
 
     def __init__(self, docs_root: Path):
@@ -358,11 +357,7 @@ class MarkdownLinkChecker:
         # Letters (a-z), numbers (0-9), Japanese (hiragana, katakana, kanji), space, hyphen
         # Note: \w includes underscore which GitHub strips, so use explicit ranges
         # Katakana range split: U+30A0-30FA (letters), skip U+30FB (nakaguro), U+30FC-30FF (marks)
-        slug = re.sub(
-            r"[^a-z0-9\u3040-\u309F\u30A0-\u30FA\u30FC-\u30FF\u4E00-\u9FFF \-]",
-            "",
-            slug
-        )
+        slug = re.sub(r"[^a-z0-9\u3040-\u309F\u30A0-\u30FA\u30FC-\u30FF\u4E00-\u9FFF \-]", "", slug)
 
         # スペースをハイフンに（各スペースを個別に置換）
         slug = slug.replace(" ", "-")
