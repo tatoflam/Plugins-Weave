@@ -11,18 +11,18 @@
 
 **Test Infrastructure**
 - [Fixture Dependency Map](#fixture-dependency-map)
-- [Hypothesis Profiles](#hypothesis-profiles)
-- [Performance Targets](#performance-targets)
 
 **Writing Tests**
 - [Adding New Tests](#adding-new-tests)
 - [Test Naming Convention](#test-naming-convention)
 - [Property-Based Tests](#property-based-tests)
-
-**Running & Debugging**
-- [Debugging Tips](#debugging-tips)
 - [CLI Integration Tests](#cli-integration-tests-v400)
 - [Tools Tests](#tools-tests-v410)
+
+**Running Tests**
+- [Debugging Tips](#debugging-tips)
+- [Hypothesis Profiles](#hypothesis-profiles)
+- [Performance Targets](#performance-targets)
 
 **CI/CD**
 - [Continuous Integration](#continuous-integration)
@@ -334,6 +334,69 @@ HYPOTHESIS_PROFILE=quick pytest scripts/test/ -m property
 
 ---
 
+## CLI Integration Tests [v4.0.0+]
+
+v4.0.0で追加されたCLI E2Eテストフレームワーク。subprocess経由で実際のCLIコマンドを実行してテストします。
+
+### ディレクトリ構成
+
+```
+cli_integration_tests/
+├── __init__.py
+├── conftest.py              # CLI専用フィクスチャ
+├── cli_runner.py            # CLIRunner ヘルパークラス
+├── test_digest_setup_cli.py
+├── test_digest_config_cli.py
+├── test_digest_auto_cli.py
+└── test_workflow_cli.py     # ワークフロー統合テスト [v4.1.0+]
+```
+
+### CLIRunner
+
+subprocess経由でCLIコマンドを実行するヘルパークラス:
+
+```python
+@pytest.mark.cli
+def test_setup_check(cli_runner):
+    result = cli_runner.run_digest_setup("check")
+    result.assert_success()
+    result.assert_json_status("not_configured")
+```
+
+### CLI専用フィクスチャ
+
+| フィクスチャ | 説明 |
+|-------------|------|
+| `cli_temp_dir` | 一時ディレクトリ |
+| `cli_plugin_root` | 最小構造のプラグインルート |
+| `cli_runner` | CLIRunner インスタンス |
+| `configured_cli_env` | 設定済み環境（config.json、テンプレート等） |
+| `configured_cli_runner` | 設定済み環境のCLIRunner |
+
+### 実行方法
+
+```bash
+# CLI統合テストのみ実行
+pytest scripts/test/cli_integration_tests/ -m cli -v
+
+# 特定のCLIテストのみ
+pytest scripts/test/cli_integration_tests/test_digest_setup_cli.py -v
+```
+
+---
+
+## Tools Tests [v4.1.0+]
+
+開発支援ツールのテスト。
+
+```
+tools_tests/
+├── test_check_footer.py     # Digestフッター検証
+└── test_link_checker.py     # ドキュメントリンクチェック
+```
+
+---
+
 ## Debugging Tips
 
 ### Running Specific Tests
@@ -389,57 +452,6 @@ HYPOTHESIS_PROFILE=ci pytest scripts/test/ -m property
 
 ---
 
-## CLI Integration Tests [v4.0.0+]
-
-v4.0.0で追加されたCLI E2Eテストフレームワーク。subprocess経由で実際のCLIコマンドを実行してテストします。
-
-### ディレクトリ構成
-
-```
-cli_integration_tests/
-├── __init__.py
-├── conftest.py              # CLI専用フィクスチャ
-├── cli_runner.py            # CLIRunner ヘルパークラス
-├── test_digest_setup_cli.py
-├── test_digest_config_cli.py
-├── test_digest_auto_cli.py
-└── test_workflow_cli.py     # ワークフロー統合テスト [v4.1.0+]
-```
-
-### CLIRunner
-
-subprocess経由でCLIコマンドを実行するヘルパークラス:
-
-```python
-@pytest.mark.cli
-def test_setup_check(cli_runner):
-    result = cli_runner.run_digest_setup("check")
-    result.assert_success()
-    result.assert_json_status("not_configured")
-```
-
-### CLI専用フィクスチャ
-
-| フィクスチャ | 説明 |
-|-------------|------|
-| `cli_temp_dir` | 一時ディレクトリ |
-| `cli_plugin_root` | 最小構造のプラグインルート |
-| `cli_runner` | CLIRunner インスタンス |
-| `configured_cli_env` | 設定済み環境（config.json、テンプレート等） |
-| `configured_cli_runner` | 設定済み環境のCLIRunner |
-
-### 実行方法
-
-```bash
-# CLI統合テストのみ実行
-pytest scripts/test/cli_integration_tests/ -m cli -v
-
-# 特定のCLIテストのみ
-pytest scripts/test/cli_integration_tests/test_digest_setup_cli.py -v
-```
-
----
-
 ## Continuous Integration
 
 ### GitHub Actions
@@ -465,18 +477,6 @@ pytest scripts/test/ --cov=. --cov-report=term-missing --cov-report=html
 # HTMLレポート確認
 open htmlcov/index.html  # macOS
 start htmlcov/index.html # Windows
-```
-
----
-
-## Tools Tests [v4.1.0+]
-
-開発支援ツールのテスト。
-
-```
-tools_tests/
-├── test_check_footer.py     # Digestフッター検証
-└── test_link_checker.py     # ドキュメントリンクチェック
 ```
 
 ---
