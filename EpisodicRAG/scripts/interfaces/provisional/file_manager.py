@@ -5,7 +5,7 @@ Handles file I/O operations, numbering, and directory management.
 """
 
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union, cast
+from typing import Any, Dict, List, Optional, Union
 
 from application.config import DigestConfig
 from domain.constants import LEVEL_CONFIG
@@ -25,6 +25,10 @@ class ProvisionalFileManager:
 
         Args:
             config: DigestConfig instance (injected for testability)
+
+        Example:
+            >>> manager = ProvisionalFileManager()
+            >>> manager.get_current_digest_number("weekly")
         """
         self.config = config or DigestConfig()
         self.level_config = LEVEL_CONFIG
@@ -75,6 +79,10 @@ class ProvisionalFileManager:
 
         Raises:
             ConfigError: If level is invalid
+
+        Example:
+            >>> manager.load_existing_provisional("weekly", 42)
+            {"individual_digests": [...]}
         """
         self._get_level_config(level)  # Validate level
 
@@ -119,6 +127,10 @@ class ProvisionalFileManager:
 
         Returns:
             Number of digits for formatting
+
+        Example:
+            >>> manager.get_digits_for_level("weekly")
+            4
         """
         level_cfg = self._get_level_config(level)
         return int(level_cfg["digits"])
@@ -135,9 +147,13 @@ class ProvisionalFileManager:
 
         Raises:
             ConfigError: If level is invalid
+
+        Example:
+            >>> manager._get_level_config("weekly")
+            {"prefix": "W", "digits": 4, "dir": "Weekly", ...}
         """
         level_cfg = self.level_config.get(level)
         if not level_cfg:
             formatter = get_error_formatter()
             raise ConfigError(formatter.config.invalid_level(level, list(self.level_config.keys())))
-        return cast(LevelConfigData, level_cfg)
+        return level_cfg

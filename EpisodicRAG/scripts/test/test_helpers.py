@@ -12,7 +12,8 @@ import json
 import shutil
 import tempfile
 from pathlib import Path
-from typing import Any, Dict, Optional, Tuple, Union
+from types import TracebackType
+from typing import Any, Dict, List, Optional, Tuple, Type, Union
 from unittest.mock import patch
 
 # 本番環境と同じディレクトリ構造定義
@@ -234,28 +235,38 @@ class TempPluginEnvironment:
         create_default_templates(self.paths["config_dir"])
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+    def __exit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> None:
         if self.temp_dir and self.temp_dir.exists():
             shutil.rmtree(self.temp_dir, ignore_errors=True)
 
     @property
     def plugin_root(self) -> Path:
+        assert self.paths is not None, "Environment not initialized. Use as context manager."
         return self.paths["plugin_root"]
 
     @property
     def loops_path(self) -> Path:
+        assert self.paths is not None, "Environment not initialized. Use as context manager."
         return self.paths["loops"]
 
     @property
     def digests_path(self) -> Path:
+        assert self.paths is not None, "Environment not initialized. Use as context manager."
         return self.paths["digests"]
 
     @property
     def essences_path(self) -> Path:
+        assert self.paths is not None, "Environment not initialized. Use as context manager."
         return self.paths["essences"]
 
     @property
     def config_dir(self) -> Path:
+        assert self.paths is not None, "Environment not initialized. Use as context manager."
         return self.paths["config_dir"]
 
     def create_grand_digest(self, initial_data: Optional[Dict[str, Any]] = None) -> Path:
@@ -292,7 +303,7 @@ class TempPluginEnvironment:
     def create_shadow_digest(
         self,
         level: str = "weekly",
-        source_files: Optional[list] = None,
+        source_files: Optional[List[str]] = None,
         initial_data: Optional[Dict[str, Any]] = None,
     ) -> Path:
         """
@@ -306,25 +317,23 @@ class TempPluginEnvironment:
         Returns:
             作成されたファイルのPath
         """
+        data: Dict[str, Any]
         if initial_data is None:
-            data = {
-                "metadata": {"last_updated": "2025-01-01T00:00:00", "version": "1.0"},
-                "latest_digests": {
-                    lv: {"overall_digest": None}
-                    for lv in [
-                        "weekly",
-                        "monthly",
-                        "quarterly",
-                        "annual",
-                        "triennial",
-                        "decadal",
-                        "multi_decadal",
-                        "centurial",
-                    ]
-                },
+            latest_digests: Dict[str, Any] = {
+                lv: {"overall_digest": None}
+                for lv in [
+                    "weekly",
+                    "monthly",
+                    "quarterly",
+                    "annual",
+                    "triennial",
+                    "decadal",
+                    "multi_decadal",
+                    "centurial",
+                ]
             }
             if source_files:
-                data["latest_digests"][level] = {
+                latest_digests[level] = {
                     "overall_digest": {
                         "source_files": source_files,
                         "digest_type": "テスト",
@@ -333,6 +342,10 @@ class TempPluginEnvironment:
                         "impression": "テスト用の所感です。",
                     }
                 }
+            data = {
+                "metadata": {"last_updated": "2025-01-01T00:00:00", "version": "1.0"},
+                "latest_digests": latest_digests,
+            }
         else:
             data = initial_data
 
@@ -386,7 +399,7 @@ class CLITestHelper:
     @staticmethod
     def run_cli_command(
         module_name: str,
-        args: list,
+        args: List[str],
         plugin_root: Path,
     ) -> Tuple[int, Union[Dict[str, Any], str]]:
         """
@@ -407,7 +420,7 @@ class CLITestHelper:
 
         exit_code = 0
         output: Union[Dict[str, Any], str] = ""
-        captured_outputs: list = []
+        captured_outputs: List[Any] = []
 
         with patch("sys.argv", full_args):
             # モジュールをリロードして新しいsys.argvを反映
@@ -419,7 +432,12 @@ class CLITestHelper:
                 try:
                     module.main()
                 except SystemExit as e:
-                    exit_code = e.code if e.code is not None else 0
+                    if e.code is None:
+                        exit_code = 0
+                    elif isinstance(e.code, int):
+                        exit_code = e.code
+                    else:
+                        exit_code = 1  # Non-int exit codes treated as error
 
             # 出力を結合
             if captured_outputs:

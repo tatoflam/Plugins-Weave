@@ -9,8 +9,18 @@ pytest 共通設定
 
 import os
 from pathlib import Path
+from typing import TYPE_CHECKING, Any, Dict, Generator, List, Tuple
+from unittest.mock import MagicMock
 
 import pytest
+
+if TYPE_CHECKING:
+    from application.config import DigestConfig
+    from application.grand import GrandDigestManager, ShadowGrandDigestManager
+    from application.shadow import FileDetector, ShadowIO, ShadowTemplate
+    from application.shadow.placeholder_manager import PlaceholderManager
+    from application.tracking import DigestTimesTracker
+    from domain.types import LevelHierarchy
 
 # =============================================================================
 # Hypothesis Configuration
@@ -45,7 +55,7 @@ from test_helpers import TempPluginEnvironment, create_test_loop_file
 
 
 @pytest.fixture(autouse=True)
-def reset_all_singletons() -> None:
+def reset_all_singletons() -> Generator[None, None, None]:
     """
     全テスト前後でシングルトンをリセット
 
@@ -79,7 +89,7 @@ def reset_all_singletons() -> None:
 # =============================================================================
 
 
-def pytest_configure(config) -> None:
+def pytest_configure(config: pytest.Config) -> None:
     """カスタムマーカーを登録"""
     config.addinivalue_line("markers", "unit: 単体テスト（高速、外部依存なし）")
     config.addinivalue_line("markers", "integration: 統合テスト（ファイルI/O）")
@@ -98,7 +108,7 @@ def pytest_configure(config) -> None:
 
 
 @pytest.fixture
-def temp_plugin_env() -> None:
+def temp_plugin_env() -> Generator[TempPluginEnvironment, None, None]:
     """
     テスト用の一時プラグイン環境を提供（関数スコープ）
 
@@ -113,7 +123,7 @@ def temp_plugin_env() -> None:
 
 
 @pytest.fixture(scope="module")
-def shared_plugin_env() -> None:
+def shared_plugin_env() -> Generator[TempPluginEnvironment, None, None]:
     """
     モジュール間で共有するプラグイン環境（読み取り専用テスト用）
 
@@ -126,14 +136,16 @@ def shared_plugin_env() -> None:
 
 
 @pytest.fixture
-def sample_loop_files(temp_plugin_env):
+def sample_loop_files(
+    temp_plugin_env: TempPluginEnvironment,
+) -> Tuple[TempPluginEnvironment, List[Path]]:
     """
     5つのサンプルLoopファイルを作成済みの環境を提供
 
     Returns:
         (env, loop_files): 環境とLoopファイルパスのリスト
     """
-    loop_files = []
+    loop_files: List[Path] = []
     for i in range(1, 6):
         loop_file = create_test_loop_file(temp_plugin_env.loops_path, i, f"test_loop_{i}")
         loop_files.append(loop_file)
@@ -146,7 +158,7 @@ def sample_loop_files(temp_plugin_env):
 
 
 @pytest.fixture
-def digest_config(temp_plugin_env):
+def digest_config(temp_plugin_env: TempPluginEnvironment) -> "DigestConfig":
     """
     初期化済みのDigestConfigインスタンスを提供
     """
@@ -156,7 +168,7 @@ def digest_config(temp_plugin_env):
 
 
 @pytest.fixture
-def config(digest_config):
+def config(digest_config: "DigestConfig") -> "DigestConfig":
     """
     digest_configのエイリアス（後方互換性のため）
 
@@ -174,7 +186,7 @@ def config(digest_config):
 
 
 @pytest.fixture
-def times_tracker(config):
+def times_tracker(config: "DigestConfig") -> "DigestTimesTracker":
     """テスト用DigestTimesTracker"""
     from application.tracking import DigestTimesTracker
 
@@ -182,7 +194,7 @@ def times_tracker(config):
 
 
 @pytest.fixture
-def template():
+def template() -> "ShadowTemplate":
     """テスト用ShadowTemplate"""
     from application.shadow import ShadowTemplate
     from domain.constants import LEVEL_NAMES
@@ -191,7 +203,7 @@ def template():
 
 
 @pytest.fixture
-def shadow_io(temp_plugin_env, template):
+def shadow_io(temp_plugin_env: TempPluginEnvironment, template: "ShadowTemplate") -> "ShadowIO":
     """テスト用ShadowIO"""
     from application.shadow import ShadowIO
 
@@ -200,7 +212,7 @@ def shadow_io(temp_plugin_env, template):
 
 
 @pytest.fixture
-def file_detector(config, times_tracker):
+def file_detector(config: "DigestConfig", times_tracker: "DigestTimesTracker") -> "FileDetector":
     """テスト用FileDetector"""
     from application.shadow import FileDetector
 
@@ -208,7 +220,7 @@ def file_detector(config, times_tracker):
 
 
 @pytest.fixture
-def level_hierarchy():
+def level_hierarchy() -> "LevelHierarchy":
     """レベル階層情報（SSoT関数を使用）"""
     from domain.constants import build_level_hierarchy
 
@@ -216,7 +228,7 @@ def level_hierarchy():
 
 
 @pytest.fixture
-def placeholder_manager():
+def placeholder_manager() -> "PlaceholderManager":
     """テスト用PlaceholderManager"""
     from application.shadow.placeholder_manager import PlaceholderManager
 
@@ -229,7 +241,7 @@ def placeholder_manager():
 
 
 @pytest.fixture
-def mock_digest_config(temp_plugin_env):
+def mock_digest_config(temp_plugin_env: TempPluginEnvironment) -> MagicMock:
     """
     モック用のDigestConfig（パス情報のみ）
 
@@ -237,8 +249,6 @@ def mock_digest_config(temp_plugin_env):
         完全なモックが必要な場合はunittest.mockを使用。
         このフィクスチャは実際のファイルシステム上に環境を作成。
     """
-    from unittest.mock import MagicMock
-
     mock = MagicMock()
     mock.plugin_root = temp_plugin_env.plugin_root
     mock.loops_path = temp_plugin_env.loops_path
@@ -254,7 +264,7 @@ def mock_digest_config(temp_plugin_env):
 
 
 @pytest.fixture
-def shadow_manager(config):
+def shadow_manager(config: "DigestConfig") -> "ShadowGrandDigestManager":
     """
     テスト用ShadowGrandDigestManager
 
@@ -268,7 +278,7 @@ def shadow_manager(config):
 
 
 @pytest.fixture
-def grand_digest_manager(config):
+def grand_digest_manager(config: "DigestConfig") -> "GrandDigestManager":
     """テスト用GrandDigestManager"""
     from application.grand import GrandDigestManager
 
@@ -281,7 +291,7 @@ def grand_digest_manager(config):
 
 
 @pytest.fixture
-def valid_digest_long_short():
+def valid_digest_long_short() -> Dict[str, Any]:
     """有効な{long, short}形式のdigestデータ"""
     return {
         "source_file": "L00001_test.txt",
@@ -293,7 +303,7 @@ def valid_digest_long_short():
 
 
 @pytest.fixture
-def valid_individual_digests_list():
+def valid_individual_digests_list() -> List[Dict[str, Any]]:
     """有効なindividual_digestsリスト"""
     return [
         {

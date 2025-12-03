@@ -25,6 +25,10 @@ def scan_files(directory: Path, pattern: str = "*.txt", sort: bool = True) -> Li
 
     Returns:
         マッチしたファイルのPathリスト
+
+    Example:
+        >>> scan_files(Path("/data/loops"), "L*.txt")
+        [Path("/data/loops/L00001.txt"), Path("/data/loops/L00002.txt")]
     """
     if not directory.exists():
         return []
@@ -50,6 +54,10 @@ def get_files_by_pattern(
 
     Returns:
         マッチしたファイルのPathリスト（ソート済み）
+
+    Example:
+        >>> get_files_by_pattern(Path("/data"), "*.txt", lambda p: p.stat().st_size > 0)
+        [Path("/data/file1.txt"), Path("/data/file2.txt")]
     """
     files = scan_files(directory, pattern, sort=True)
 
@@ -72,6 +80,11 @@ def get_max_numbered_file(
 
     Returns:
         最大番号（ファイルがなければNone）
+
+    Example:
+        >>> def extractor(name): return int(name[1:6]) if name.startswith("L") else None
+        >>> get_max_numbered_file(Path("/data/loops"), "L*.txt", extractor)
+        186
     """
     if not directory.exists():
         return None
@@ -100,6 +113,11 @@ def filter_files_after_number(
 
     Returns:
         しきい値より大きい番号のファイルリスト
+
+    Example:
+        >>> files = [Path("L00001.txt"), Path("L00002.txt"), Path("L00003.txt")]
+        >>> filter_files_after_number(files, 1, lambda n: int(n[1:6]))
+        [Path("L00002.txt"), Path("L00003.txt")]
     """
     result = []
 
@@ -121,6 +139,10 @@ def count_files(directory: Path, pattern: str = "*.txt") -> int:
 
     Returns:
         マッチしたファイル数
+
+    Example:
+        >>> count_files(Path("/data/loops"), "L*.txt")
+        186
     """
     if not directory.exists():
         return 0

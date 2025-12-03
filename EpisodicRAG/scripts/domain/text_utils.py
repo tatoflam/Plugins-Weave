@@ -9,9 +9,7 @@ Usage:
     from domain.text_utils import extract_long_value, extract_short_value
 """
 
-from typing import Any
-
-from domain.types import LongShortText
+from typing import Any, cast
 
 
 def extract_long_value(text: Any, default: str = "") -> str:
@@ -36,18 +34,18 @@ def extract_long_value(text: Any, default: str = "") -> str:
         両形式をサポート。
     """
     if isinstance(text, dict):
-        return text.get("long", default)
+        return cast(str, text.get("long", default))
     if isinstance(text, str):
         return text if text else default
     return default
 
 
-def extract_short_value(text: LongShortText, default: str = "") -> str:
+def extract_short_value(text: Any, default: str = "") -> str:
     """
     LongShortTextからshort版の値を抽出（individual_digests用）
 
     Args:
-        text: LongShortText型のデータ
+        text: LongShortText型のデータ（または辞書）
         default: 値が取得できない場合のデフォルト値
 
     Returns:
@@ -58,7 +56,7 @@ def extract_short_value(text: LongShortText, default: str = "") -> str:
         '1200字...'
     """
     if isinstance(text, dict):
-        return text.get("short", default)
+        return cast(str, text.get("short", default))
     return default
 
 
@@ -79,5 +77,5 @@ def extract_value(text: Any, key: str, default: str = "") -> str:
         '詳細'
     """
     if isinstance(text, dict):
-        return text.get(key, default)
+        return cast(str, text.get(key, default))
     return default

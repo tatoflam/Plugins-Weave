@@ -21,7 +21,7 @@ from .cli_runner import CLIRunner
 # =============================================================================
 
 
-def pytest_configure(config) -> None:
+def pytest_configure(config: pytest.Config) -> None:
     """カスタムマーカーを登録"""
     config.addinivalue_line("markers", "cli: CLI統合テスト（subprocess経由）")
 

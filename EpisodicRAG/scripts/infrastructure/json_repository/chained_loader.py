@@ -95,6 +95,10 @@ class ChainedLoader(Generic[T]):
 
         Args:
             strategy: 追加する戦略（リストの最後に追加）
+
+        Example:
+            >>> loader = ChainedLoader([])
+            >>> loader.add_strategy(FileLoadStrategy(safe_read_json))
         """
         self._strategies.append(strategy)
 
@@ -105,6 +109,10 @@ class ChainedLoader(Generic[T]):
         Args:
             index: 挿入位置
             strategy: 挿入する戦略
+
+        Example:
+            >>> loader = ChainedLoader([DefaultLoadStrategy()])
+            >>> loader.insert_strategy(0, FileLoadStrategy(safe_read_json))
         """
         self._strategies.insert(index, strategy)
 

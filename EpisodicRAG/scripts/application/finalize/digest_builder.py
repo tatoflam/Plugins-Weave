@@ -40,7 +40,7 @@ Note:
 """
 
 from datetime import datetime
-from typing import List
+from typing import Any, List
 
 from domain.text_utils import extract_long_value
 from domain.types import IndividualDigestData, OverallDigestData, RegularDigestData
@@ -74,7 +74,7 @@ class RegularDigestBuilder:
     """
 
     @staticmethod
-    def _extract_long_value(value, default: str = "") -> str:
+    def _extract_long_value(value: Any, default: str = "") -> str:
         """
         abstract/impression から long 版の値を抽出する。
 

@@ -84,7 +84,13 @@ class ValidationResult:
 
     @classmethod
     def success(cls, path: Path, validator_name: str) -> "ValidationResult":
-        """検証成功の結果を生成"""
+        """
+        検証成功の結果を生成
+
+        Example:
+            >>> ValidationResult.success(Path("/data"), "PluginRootValidator")
+            ValidationResult(is_valid=True, validated_path=Path("/data"), ...)
+        """
         return cls(
             is_valid=True,
             validated_path=path,
@@ -93,7 +99,13 @@ class ValidationResult:
 
     @classmethod
     def failure(cls, message: str, validator_name: str = "") -> "ValidationResult":
-        """検証失敗の結果を生成"""
+        """
+        検証失敗の結果を生成
+
+        Example:
+            >>> ValidationResult.failure("Path not allowed", "PluginRootValidator")
+            ValidationResult(is_valid=False, error_message="Path not allowed", ...)
+        """
         return cls(
             is_valid=False,
             error_message=message,
@@ -145,6 +157,12 @@ class PluginRootValidator(PathValidator):
 
         Returns:
             ValidationResult if within plugin_root, None otherwise
+
+        Example:
+            >>> validator = PluginRootValidator()
+            >>> result = validator.validate(context)
+            >>> result.is_valid if result else None
+            True
         """
         plugin_root_resolved = context.plugin_root.resolve()
 
@@ -176,6 +194,12 @@ class TrustedExternalPathValidator(PathValidator):
 
         Returns:
             ValidationResult if within trusted paths, None otherwise
+
+        Example:
+            >>> validator = TrustedExternalPathValidator()
+            >>> result = validator.validate(context)
+            >>> result.is_valid if result else None
+            True
         """
         if not context.trusted_paths:
             return None  # 信頼済みパスがない場合はスキップ
@@ -258,9 +282,22 @@ class PathValidatorChain:
 
         Args:
             validator: 追加するValidator
+
+        Example:
+            >>> chain = PathValidatorChain([])
+            >>> chain.add_validator(PluginRootValidator())
+            >>> len(chain)
+            1
         """
         self._validators.append(validator)
 
     def __len__(self) -> int:
-        """登録されているValidator数"""
+        """
+        登録されているValidator数
+
+        Example:
+            >>> chain = PathValidatorChain([PluginRootValidator()])
+            >>> len(chain)
+            1
+        """
         return len(self._validators)

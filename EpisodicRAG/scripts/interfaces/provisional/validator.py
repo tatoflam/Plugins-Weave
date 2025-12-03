@@ -25,6 +25,11 @@ def validate_long_short_text(value: Any, field_name: str, index: int) -> None:
 
     Raises:
         ValidationError: If value is not {long: str, short: str} format
+
+    Example:
+        >>> validate_long_short_text({"long": "詳細", "short": "概要"}, "abstract", 0)
+        >>> validate_long_short_text("string", "abstract", 0)
+        ValidationError: abstract at index 0 must be {long: str, short: str}
     """
     if value is None:
         return  # Optional field
@@ -55,6 +60,10 @@ def validate_individual_digest(digest: Any, index: int, context: str = "") -> No
 
     Raises:
         ValidationError: If validation fails
+
+    Example:
+        >>> digest = {"source_file": "L00186.txt", "abstract": {"long": "...", "short": "..."}}
+        >>> validate_individual_digest(digest, 0)
     """
     prefix = f"{context} " if context else ""
     formatter = get_error_formatter()
@@ -86,6 +95,10 @@ def validate_individual_digests_list(
 
     Raises:
         ValidationError: If any digest fails validation
+
+    Example:
+        >>> digests = [{"source_file": "L00186.txt"}, {"source_file": "L00187.txt"}]
+        >>> validate_individual_digests_list(digests)
     """
     for i, digest in enumerate(digests):
         validate_individual_digest(digest, i, context)
@@ -104,6 +117,11 @@ def validate_provisional_structure(data: Any) -> List[IndividualDigestData]:
     Note:
         This function logs warnings for invalid structures but does not raise.
         It returns an empty list for graceful degradation.
+
+    Example:
+        >>> data = {"individual_digests": [{"source_file": "L00186.txt"}]}
+        >>> validate_provisional_structure(data)
+        [{"source_file": "L00186.txt"}]
     """
     from infrastructure import log_warning
 
@@ -131,6 +149,12 @@ def validate_input_format(data: Any) -> List[IndividualDigestData]:
 
     Raises:
         ValidationError: If data format is invalid
+
+    Example:
+        >>> validate_input_format([{"source_file": "L00186.txt"}])
+        [{"source_file": "L00186.txt"}]
+        >>> validate_input_format({"individual_digests": [...]})
+        [...]
     """
     # Data is a list: return directly
     if is_valid_list(data):

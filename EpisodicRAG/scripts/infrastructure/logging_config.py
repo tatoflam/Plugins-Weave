@@ -57,6 +57,10 @@ def get_logger(name: str = "episodic_rag") -> logging.Logger:
 
     Returns:
         設定済みのLoggerインスタンス
+
+    Example:
+        >>> logger = get_logger("my_module")
+        >>> logger.info("Processing started")
     """
     return logging.getLogger(name)
 
@@ -84,6 +88,11 @@ def setup_logging(level: Optional[int] = None) -> logging.Logger:
 
     Returns:
         設定済みのLoggerインスタンス
+
+    Example:
+        >>> import logging
+        >>> logger = setup_logging(logging.DEBUG)
+        >>> logger.debug("Debug message enabled")
     """
     logger = logging.getLogger("episodic_rag")
 
@@ -136,6 +145,10 @@ def log_error(message: str, exit_code: Optional[int] = None) -> None:
     Args:
         message: エラーメッセージ
         exit_code: 指定時はこのコードでプログラムを終了
+
+    Example:
+        >>> log_error("File not found")
+        >>> log_error("Critical error", exit_code=1)  # プログラム終了
     """
     _logger.error(message)
     if exit_code is not None:
@@ -148,6 +161,9 @@ def log_warning(message: str) -> None:
 
     Args:
         message: 警告メッセージ
+
+    Example:
+        >>> log_warning("Deprecated function used")
     """
     _logger.warning(message)
 
@@ -158,6 +174,9 @@ def log_info(message: str) -> None:
 
     Args:
         message: 情報メッセージ
+
+    Example:
+        >>> log_info("Processing 10 files")
     """
     _logger.info(message)
 
@@ -168,5 +187,8 @@ def log_debug(message: str) -> None:
 
     Args:
         message: デバッグメッセージ
+
+    Example:
+        >>> log_debug("Variable x = 42")
     """
     _logger.debug(message)

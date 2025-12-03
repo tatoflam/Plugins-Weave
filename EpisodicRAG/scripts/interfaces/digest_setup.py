@@ -330,7 +330,7 @@ class SetupManager:
 
         return external_paths
 
-    def _is_external_path(self, path_str: str) -> bool:
+    def _is_external_path(self, path_str: Optional[str]) -> bool:
         """パスがplugin_root外を指すか判定"""
         if path_str is None:
             return False
@@ -409,8 +409,8 @@ def main(plugin_root: Optional[Path] = None) -> None:
                 output_error(f"Invalid JSON: {e}")
                 return
 
-            result = manager.init(config_data, force=args.force)
-            output_json(asdict(result))
+            init_result = manager.init(config_data, force=args.force)
+            output_json(asdict(init_result))
 
         else:
             parser.print_help()

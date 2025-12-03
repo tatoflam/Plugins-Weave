@@ -26,6 +26,10 @@ def find_plugin_root(script_path: Path) -> Path:
 
     Raises:
         FileNotFoundError: Pluginルートが見つからない場合
+
+    Example:
+        >>> find_plugin_root(Path("/project/scripts/main.py"))
+        Path("/project")
     """
     current = script_path.resolve()
 

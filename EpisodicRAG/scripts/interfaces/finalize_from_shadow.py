@@ -121,6 +121,10 @@ class DigestFinalizerFromShadow:
             grand_digest_manager: GrandDigestManager インスタンス（省略時は自動生成、テスト時にモック注入可能）
             shadow_manager: ShadowGrandDigestManager インスタンス（省略時は自動生成、テスト時にモック注入可能）
             times_tracker: DigestTimesTracker インスタンス（省略時は自動生成、テスト時にモック注入可能）
+
+        Example:
+            >>> finalizer = DigestFinalizerFromShadow()
+            >>> finalizer.finalize_from_shadow("weekly", "知性射程理論")
         """
         # ARCHITECTURE: デフォルト値パターン - Noneなら内部で生成
         if config is None:
@@ -152,6 +156,9 @@ class DigestFinalizerFromShadow:
 
         Raises:
             ValidationError: source_filesの形式が不正な場合
+
+        Example:
+            >>> finalizer.validate_shadow_content("weekly", ["L00186.txt", "L00187.txt"])
         """
         return self._validator.validate_shadow_content(level, source_files)
 
@@ -169,6 +176,10 @@ class DigestFinalizerFromShadow:
             ValidationError: 入力データが不正な場合
             DigestError: ダイジェスト処理に失敗した場合
             FileIOError: ファイルI/Oに失敗した場合
+
+        Example:
+            >>> finalizer = DigestFinalizerFromShadow()
+            >>> finalizer.finalize_from_shadow("weekly", "知性射程理論と協働AI実現")
         """
         _logger.info(LOG_SEPARATOR)
         _logger.info(f"Shadowからダイジェスト確定: {level.upper()}")

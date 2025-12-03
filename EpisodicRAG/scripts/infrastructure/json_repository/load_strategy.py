@@ -58,12 +58,23 @@ class LoadStrategy(ABC, Generic[T]):
 
         Returns:
             読み込んだdict、または読み込み不可の場合はNone
+
+        Example:
+            >>> strategy = FileLoadStrategy(safe_read_json)
+            >>> strategy.load(context)
+            {"key": "value"}
         """
         ...
 
     @abstractmethod
     def get_description(self) -> str:
-        """戦略の説明（デバッグ/ログ用）"""
+        """
+        戦略の説明（デバッグ/ログ用）
+
+        Example:
+            >>> strategy.get_description()
+            "FileLoadStrategy: Load from existing file"
+        """
         ...
 
 
@@ -114,7 +125,14 @@ class FileLoadStrategy(LoadStrategy[T]):
         self._read_func = read_func
 
     def load(self, context: LoadContext) -> Optional[T]:
-        """既存ファイルから読み込み"""
+        """
+        既存ファイルから読み込み
+
+        Example:
+            >>> strategy = FileLoadStrategy(safe_read_json)
+            >>> strategy.load(LoadContext(target_file=Path("data.json")))
+            {"key": "value"}
+        """
         if not context.target_file.exists():
             return None
         logger.debug(f"Loading existing file: {context.target_file}")
@@ -124,6 +142,13 @@ class FileLoadStrategy(LoadStrategy[T]):
         return cast(Optional[T], raw_data)
 
     def get_description(self) -> str:
+        """
+        戦略の説明
+
+        Example:
+            >>> FileLoadStrategy(safe_read_json).get_description()
+            "FileLoadStrategy: Load from existing file"
+        """
         return "FileLoadStrategy: Load from existing file"
 
 
@@ -148,7 +173,15 @@ class TemplateLoadStrategy(LoadStrategy[T]):
         self._save_func = save_func
 
     def load(self, context: LoadContext) -> Optional[T]:
-        """テンプレートから読み込み・保存"""
+        """
+        テンプレートから読み込み・保存
+
+        Example:
+            >>> strategy = TemplateLoadStrategy(safe_read_json, save_json)
+            >>> ctx = LoadContext(target_file=Path("new.json"), template_file=Path("template.json"))
+            >>> strategy.load(ctx)
+            {"default": "value"}
+        """
         if not context.template_file or not context.template_file.exists():
             return None
 
@@ -166,6 +199,13 @@ class TemplateLoadStrategy(LoadStrategy[T]):
         return cast(Optional[T], raw_template)
 
     def get_description(self) -> str:
+        """
+        戦略の説明
+
+        Example:
+            >>> TemplateLoadStrategy(read, save).get_description()
+            "TemplateLoadStrategy: Initialize from template file"
+        """
         return "TemplateLoadStrategy: Initialize from template file"
 
 
@@ -184,7 +224,15 @@ class FactoryLoadStrategy(LoadStrategy[T]):
         self._save_func = save_func
 
     def load(self, context: LoadContext) -> Optional[T]:
-        """ファクトリから作成・保存"""
+        """
+        ファクトリから作成・保存
+
+        Example:
+            >>> strategy = FactoryLoadStrategy(save_json)
+            >>> ctx = LoadContext(target_file=Path("new.json"), default_factory=dict)
+            >>> strategy.load(ctx)
+            {}
+        """
         if not context.default_factory:
             return None
 
@@ -200,6 +248,13 @@ class FactoryLoadStrategy(LoadStrategy[T]):
         return result
 
     def get_description(self) -> str:
+        """
+        戦略の説明
+
+        Example:
+            >>> FactoryLoadStrategy(save_json).get_description()
+            "FactoryLoadStrategy: Create from default_factory"
+        """
         return "FactoryLoadStrategy: Create from default_factory"
 
 
@@ -211,11 +266,25 @@ class DefaultLoadStrategy(LoadStrategy[T]):
     """
 
     def load(self, context: LoadContext) -> Optional[T]:
-        """空dictを返す"""
+        """
+        空dictを返す
+
+        Example:
+            >>> strategy = DefaultLoadStrategy()
+            >>> strategy.load(LoadContext(target_file=Path("any.json")))
+            {}
+        """
         logger.debug("No template or factory provided, returning empty dict")
         return cast(T, {})
 
     def get_description(self) -> str:
+        """
+        戦略の説明
+
+        Example:
+            >>> DefaultLoadStrategy().get_description()
+            "DefaultLoadStrategy: Return empty dict"
+        """
         return "DefaultLoadStrategy: Return empty dict"
 
 

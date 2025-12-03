@@ -31,6 +31,12 @@ def sanitize_filename(title: str, max_length: int = 50) -> str:
     Raises:
         TypeError: titleがstr型でない場合
         ValueError: max_lengthが正の整数でない場合
+
+    Example:
+        >>> sanitize_filename("知性射程理論と協働AI実現")
+        "知性射程理論と協働AI実現"
+        >>> sanitize_filename("Test: Title/Name?")
+        "Test_TitleName"
     """
     # 型チェック
     formatter = get_error_formatter()
@@ -75,6 +81,10 @@ def get_next_digest_number(digests_path: Path, level: str) -> int:
 
     Raises:
         ValueError: 無効なlevelが指定された場合
+
+    Example:
+        >>> get_next_digest_number(Path("/data/Digests"), "weekly")
+        42
     """
     # 循環インポートを避けるためローカルインポート
     from domain.constants import LEVEL_CONFIG

@@ -46,6 +46,11 @@ from infrastructure.config.error_messages import initialization_failed_message
 
 if TYPE_CHECKING:
     from application.config import DigestConfig
+    from application.config.config_validator import ConfigValidator
+    from application.config.level_path_service import LevelPathService
+    from application.config.source_path_resolver import SourcePathResolver
+    from application.config.threshold_provider import ThresholdProvider
+    from domain.types import ConfigData
 
 
 class DigestConfigBuilder:
@@ -225,12 +230,12 @@ class DigestConfigBuilder:
         plugin_root: Path,
         config_file: Path,
         config_loader: ConfigLoader,
-        config,
+        config: "ConfigData",
         path_resolver: PathResolver,
-        threshold_provider,
-        level_path_service,
-        source_path_resolver,
-        config_validator,
+        threshold_provider: "ThresholdProvider",
+        level_path_service: "LevelPathService",
+        source_path_resolver: "SourcePathResolver",
+        config_validator: "ConfigValidator",
     ) -> "DigestConfig":
         """
         DigestConfigインスタンスを直接構築（コンストラクタをバイパス）

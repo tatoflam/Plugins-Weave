@@ -26,6 +26,11 @@ def load_config(config_file: Path) -> ConfigData:
 
     Raises:
         ConfigError: 設定ファイルが見つからない、またはJSONパースに失敗した場合
+
+    Example:
+        >>> config = load_config(Path("config.json"))
+        >>> config["base_dir"]
+        "."
     """
     if not config_file.exists():
         raise ConfigError(

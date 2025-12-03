@@ -347,15 +347,19 @@ def main(plugin_root: Optional[Path] = None) -> None:
 
         elif args.command == "set":
             # 値の型を推測
-            value: Union[str, int, bool, None] = args.value
-            if value.lower() == "true":
+            raw_value: str = args.value
+            value: Union[str, int, bool, None]
+            lower_value = raw_value.lower()
+            if lower_value == "true":
                 value = True
-            elif value.lower() == "false":
+            elif lower_value == "false":
                 value = False
-            elif value.lower() == "null" or value.lower() == "none":
+            elif lower_value == "null" or lower_value == "none":
                 value = None
-            elif value.isdigit() or (value.startswith("-") and value[1:].isdigit()):
-                value = int(value)
+            elif raw_value.isdigit() or (raw_value.startswith("-") and raw_value[1:].isdigit()):
+                value = int(raw_value)
+            else:
+                value = raw_value
 
             result = editor.set_value(args.key, value)
             output_json(result)

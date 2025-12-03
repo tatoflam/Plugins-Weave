@@ -62,6 +62,12 @@ class ConfigLoader:
 
         Raises:
             ConfigError: 設定ファイルが見つからない、またはJSONパースに失敗した場合
+
+        Example:
+            >>> loader = ConfigLoader(Path("config.json"))
+            >>> config = loader.load()
+            >>> config["base_dir"]
+            "/path/to/project"
         """
         if self._config is not None:
             return self._config
@@ -80,6 +86,10 @@ class ConfigLoader:
 
         Raises:
             ConfigError: 設定ファイルが見つからない、またはJSONパースに失敗した場合
+
+        Example:
+            >>> loader = ConfigLoader(Path("config.json"))
+            >>> config = loader.reload()  # 常にファイルから再読み込み
         """
         self._config = None
         return self.load()
@@ -121,6 +131,10 @@ class ConfigLoader:
 
         Returns:
             設定データ辞書
+
+        Example:
+            >>> loader = ConfigLoader(Path("config.json"))
+            >>> config = loader.get_config()
         """
         return self.load()
 
@@ -134,6 +148,12 @@ class ConfigLoader:
 
         Returns:
             設定値、またはデフォルト値
+
+        Example:
+            >>> loader.get("base_dir")
+            "/path/to/project"
+            >>> loader.get("nonexistent", "default")
+            "default"
         """
         config = self.load()
         return config.get(key, default)
@@ -147,6 +167,12 @@ class ConfigLoader:
 
         Returns:
             キーが存在する場合True
+
+        Example:
+            >>> loader.has_key("base_dir")
+            True
+            >>> loader.has_key("nonexistent")
+            False
         """
         config = self.load()
         return key in config
@@ -163,6 +189,12 @@ class ConfigLoader:
 
         Raises:
             ConfigError: キーが存在しない場合
+
+        Example:
+            >>> loader.get_required("base_dir")
+            "/path/to/project"
+            >>> loader.get_required("nonexistent")
+            ConfigError: Required config key 'nonexistent' is missing
         """
         config = self.load()
         # Use dict view for dynamic key access

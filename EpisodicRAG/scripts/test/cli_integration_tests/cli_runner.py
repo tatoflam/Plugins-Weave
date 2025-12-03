@@ -272,7 +272,7 @@ class CLIRunner:
     # digest_setup CLI
     # =========================================================================
 
-    def run_digest_setup(self, *args: str, **kwargs) -> CLIResult:
+    def run_digest_setup(self, *args: str, **kwargs: Any) -> CLIResult:
         """
         digest_setup.py を実行
 
@@ -295,7 +295,7 @@ class CLIRunner:
     # digest_config CLI
     # =========================================================================
 
-    def run_digest_config(self, *args: str, **kwargs) -> CLIResult:
+    def run_digest_config(self, *args: str, **kwargs: Any) -> CLIResult:
         """
         digest_config.py を実行
 
@@ -318,7 +318,7 @@ class CLIRunner:
     # digest_auto CLI
     # =========================================================================
 
-    def run_digest_auto(self, *args: str, **kwargs) -> CLIResult:
+    def run_digest_auto(self, *args: str, **kwargs: Any) -> CLIResult:
         """
         digest_auto.py を実行
 
@@ -340,7 +340,7 @@ class CLIRunner:
     # shadow_state_checker CLI
     # =========================================================================
 
-    def run_shadow_state_checker(self, level: str, *args: str, **kwargs) -> CLIResult:
+    def run_shadow_state_checker(self, level: str, *args: str, **kwargs: Any) -> CLIResult:
         """
         shadow_state_checker.py を実行
 
@@ -365,7 +365,7 @@ class CLIRunner:
         digest_json: str,
         *args: str,
         append: bool = False,
-        **kwargs,
+        **kwargs: Any,
     ) -> CLIResult:
         """
         save_provisional_digest.py を実行
@@ -390,7 +390,9 @@ class CLIRunner:
     # finalize_from_shadow CLI
     # =========================================================================
 
-    def run_finalize_from_shadow(self, level: str, title: str, *args: str, **kwargs) -> CLIResult:
+    def run_finalize_from_shadow(
+        self, level: str, title: str, *args: str, **kwargs: Any
+    ) -> CLIResult:
         """
         finalize_from_shadow.py を実行
 
@@ -411,7 +413,7 @@ class CLIRunner:
     # generate_digest_auto.sh（Bashスクリプト）
     # =========================================================================
 
-    def run_generate_digest_auto_sh(self, level: Optional[str] = None, **kwargs) -> CLIResult:
+    def run_generate_digest_auto_sh(self, level: Optional[str] = None, **kwargs: Any) -> CLIResult:
         """
         generate_digest_auto.sh を実行
 

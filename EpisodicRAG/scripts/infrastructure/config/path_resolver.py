@@ -154,6 +154,11 @@ class PathResolver:
 
         Raises:
             ConfigError: pathsセクションまたはキーが存在しない場合
+
+        Example:
+            >>> resolver = PathResolver(plugin_root, config)
+            >>> resolver.resolve_path("loops_dir")
+            Path("/data/Loops")
         """
         if "paths" not in self.config:
             raise ConfigError(config_section_missing_message("paths"))
@@ -184,6 +189,10 @@ class PathResolver:
 
         Returns:
             identityファイルの絶対Path（設定されていない場合はNone）
+
+        Example:
+            >>> resolver.get_identity_file_path()
+            Path("/data/identity.json")
         """
         identity_file = self.config.get("paths", {}).get("identity_file_path")
 

@@ -88,7 +88,7 @@ class ShadowStateChecker:
             base_path = Path(base_dir).expanduser().resolve()
 
         paths = config.get("paths", {})
-        essences_dir = paths.get("essences_dir", "data/Essences")
+        essences_dir = str(paths.get("essences_dir", "data/Essences"))
         return base_path / essences_dir
 
     def _load_shadow(self) -> Dict[str, Any]:
@@ -200,7 +200,7 @@ class ShadowStateChecker:
             )
 
 
-def main():
+def main() -> None:
     """CLIエントリーポイント"""
     parser = argparse.ArgumentParser(
         description="Shadow状態確認CLI",

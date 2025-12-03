@@ -51,6 +51,12 @@ def safe_read_json(file_path: Path, raise_on_error: bool = True) -> Optional[Dic
 
     Raises:
         FileIOError: raise_on_error=Trueの場合、JSONパースまたはI/Oエラー時
+
+    Example:
+        >>> safe_read_json(Path("config.json"))
+        {"version": "1.0"}
+        >>> safe_read_json(Path("invalid.json"), raise_on_error=False)
+        None
     """
     formatter = get_error_formatter()
     try:
@@ -199,6 +205,10 @@ def file_exists(file_path: Path) -> bool:
 
     Returns:
         存在すればTrue
+
+    Example:
+        >>> file_exists(Path("config.json"))
+        True
     """
     return file_path.exists()
 
@@ -212,6 +222,10 @@ def ensure_directory(dir_path: Path) -> None:
 
     Raises:
         FileIOError: ディレクトリの作成に失敗した場合
+
+    Example:
+        >>> ensure_directory(Path("/data/output"))
+        # /data/output が存在しなければ作成される
     """
     formatter = get_error_formatter()
     try:

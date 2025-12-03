@@ -21,7 +21,7 @@ GrandDigest更新後に作成された新しいコンテンツを保持し、
 """
 
 from pathlib import Path
-from typing import Dict, List, Optional, cast
+from typing import List, Optional
 
 # Plugin版: application.configをインポート
 from application.config import DigestConfig
@@ -31,7 +31,7 @@ from application.shadow import FileDetector, ShadowIO, ShadowTemplate, ShadowUpd
 from application.tracking import DigestTimesTracker
 from domain.constants import LEVEL_CONFIG, LEVEL_NAMES, LOG_SEPARATOR, build_level_hierarchy
 from domain.file_constants import GRAND_DIGEST_FILENAME, SHADOW_GRAND_DIGEST_FILENAME
-from domain.types import LevelHierarchyEntry, OverallDigestData
+from domain.types import OverallDigestData
 from infrastructure import get_structured_logger, log_warning
 
 _logger = get_structured_logger(__name__)
@@ -75,9 +75,9 @@ class ShadowGrandDigestManager:
         self.digest_times_tracker = DigestTimesTracker(config)
         self._detector = FileDetector(config, self.digest_times_tracker)
         self._io = ShadowIO(self.shadow_digest_file, self._template.get_template)
-        # Cast level_hierarchy for type compatibility
-        hierarchy = cast(Dict[str, LevelHierarchyEntry], self.level_hierarchy)
-        self._updater = ShadowUpdater(self._io, self._detector, self._template, hierarchy)
+        self._updater = ShadowUpdater(
+            self._io, self._detector, self._template, self.level_hierarchy
+        )
 
     # ========================================
     # パブリックAPI

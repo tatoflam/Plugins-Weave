@@ -198,8 +198,8 @@ class MarkdownLinkChecker:
 
         # アンカーのみ（同一ファイル内）
         if link_target.startswith("#"):
-            anchor = link_target[1:]
-            if self._validate_anchor(source_file, anchor):
+            same_file_anchor = link_target[1:]
+            if self._validate_anchor(source_file, same_file_anchor):
                 return LinkCheckResult(
                     file_path=rel_path,
                     line_number=line_num,
@@ -214,10 +214,11 @@ class MarkdownLinkChecker:
                     link_text=link_text,
                     link_target=link_target,
                     status=LinkStatus.ANCHOR_MISSING.value,
-                    suggestion=f"Anchor '{anchor}' not found in current file",
+                    suggestion=f"Anchor '{same_file_anchor}' not found in current file",
                 )
 
         # ファイル参照（アンカー付きの場合もあり）
+        anchor: Optional[str]
         if "#" in link_target:
             file_part, anchor = link_target.split("#", 1)
         else:
@@ -477,7 +478,7 @@ class MarkdownLinkChecker:
         ]
 
 
-def main():
+def main() -> None:
     """CLIエントリーポイント"""
     # Windows環境でのUnicode出力対応
     import io
