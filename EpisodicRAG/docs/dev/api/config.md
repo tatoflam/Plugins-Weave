@@ -49,7 +49,7 @@ from infrastructure.config import (
    - [Context Manager対応](#context-manager対応)
    - [thresholdプロパティ](#thresholdプロパティ)
 4. [CLI使用方法](#cli使用方法)
-   - [interfaces.config_cli モジュール](#interfacesconfigcli-モジュール)
+   - [interfaces.config_cli モジュール](#interfacesconfig_cli-モジュール)
    - [スキルCLI (v4.0.0+)](#スキルcli-v400)
    - [テスト実行](#テスト実行)
 

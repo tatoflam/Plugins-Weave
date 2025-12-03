@@ -39,12 +39,12 @@ from domain import (
 - [バリデーションヘルパー](#バリデーションヘルパーdomainvalidatorshelperspy-v410) - 共通検証関数 *(v4.1.0+)*
 
 **ファイル・階層操作**
-- [関数](#関数domainfilenamingpy) - ファイル命名、番号抽出
-- [レベルレジストリ](#レベルレジストリdomainlevelregistrypy) - 階層設定の一元管理
+- [関数](#関数domainfile_namingpy) - ファイル命名、番号抽出
+- [レベルレジストリ](#レベルレジストリdomainlevel_registrypy) - 階層設定の一元管理
 - [定数ユーティリティ](#定数ユーティリティ関数domainconstantspy) - プレースホルダー生成
 
 **エラー処理**
-- [エラーフォーマット](#エラーフォーマットdomainerrorformatter) - CompositeErrorFormatter *(v4.0.0+)*
+- [エラーフォーマット](#エラーフォーマットdomainerror_formatter) - CompositeErrorFormatter *(v4.0.0+)*
 
 ---
 

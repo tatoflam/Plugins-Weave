@@ -198,7 +198,7 @@ python -m interfaces.digest_setup init --config '...' --force
 }
 ```
 
-> 📖 `trusted_external_paths` の詳細は [用語集](../../README.md#trustedexternalpaths) を参照
+> 📖 `trusted_external_paths` の詳細は [用語集](../../README.md#trusted_external_paths) を参照
 
 ---
 **EpisodicRAG** by Weave | [GitHub](https://github.com/Bizuayeu/Plugins-Weave)

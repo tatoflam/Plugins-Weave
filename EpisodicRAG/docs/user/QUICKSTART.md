@@ -27,7 +27,7 @@ EpisodicRAGを最速でセットアップし、動作確認するためのガイ
 - Python 3.x がインストール済み
 
 > **パス変数の凡例**:
-> - `{plugin_root}`: プラグインのインストール先（[用語集](../../README.md#pluginroot) 参照）
+> - `{plugin_root}`: プラグインのインストール先（[用語集](../../README.md#plugin_root) 参照）
 > - `{loops_dir}`: config.jsonで設定されたLoopディレクトリ
 
 ---

@@ -32,14 +32,14 @@ from interfaces import (
 
 ## 目次
 
-1. [SetupManager（digest_setup.py）](#setupmanagerdigestsetuppy)
-2. [ConfigEditor（digest_config.py）](#configeditordigestconfigpy)
-3. [DigestAutoAnalyzer（digest_auto.py）](#digestautoanalyzerdigestautopy)
+1. [SetupManager（digest_setup.py）](#setupmanagerdigest_setuppy)
+2. [ConfigEditor（digest_config.py）](#configeditordigest_configpy)
+3. [DigestAutoAnalyzer（digest_auto.py）](#digestautoanalyzerdigest_autopy)
 4. [DigestFinalizerFromShadow](#digestfinalizerfromshadow)
 5. [ProvisionalDigestSaver](#provisionaldigestsaver)
 6. [Provisionalサブパッケージ](#provisionalサブパッケージinterfacesprovisional)
-7. [ヘルパー関数](#ヘルパー関数interfacesinterfacehelperspy)
-8. [CLI共通ヘルパー](#cli共通ヘルパーinterfacesclihelperspy) *(v4.1.0+)*
+7. [ヘルパー関数](#ヘルパー関数interfacesinterface_helperspy)
+8. [CLI共通ヘルパー](#cli共通ヘルパーinterfacescli_helperspy) *(v4.1.0+)*
 9. [ShadowStateChecker（内部CLI）](#shadowstatechecker内部cli)
 
 ---

@@ -416,7 +416,7 @@ L00001追加 → L00002追加 → /digest
 
 | 用語 | セクション |
 |------|----------|
-| base_dir | [基本概念](#basedir) |
+| base_dir | [基本概念](#base_dir) |
 | Cascade | [8階層構造](#階層的カスケード) |
 | Digest | [基本概念](#digest) |
 | Essences | [基本概念](#essences) |
@@ -424,7 +424,7 @@ L00001追加 → L00002追加 → /digest
 | Loop | [基本概念](#loop) |
 | paths | [基本概念](#paths) |
 | Placeholder | [プロセス・操作](#プレースホルダー) |
-| plugin_root | [基本概念](#pluginroot) |
+| plugin_root | [基本概念](#plugin_root) |
 | Provisional Digest | [記憶構造](#provisional-digest) |
 | Regular Digest | [記憶構造](#regular-digest) |
 | ShadowGrandDigest | [記憶構造](#shadowgranddigest) |

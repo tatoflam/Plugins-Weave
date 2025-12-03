@@ -22,7 +22,7 @@ lychee compatibility:
     - 絵文字は削除される
     - スペースはハイフンに変換
     - 先頭・末尾のハイフンは保持（strip しない）
-    - アンダースコアは削除される
+    - アンダースコアは保持される
     - 例: "## 📥 必須パラメータ" → "#-必須パラメータ"
 """
 
@@ -356,9 +356,9 @@ class MarkdownLinkChecker:
 
         # 特殊文字・絵文字を除去（日本語・英数字・スペース・ハイフンは保持）
         # Letters (a-z), numbers (0-9), Japanese (hiragana, katakana, kanji), space, hyphen
-        # Note: \w includes underscore which GitHub strips, so use explicit ranges
+        # Note: underscore is kept per GitHub/lychee spec
         # Katakana range split: U+30A0-30FA (letters), skip U+30FB (nakaguro), U+30FC-30FF (marks)
-        slug = re.sub(r"[^a-z0-9\u3040-\u309F\u30A0-\u30FA\u30FC-\u30FF\u4E00-\u9FFF \-]", "", slug)
+        slug = re.sub(r"[^a-z0-9_\u3040-\u309F\u30A0-\u30FA\u30FC-\u30FF\u4E00-\u9FFF \-]", "", slug)
 
         # スペースをハイフンに（各スペースを個別に置換）
         slug = slug.replace(" ", "-")

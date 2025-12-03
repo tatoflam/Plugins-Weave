@@ -417,7 +417,7 @@ Examples: W0001_CognitiveArchitecture.txt
 
 | Term | Section |
 |------|---------|
-| base_dir | [Basic Concepts](#basedir) |
+| base_dir | [Basic Concepts](#base_dir) |
 | Cascade | [8-Layer Hierarchy](#hierarchical-cascade) |
 | Digest | [Basic Concepts](#digest) |
 | Essences | [Basic Concepts](#essences) |
@@ -426,7 +426,7 @@ Examples: W0001_CognitiveArchitecture.txt
 | Mottled Memory | [Processes & Operations](#mottled-memory-まだらボケ) |
 | paths | [Basic Concepts](#paths) |
 | Placeholder | [Processes & Operations](#placeholder) |
-| plugin_root | [Basic Concepts](#pluginroot) |
+| plugin_root | [Basic Concepts](#plugin_root) |
 | Provisional Digest | [Memory Structure](#provisional-digest) |
 | Regular Digest | [Memory Structure](#regular-digest) |
 | ShadowGrandDigest | [Memory Structure](#shadowgranddigest) |

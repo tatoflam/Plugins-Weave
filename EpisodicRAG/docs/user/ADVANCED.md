@@ -303,7 +303,7 @@ dataディレクトリ全体をクラウドストレージ（Google Drive, Dropb
 }
 ```
 
-> 📖 `trusted_external_paths` の詳細は [api/config.md](../dev/api/config.md#trustedexternalpaths) を参照
+> 📖 `trusted_external_paths` の詳細は [api/config.md](../dev/api/config.md#trusted_external_paths) を参照
 
 ### リカバリ手順
 

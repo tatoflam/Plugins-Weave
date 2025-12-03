@@ -28,7 +28,7 @@ A guide to set up EpisodicRAG as quickly as possible and verify it works.
 - Python 3.x installed
 
 > **Path Variable Legend**:
-> - `{plugin_root}`: Plugin installation directory (see [Glossary](../../README.en.md#pluginroot))
+> - `{plugin_root}`: Plugin installation directory (see [Glossary](../../README.en.md#plugin_root))
 > - `{loops_dir}`: Loop directory configured in config.json
 
 ---

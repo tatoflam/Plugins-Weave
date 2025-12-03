@@ -521,15 +521,15 @@ class TestSlugifyLycheeCompat:
         assert len(results) == 1
         assert results[0].status == LinkStatus.VALID.value
 
-    def test_underscore_stripped_from_anchor(self, temp_docs_dir) -> None:
-        """アンダースコアはアンカーから除去される（lychee互換）
+    def test_underscore_kept_in_anchor(self, temp_docs_dir) -> None:
+        """アンダースコアはアンカーに保持される（lychee/GitHub互換）
 
-        GitHubはアンダースコアを保持しないため、link_checkerも同様に振る舞う。
+        GitHubはアンダースコアを保持するため、link_checkerも同様に振る舞う。
         """
         # Setup - アンダースコア付き見出し
         file1 = temp_docs_dir / "index.md"
         file1.write_text(
-            "## test_section\n\n[リンク](#testsection)",
+            "## test_section\n\n[リンク](#test_section)",
             encoding="utf-8",
         )
 
@@ -537,7 +537,7 @@ class TestSlugifyLycheeCompat:
         checker = MarkdownLinkChecker(temp_docs_dir)
         results = checker.check_all()
 
-        # Verify - アンダースコアなしのリンクが有効
+        # Verify - アンダースコア付きのリンクが有効
         assert len(results) == 1
         assert results[0].status == LinkStatus.VALID.value
 
