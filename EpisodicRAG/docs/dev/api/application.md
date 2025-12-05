@@ -294,8 +294,9 @@ class CascadeStepResult:
     """カスケードステップの実行結果"""
     step_name: str                   # ステップ名
     status: CascadeStepStatus        # 実行ステータス
-    message: Optional[str] = None    # 詳細メッセージ
-    details: Optional[Dict[str, Any]] = None  # 追加詳細
+    message: str                     # 詳細メッセージ
+    files_processed: int = 0         # 処理ファイル数
+    details: Dict[str, Any] = field(default_factory=dict)  # 追加詳細
 ```
 
 #### CascadeResult
@@ -304,10 +305,16 @@ class CascadeStepResult:
 @dataclass
 class CascadeResult:
     """カスケード処理全体の結果"""
-    success: bool                    # 全体成功フラグ
+    level: str                       # 起点レベル
     steps: List[CascadeStepResult]   # 各ステップ結果
-    processed_levels: List[str]      # 処理されたレベル
-    error_message: Optional[str] = None  # エラーメッセージ
+    success: bool                    # 全体成功フラグ
+    next_level: Optional[str] = None # 次のレベル（上位階層）
+
+    # プロパティ
+    @property
+    def total_files_processed(self) -> int: ...  # 処理ファイル合計
+    @property
+    def step_summary(self) -> Dict[str, CascadeStepStatus]: ...  # ステップ要約
 ```
 
 #### CascadeOrchestrator

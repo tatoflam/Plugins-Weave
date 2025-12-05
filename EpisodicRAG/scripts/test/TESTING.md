@@ -108,7 +108,7 @@ test/
 | **Integration** | `test_e2e_workflow.py`, `test_full_cascade.py`, `test_config_integration.py` | 14 |
 | **CLI Integration** | `test_digest_*_cli.py`, `test_workflow_cli.py` | 4 |
 | **Performance** | `test_benchmarks.py` | 1 |
-| **Tools** | `test_check_footer.py`, `test_link_checker.py`, `test_validate_json.py` | 3 |
+| **Tools** | `test_check_footer.py`, `test_link_checker.py`, `test_validate_json.py`, `test_bandit_integration.py` | 4 |
 | **Property** | `test_*_properties.py` (全11ファイル、各層に分散) | 11 |
 
 > 📊 最新のテスト数: `pytest --collect-only | tail -1`
@@ -391,9 +391,10 @@ pytest scripts/test/cli_integration_tests/test_digest_setup_cli.py -v
 
 ```
 tools_tests/
-├── test_check_footer.py     # Digestフッター検証
-├── test_link_checker.py     # ドキュメントリンクチェック
-└── test_validate_json.py    # JSON検証ツール
+├── test_check_footer.py       # Digestフッター検証
+├── test_link_checker.py       # ドキュメントリンクチェック
+├── test_validate_json.py      # JSON検証ツール
+└── test_bandit_integration.py # セキュリティスキャン統合 (v5.0.0+)
 ```
 
 ---
