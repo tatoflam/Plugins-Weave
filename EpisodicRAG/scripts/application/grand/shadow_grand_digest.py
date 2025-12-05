@@ -32,7 +32,6 @@ from application.tracking import DigestTimesTracker
 from domain.constants import (
     DIGEST_LEVEL_NAMES,
     LEVEL_CONFIG,
-    LEVEL_NAMES,
     LOG_SEPARATOR,
     build_level_hierarchy,
 )

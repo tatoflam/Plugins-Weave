@@ -62,7 +62,7 @@ class ThresholdProvider:
         # LEVEL_CONFIGからデフォルト閾値を取得（Single Source of Truth）
         # Note: level は既に LEVEL_CONFIG に存在することが保証されている（行53でチェック済み）
         level_config = LEVEL_CONFIG[level]
-        default = level_config.get("threshold", 5)
+        default: int = level_config.get("threshold") or 5
         # Cast to Dict for dynamic key access
         levels_dict = as_dict(self.config.get("levels", {}))
         if key in levels_dict:

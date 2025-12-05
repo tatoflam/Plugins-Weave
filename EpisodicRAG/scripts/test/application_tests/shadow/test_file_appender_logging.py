@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Dict, List
 
 import pytest
+from test_helpers import create_test_loop_file
 
 from application.config import DigestConfig
 from application.shadow import (
@@ -30,7 +31,6 @@ from domain.constants import (
     LOG_PREFIX_STATE,
     LOG_PREFIX_VALIDATE,
 )
-from test_helpers import create_test_loop_file
 
 if TYPE_CHECKING:
     from test_helpers import TempPluginEnvironment

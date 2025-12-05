@@ -20,7 +20,7 @@ from typing import Dict, List, Optional
 
 from application.config.level_path_service import LevelPathService
 from domain.config.config_constants import REQUIRED_CONFIG_KEYS, THRESHOLD_KEYS
-from domain.constants import DIGEST_LEVEL_NAMES, LEVEL_CONFIG, LEVEL_NAMES
+from domain.constants import DIGEST_LEVEL_NAMES, LEVEL_CONFIG
 from domain.types import ConfigData, as_dict
 from domain.validators.helpers import collect_type_error as _collect_type_error
 

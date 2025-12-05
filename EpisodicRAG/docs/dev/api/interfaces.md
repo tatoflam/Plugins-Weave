@@ -522,7 +522,7 @@ python -m interfaces.shadow_state_checker monthly
 
 ---
 
-## FindPluginRoot CLI（find_plugin_root.py） *(v5.0.0+)*
+## FindPluginRoot CLI（find_plugin_root.py）
 
 EpisodicRAGプラグインルートを自動検出するCLI。任意のディレクトリから実行可能。
 

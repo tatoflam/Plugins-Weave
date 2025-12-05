@@ -13,7 +13,6 @@ import pytest
 
 from tools.validate_json import JSONStatus, JSONValidator, ValidationResult
 
-
 # =============================================================================
 # Cycle 1: 基本構造テスト
 # =============================================================================

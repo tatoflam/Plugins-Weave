@@ -6,9 +6,14 @@ find_plugin_root テスト
 EpisodicRAGプラグインルート検出のTDDテスト。
 """
 
-import pytest
+import json
+import sys
 from pathlib import Path
+from unittest.mock import patch
 
+import pytest
+from hypothesis import given, settings
+from hypothesis import strategies as st
 
 # =============================================================================
 # Stage 1: is_valid_plugin_root() 単体テスト
@@ -191,10 +196,6 @@ def test_find_plugin_root_not_found(tmp_path):
 # Stage 4: CLI統合テスト
 # =============================================================================
 
-import json
-import sys
-from unittest.mock import patch
-
 
 @pytest.mark.integration
 def test_cli_json_output(tmp_path):
@@ -254,9 +255,6 @@ def test_cli_error_output_json(tmp_path):
 # =============================================================================
 # Stage 5: Property-based テスト (Hypothesis)
 # =============================================================================
-
-from hypothesis import given, settings
-from hypothesis import strategies as st
 
 
 @pytest.mark.property
