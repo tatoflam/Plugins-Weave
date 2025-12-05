@@ -1,4 +1,4 @@
-<!-- Last synced: 2025-12-05 -->
+<!-- Last synced: 2025-12-06 -->
 English | [日本語](CHANGELOG.md)
 
 # Changelog
@@ -38,6 +38,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Shell scripts deprecated**
   - Consolidated interactive processes into md files
   - Purpose: Improved readability, prevention of skipped steps
+
+### Added
+
+- **Bandit security scan integration**
+  - Scan for security vulnerabilities with `make security`
+  - Added security job to CI/CD (GitHub Actions)
+  - Added Bandit to pre-commit hooks
+  - Added integration test `test_bandit_integration.py`
+
+- **cascade_orchestrator readability improvement**
+  - Added 4-step control flow comments
+  - Added `CascadeStepResult.details` structure documentation
 
 ---
 

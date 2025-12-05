@@ -322,6 +322,29 @@ python -m pytest test/config_tests/ -v
 
 `scripts/tools/` ディレクトリには、ドキュメントの品質管理ツールが含まれています。
 
+### セキュリティ分析（Bandit） *(v5.0.0+)*
+
+[Bandit](https://bandit.readthedocs.io/) を使用してセキュリティ脆弱性をスキャンします。
+
+```bash
+cd plugins-weave/EpisodicRAG
+
+# セキュリティチェック実行
+make security
+
+# または直接実行
+python -m bandit -r scripts/ --exclude scripts/test --severity-level medium
+```
+
+**出力例**（問題がない場合）:
+```text
+Run started...
+...
+Run completed
+Total time: 0.5s
+No issues identified.
+```
+
 ### フッターチェッカー（check_footer.py）
 
 各ドキュメントのフッターが `_footer.md` で定義された形式と一致しているかを検証します。

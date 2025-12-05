@@ -315,6 +315,51 @@ class TestDigestConfigBuilderEquivalence:
 # =============================================================================
 
 
+class TestDigestConfigBuilderPathResolver:
+    """カスタムPathResolver注入のテスト"""
+
+    @pytest.mark.unit
+    def test_with_custom_path_resolver_stores_resolver(self) -> None:
+        """with_custom_path_resolver()がresolverを保存"""
+        from infrastructure.config import PathResolver
+
+        mock_resolver = MagicMock(spec=PathResolver)
+        builder = DigestConfigBuilder().with_custom_path_resolver(mock_resolver)
+        assert builder._path_resolver is mock_resolver
+
+    @pytest.mark.unit
+    def test_with_custom_path_resolver_returns_self(self) -> None:
+        """fluent interfaceでselfを返す"""
+        from infrastructure.config import PathResolver
+
+        mock_resolver = MagicMock(spec=PathResolver)
+        builder = DigestConfigBuilder()
+        result = builder.with_custom_path_resolver(mock_resolver)
+        assert result is builder
+
+    @pytest.mark.unit
+    def test_method_chaining_with_path_resolver(self) -> None:
+        """PathResolverを含むメソッドチェーン"""
+        from infrastructure.config import PathResolver
+
+        mock_loader = MagicMock(spec=ConfigLoader)
+        mock_resolver = MagicMock(spec=PathResolver)
+        builder = (
+            DigestConfigBuilder()
+            .with_plugin_root(Path("/test"))
+            .with_custom_loader(mock_loader)
+            .with_custom_path_resolver(mock_resolver)
+        )
+        assert builder._plugin_root == Path("/test")
+        assert builder._config_loader is mock_loader
+        assert builder._path_resolver is mock_resolver
+
+
+# =============================================================================
+# Import Tests
+# =============================================================================
+
+
 class TestDigestConfigBuilderImports:
     """DigestConfigBuilder import path tests"""
 

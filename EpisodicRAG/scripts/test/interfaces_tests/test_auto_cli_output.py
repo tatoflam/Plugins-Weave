@@ -176,5 +176,101 @@ class TestDigestAutoCLIOutputFormats(unittest.TestCase):
                 assert result["error"] is not None
 
 
+class TestFormatTextReportDisplayLimit:
+    """MAX_DISPLAY_FILES による表示切り詰めのテスト"""
+
+    @pytest.mark.unit
+    def test_displays_all_files_when_under_limit(self) -> None:
+        """5件未満の場合、すべてのファイルを表示"""
+        from interfaces.digest_auto import AnalysisResult, Issue, format_text_report
+
+        files = ["L00001.txt", "L00002.txt", "L00003.txt"]
+        result = AnalysisResult(
+            status="warning",
+            issues=[Issue(type="unprocessed_loops", count=3, files=files)],
+        )
+        formatted = format_text_report(result)
+
+        # すべてのファイルが表示される
+        for f in files:
+            assert f"  - {f}" in formatted
+        # 省略表示がない
+        assert "... 他" not in formatted
+
+    @pytest.mark.unit
+    def test_boundary_exactly_five_files(self) -> None:
+        """境界値: ちょうど5件の場合、省略なし"""
+        from interfaces.digest_auto import AnalysisResult, Issue, format_text_report
+
+        files = [f"L0000{i}.txt" for i in range(1, 6)]  # 5件
+        result = AnalysisResult(
+            status="warning",
+            issues=[Issue(type="unprocessed_loops", count=5, files=files)],
+        )
+        formatted = format_text_report(result)
+
+        # すべてのファイルが表示される
+        for f in files:
+            assert f"  - {f}" in formatted
+        # 省略表示がない
+        assert "... 他" not in formatted
+
+    @pytest.mark.unit
+    def test_boundary_six_files_truncates_one(self) -> None:
+        """境界値: 6件の場合、1件省略"""
+        from interfaces.digest_auto import AnalysisResult, Issue, format_text_report
+
+        files = [f"L0000{i}.txt" for i in range(1, 7)]  # 6件
+        result = AnalysisResult(
+            status="warning",
+            issues=[Issue(type="unprocessed_loops", count=6, files=files)],
+        )
+        formatted = format_text_report(result)
+
+        # 最初の5件が表示される
+        for f in files[:5]:
+            assert f"  - {f}" in formatted
+        # 6件目は表示されない
+        assert f"  - {files[5]}" not in formatted
+        # 省略表示がある
+        assert "... 他1個" in formatted
+
+    @pytest.mark.unit
+    def test_truncates_many_files(self) -> None:
+        """10件の場合、5件+省略表示"""
+        from interfaces.digest_auto import AnalysisResult, Issue, format_text_report
+
+        files = [f"L{i:05d}.txt" for i in range(1, 11)]  # 10件
+        result = AnalysisResult(
+            status="warning",
+            issues=[Issue(type="unprocessed_loops", count=10, files=files)],
+        )
+        formatted = format_text_report(result)
+
+        # 最初の5件が表示される
+        for f in files[:5]:
+            assert f"  - {f}" in formatted
+        # 6件目以降は表示されない
+        for f in files[5:]:
+            assert f"  - {f}" not in formatted
+        # 省略表示: "... 他5個"
+        assert "... 他5個" in formatted
+
+    @pytest.mark.unit
+    def test_truncation_message_format(self) -> None:
+        """省略メッセージのフォーマット確認: "... 他N個" """
+        from interfaces.digest_auto import AnalysisResult, Issue, format_text_report
+
+        files = [f"L{i:05d}.txt" for i in range(1, 8)]  # 7件
+        result = AnalysisResult(
+            status="warning",
+            issues=[Issue(type="unprocessed_loops", count=7, files=files)],
+        )
+        formatted = format_text_report(result)
+
+        # 正確なフォーマットを確認
+        assert "  ... 他2個" in formatted
+
+
 if __name__ == "__main__":
     unittest.main()

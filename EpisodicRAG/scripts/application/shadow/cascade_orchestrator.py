@@ -43,7 +43,7 @@ Usage:
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import TYPE_CHECKING, Dict, List, Optional
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 from domain.types import LevelHierarchyEntry
 from infrastructure import get_structured_logger
@@ -76,7 +76,12 @@ class CascadeStepResult:
     status: CascadeStepStatus
     message: str
     files_processed: int = 0
-    details: Dict = field(default_factory=dict)
+    details: Dict[str, Any] = field(default_factory=dict)
+    # details の内容（ステップ別）:
+    #   promote: {"source_files_count": int}
+    #   detect:  {"new_files_count": int, "sample_files": str}
+    #   add:     {"added_count": int}
+    #   clear:   {}
 
 
 @dataclass
@@ -170,6 +175,12 @@ class CascadeOrchestrator:
         success = True
         next_level = self.level_hierarchy[level]["next"]
 
+        # === 4ステップ制御フロー ===
+        # Step 1: promote - 常に実行（Shadow → Grand 確定）
+        # Step 2: detect  - next_level 存在時のみ（次階層の新規ファイル検出）
+        # Step 3: add     - next_level + 新規ファイル存在時のみ（Shadow追加）
+        # Step 4: clear   - 常に実行（現階層 Shadow クリア）
+
         # Step 1: Promote (Shadow → Grand 確認)
         promote_result = self._step_promote(level)
         steps.append(promote_result)
@@ -224,8 +235,14 @@ class CascadeOrchestrator:
         """
         Step 1: Shadow → Grand 昇格確認
 
-        Note: 実際の昇格処理はfinalize_from_shadow.pyで実行される。
-        ここでは確認のみ。
+        Shadowダイジェストの存在を確認し、昇格準備状態をレポート。
+        実際の昇格処理はfinalize_from_shadow.pyで実行される。
+
+        Args:
+            level: 確認対象のレベル名
+
+        Returns:
+            CascadeStepResult: 昇格準備状態（SUCCESS/NO_DATA）
         """
         _logger.info(f"[Step 1/4] Shadow昇格確認: {level}")
         _logger.state("step_promote", level=level)
@@ -254,8 +271,14 @@ class CascadeOrchestrator:
         """
         Step 2: 次レベルの新規ファイル検出
 
+        上位レベルに追加すべき新規ファイルを検出する。
+
+        Args:
+            next_level: 検出対象の上位レベル名
+
         Returns:
-            Tuple of (step result, list of new files)
+            tuple[CascadeStepResult, List[Path]]:
+                ステップ結果と検出された新規ファイルのリスト
         """
         _logger.info(f"[Step 2/4] 新規ファイル検出: {next_level}")
         _logger.state("step_detect", next_level=next_level)
@@ -290,6 +313,15 @@ class CascadeOrchestrator:
     def _step_add(self, next_level: str, new_files: List[Path]) -> CascadeStepResult:
         """
         Step 3: 次レベルのShadowにファイル追加
+
+        検出された新規ファイルを上位レベルのShadowダイジェストに追加する。
+
+        Args:
+            next_level: 追加先の上位レベル名
+            new_files: 追加するファイルのリスト
+
+        Returns:
+            CascadeStepResult: 追加処理の結果
         """
         _logger.info(f"[Step 3/4] Shadowにファイル追加中: {len(new_files)}件 → {next_level}")
         _logger.state("step_add", next_level=next_level, file_count=len(new_files))
@@ -308,6 +340,14 @@ class CascadeOrchestrator:
     def _step_clear(self, level: str) -> CascadeStepResult:
         """
         Step 4: 現在レベルのShadowをクリア
+
+        確定済みレベルのShadowダイジェストを初期化する。
+
+        Args:
+            level: クリア対象のレベル名
+
+        Returns:
+            CascadeStepResult: クリア処理の結果
         """
         _logger.info(f"[Step 4/4] Shadowクリア: {level}")
         _logger.state("step_clear", level=level)

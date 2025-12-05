@@ -32,6 +32,23 @@ jobs:
         working-directory: EpisodicRAG
         run: ruff format --check scripts/
 
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install bandit
+        run: pip install bandit
+
+      - name: Run Bandit security scan
+        working-directory: EpisodicRAG
+        run: bandit -r scripts/ --exclude scripts/test --severity-level medium
+
   type-check:
     runs-on: ubuntu-latest
     steps:

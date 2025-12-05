@@ -1,13 +1,14 @@
-.PHONY: help test lint type-check format check all clean install
+.PHONY: help test lint security type-check format check all clean install
 
 help:
 	@echo "Available commands:"
 	@echo "  make install     - Install dev dependencies"
 	@echo "  make test        - Run tests with coverage"
 	@echo "  make lint        - Run linter (ruff)"
+	@echo "  make security    - Run security scanner (bandit)"
 	@echo "  make type-check  - Run type checker (mypy)"
 	@echo "  make format      - Auto-format code (ruff)"
-	@echo "  make check       - Run all checks (lint + type + test)"
+	@echo "  make check       - Run all checks (lint + security + type + test)"
 	@echo "  make clean       - Remove cache files"
 
 install:
@@ -20,6 +21,9 @@ test:
 lint:
 	python -m ruff check scripts/
 
+security:
+	python -m bandit -r scripts/ --exclude scripts/test --severity-level medium
+
 type-check:
 	python -m mypy scripts/ --ignore-missing-imports
 
@@ -27,7 +31,7 @@ format:
 	python -m ruff check scripts/ --fix
 	python -m ruff format scripts/
 
-check: lint type-check test
+check: lint security type-check test
 
 all: check
 

@@ -241,10 +241,18 @@ class DigestConfigBuilder:
         DigestConfigインスタンスを直接構築（コンストラクタをバイパス）
 
         Builder経由でのみ使用される内部メソッド。
+
+        WHY: object.__new__パターンを使用する理由
+        ----------------------------------------
+        1. 不変性の維持: DigestConfigは構築後に変更されないイミュータブル
+           オブジェクトとして設計。通常の__init__では段階的な構築が困難。
+        2. 依存性注入: Builderが全てのコンポーネントを組み立ててから
+           一括でインスタンスに設定することで、部分的な初期化状態を回避。
+        3. テスト容易性: モックコンポーネントを注入してテスト可能。
         """
         from application.config import DigestConfig
 
-        # object.__new__ で __init__ をスキップしてインスタンス作成
+        # object.__new__で__init__をスキップし、Builderが全属性を直接設定
         instance = object.__new__(DigestConfig)
 
         # 属性を直接設定

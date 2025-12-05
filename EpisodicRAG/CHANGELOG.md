@@ -38,6 +38,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - 対話型プロセスを md ファイルに一本化
   - 目的: 可読性向上、読み飛ばし防止
 
+### Added
+
+- **Bandit セキュリティスキャン統合**
+  - `make security` でセキュリティ脆弱性をスキャン
+  - CI/CD (GitHub Actions) に security ジョブ追加
+  - pre-commit フックに Bandit 追加
+  - 統合テスト `test_bandit_integration.py` 追加
+
+- **cascade_orchestrator 可読性向上**
+  - 4ステップ制御フローのコメント追加
+  - `CascadeStepResult.details` の構造説明追加
+
 ---
 
 ## [4.1.0] - 2025-12-03

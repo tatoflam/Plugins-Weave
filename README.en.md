@@ -1,7 +1,7 @@
 <!--
   This file is for GitHub repository landing page display.
   See EpisodicRAG/ directory for detailed documentation.
-  Last synced: 2025-12-03
+  Last synced: 2025-12-05
 -->
 English | [日本語](README.md)
 

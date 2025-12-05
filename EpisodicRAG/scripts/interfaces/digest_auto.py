@@ -30,6 +30,9 @@ from domain.file_constants import (
 from infrastructure.json_repository import load_json, try_load_json
 from interfaces.cli_helpers import output_error, output_json
 
+# 表示制限の定数
+MAX_DISPLAY_FILES = 5  # テキストレポートに表示する最大ファイル数
+
 
 @dataclass
 class Issue:
@@ -412,10 +415,10 @@ def format_text_report(result: AnalysisResult) -> str:
         for issue in result.issues:
             if issue.type == "unprocessed_loops":
                 output.append(f"⚠️ 未処理Loop検出: {issue.count}個")
-                for f in issue.files[:5]:  # 最大5件表示
+                for f in issue.files[:MAX_DISPLAY_FILES]:
                     output.append(f"  - {f}")
-                if len(issue.files) > 5:
-                    output.append(f"  ... 他{len(issue.files) - 5}個")
+                if len(issue.files) > MAX_DISPLAY_FILES:
+                    output.append(f"  ... 他{len(issue.files) - MAX_DISPLAY_FILES}個")
                 output.append("")
 
             elif issue.type == "placeholders":
