@@ -26,6 +26,7 @@ DIGEST_FILE_EXTENSION = ".txt"  # ダイジェストファイルの拡張子
 # =============================================================================
 
 SOURCE_TYPE_LOOPS = "loops"  # Loopファイルをソースとするレベル（weekly）
+SOURCE_TYPE_RAW = "raw"  # 生データソース（階層の起点、loopレベル用）
 
 
 # =============================================================================
@@ -33,6 +34,14 @@ SOURCE_TYPE_LOOPS = "loops"  # Loopファイルをソースとするレベル（
 # =============================================================================
 
 LEVEL_CONFIG: Dict[str, LevelConfigData] = {
+    "loop": {
+        "prefix": "L",
+        "digits": 5,
+        "dir": "",  # Loopsディレクトリは別管理（config.loops_path）
+        "source": SOURCE_TYPE_RAW,  # 階層の起点（親レベルなし）
+        "next": "weekly",
+        "threshold": None,  # 閾値なし（手動トリガー）
+    },
     "weekly": {
         "prefix": "W",
         "digits": 4,
@@ -99,7 +108,11 @@ LEVEL_CONFIG: Dict[str, LevelConfigData] = {
     },
 }
 
+# 全レベル名（loopを含む9レベル）
 LEVEL_NAMES = list(LEVEL_CONFIG.keys())
+
+# ダイジェスト階層専用（loopを除く8レベル）
+DIGEST_LEVEL_NAMES = [level for level in LEVEL_NAMES if level != "loop"]
 
 
 # =============================================================================

@@ -80,6 +80,7 @@
 v2.0.0 より、Clean Architecture（4層構造）を採用しています。
 v4.0.0 で設定機能を3層に分散し、CLIモジュールを追加しました。
 v4.1.0 でTypedDict分割、新パターン追加、開発ツールを追加しました。
+v5.0.0 でプラグインルート自動検出、Loop層追加、シェルスクリプト廃止。
 
 ### 層構造
 
@@ -651,20 +652,31 @@ DigestAnalyzerが生成した個別ダイジェストの中間ファイル（JSO
 
 ### last_digest_times.json
 
-各レベルの最終処理ファイルを追跡する状態ファイル。
+各レベルの最終処理時刻とファイル番号を追跡する状態ファイル。
 
 ```json
 {
+  "loop": {
+    "timestamp": "2025-12-05T10:30:00",
+    "last_processed": 10
+  },
   "weekly": {
-    "last_file": "L00005_タイトル.txt",
-    "last_number": 5
+    "timestamp": "2025-12-05T10:30:00",
+    "last_processed": 10
   },
   "monthly": {
-    "last_file": "W0005_タイトル.txt",
-    "last_number": 5
+    "timestamp": "2025-12-05T10:30:00",
+    "last_processed": 3
   }
 }
 ```
+
+| フィールド | 型 | 説明 |
+|-----------|-----|------|
+| `timestamp` | string | ISO形式の処理日時 |
+| `last_processed` | int \| null | 最終処理ファイル番号（数値のみ） |
+
+> **Note**: v5.0.0でLoop層が追加されました。全レベル（Loop含む）で最新の`/digest`対象を把握可能です。
 
 ---
 

@@ -572,9 +572,10 @@ def load_or_create(self) -> DigestTimesData
 **DigestTimesData構造**:
 ```python
 {
+    "loop": {"timestamp": "2025-12-05T10:00:00", "last_processed": 186},
     "weekly": {"timestamp": "2025-11-28T12:00:00", "last_processed": 5},
     "monthly": {"timestamp": "", "last_processed": None},
-    # ... 全8レベル
+    # ... 全9レベル（loop + 8階層）
 }
 ```
 

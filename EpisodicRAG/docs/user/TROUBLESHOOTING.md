@@ -4,7 +4,9 @@
 
 このドキュメントでは、EpisodicRAGプラグインで発生する問題の**具体的な解決手順**を提供します。
 
-> **対応バージョン**: EpisodicRAG Plugin v4.0.0+ / ファイルフォーマット 1.0
+> **対応バージョン**: EpisodicRAG Plugin v5.0.0+ / ファイルフォーマット 1.0
+>
+> **v5.0.0変更点**: プラグインルート自動検出（任意ディレクトリから`/digest`実行可能）、`last_digest_times.json`にLoop層追加、シェルスクリプト廃止（mdファイルに一本化）。
 >
 > **v4.0.0変更点**: config層がClean Architecture（3層）に分解されました。スキルはPythonスクリプトとしても実行可能です（`python -m interfaces.digest_setup`等）。
 >
@@ -606,15 +608,6 @@ cat {essences_dir}/ShadowGrandDigest.txt
 ## デバッグモード
 
 より詳細な情報が必要な場合、スクリプトを直接実行してエラー詳細を確認できます：
-
-### generate_digest_auto.sh のデバッグ
-
-```bash
-cd {plugin_root}
-bash -x scripts/generate_digest_auto.sh
-```
-
-`-x` オプションで各コマンドの実行内容が表示されます。
 
 ### Pythonスクリプトのデバッグ
 

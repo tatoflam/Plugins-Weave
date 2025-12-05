@@ -56,7 +56,9 @@ LevelConfigKey = Literal["prefix", "digits", "dir", "source", "next", "threshold
 # =============================================================================
 
 # ソースタイプ（各レベルの入力元）
+# Note: "raw" は loop レベル専用（階層の起点、親レベルなし）
 SourceType = Literal[
+    "raw",  # loop レベル専用
     "loops",
     "weekly",
     "monthly",

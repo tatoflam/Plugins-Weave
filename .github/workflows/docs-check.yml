@@ -5,10 +5,12 @@ on:
     branches: [main]
     paths:
       - '**/*.md'
+      - 'EpisodicRAG/.claude-plugin/*.json'
   pull_request:
     branches: [main]
     paths:
       - '**/*.md'
+      - 'EpisodicRAG/.claude-plugin/*.json'
 
 jobs:
   link-check:
@@ -72,3 +74,33 @@ jobs:
           globs: '**/*.md'
           fix: false
         continue-on-error: true
+
+  json-validate:
+    name: Validate JSON Schema
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Validate config.template.json
+        working-directory: EpisodicRAG
+        run: |
+          python -m scripts.tools.validate_json \
+            .claude-plugin/config.template.json \
+            --check-paths
+
+      - name: Validate config.json structure (if exists)
+        working-directory: EpisodicRAG
+        run: |
+          if [ -f ".claude-plugin/config.json" ]; then
+            python -m scripts.tools.validate_json \
+              .claude-plugin/config.json \
+              --template .claude-plugin/config.template.json \
+              --check-paths
+          else
+            echo "config.json not found (expected - created on setup)"
+          fi

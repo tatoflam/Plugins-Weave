@@ -225,12 +225,21 @@ class TestLogPrefixLiteral:
 class TestLiteralTypesConsistencyWithConstants:
     """Literal型がconstants.pyの定数と一致することを確認"""
 
-    def test_level_name_matches_level_names_constant(self) -> None:
-        """LevelNameがLEVEL_NAMES定数と一致"""
-        from domain.constants import LEVEL_NAMES
+    def test_level_name_matches_digest_level_names_constant(self) -> None:
+        """LevelNameがDIGEST_LEVEL_NAMES定数と一致（loopを除く8レベル）"""
+        from domain.constants import DIGEST_LEVEL_NAMES
         from domain.types import LevelName
 
         literal_values = set(get_args(LevelName))
+        constant_values = set(DIGEST_LEVEL_NAMES)
+        assert literal_values == constant_values
+
+    def test_all_level_name_matches_level_names_constant(self) -> None:
+        """AllLevelNameがLEVEL_NAMES定数と一致（loop含む9レベル）"""
+        from domain.constants import LEVEL_NAMES
+        from domain.types import AllLevelName
+
+        literal_values = set(get_args(AllLevelName))
         constant_values = set(LEVEL_NAMES)
         assert literal_values == constant_values
 

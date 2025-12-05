@@ -36,13 +36,13 @@ from test_helpers import create_test_loop_file
 
 from application.config import DigestConfig
 from application.grand import ShadowGrandDigestManager
-from domain.constants import LEVEL_NAMES
+from domain.constants import DIGEST_LEVEL_NAMES
 
 # 統合テストマーカー
 pytestmark = [pytest.mark.integration]
 
-# テスト対象の全レベル
-TESTABLE_LEVELS = LEVEL_NAMES  # ["weekly", "monthly", "quarterly", ...]
+# テスト対象の全レベル（loopを除く - threshold=None のため）
+TESTABLE_LEVELS = DIGEST_LEVEL_NAMES  # ["weekly", "monthly", "quarterly", ...]
 
 
 class TestThresholdBoundaryBase:

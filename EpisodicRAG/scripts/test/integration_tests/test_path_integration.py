@@ -13,7 +13,7 @@ from pathlib import Path
 from test_helpers import LEVEL_DIRS, TempPluginEnvironment
 
 from application.config import DigestConfig
-from domain.constants import LEVEL_CONFIG, LEVEL_NAMES
+from domain.constants import DIGEST_LEVEL_NAMES, LEVEL_CONFIG
 from domain.file_naming import format_digest_number
 
 
@@ -30,7 +30,7 @@ class TestProvisionalDirectoryStructure(unittest.TestCase):
         with TempPluginEnvironment() as env:
             config = DigestConfig(plugin_root=env.plugin_root)
 
-            for level in LEVEL_NAMES:
+            for level in DIGEST_LEVEL_NAMES:
                 prov_dir = config.get_provisional_dir(level)
                 level_dir = config.get_level_dir(level)
 
@@ -43,7 +43,7 @@ class TestProvisionalDirectoryStructure(unittest.TestCase):
         with TempPluginEnvironment() as env:
             config = DigestConfig(plugin_root=env.plugin_root)
 
-            for level in LEVEL_NAMES:
+            for level in DIGEST_LEVEL_NAMES:
                 level_dir = config.get_level_dir(level)
                 expected_name = LEVEL_CONFIG[level]["dir"]
 
@@ -55,7 +55,7 @@ class TestProvisionalDirectoryStructure(unittest.TestCase):
         with TempPluginEnvironment() as env:
             config = DigestConfig(plugin_root=env.plugin_root)
 
-            for level in LEVEL_NAMES:
+            for level in DIGEST_LEVEL_NAMES:
                 prov_dir = config.get_provisional_dir(level)
                 self.assertTrue(prov_dir.exists())
 

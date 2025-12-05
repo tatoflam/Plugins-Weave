@@ -590,6 +590,7 @@ if callback("ファイルを上書きしますか？"):
 
 > **v4.0.0 更新**: 設定管理が `infrastructure/config/` サブパッケージとして追加されました。
 > **v4.1.0 更新**: PathValidatorChain（Chain of Responsibility）が追加されました。
+> **v5.0.0 更新**: LEVEL_CONFIGにloop層が追加されました（9レベル化）。
 
 ---
 **EpisodicRAG** by Weave | [GitHub](https://github.com/Bizuayeu/Plugins-Weave)

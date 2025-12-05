@@ -72,6 +72,7 @@ print(DIGEST_FORMAT_VERSION) # "1.0"
 
 ```python
 LEVEL_CONFIG: Dict[str, Dict[str, Any]] = {
+    "loop": {"prefix": "L", "digits": 5, "dir": "", "source": "raw", "next": "weekly", "threshold": None},
     "weekly": {"prefix": "W", "digits": 4, "dir": "1_Weekly", "source": "loops", "next": "monthly", "threshold": 5},
     "monthly": {"prefix": "M", "digits": 4, "dir": "2_Monthly", "source": "weekly", "next": "quarterly", "threshold": 5},
     "quarterly": {"prefix": "Q", "digits": 3, "dir": "3_Quarterly", "source": "monthly", "next": "annual", "threshold": 3},
@@ -92,10 +93,15 @@ LEVEL_CONFIG: Dict[str, Dict[str, Any]] = {
 | `next` | 確定時にカスケードする上位階層 | `monthly`, `None` |
 | `threshold` | ダイジェスト生成に必要なソースファイル数 | `5`, `3`, `4` |
 
-### LEVEL_NAMES
+### LEVEL_NAMES / DIGEST_LEVEL_NAMES
 
 ```python
-LEVEL_NAMES = ["weekly", "monthly", "quarterly", "annual", "triennial", "decadal", "multi_decadal", "centurial"]
+# 全レベル名（loopを含む9レベル）
+LEVEL_NAMES = list(LEVEL_CONFIG.keys())  # ["loop", "weekly", "monthly", ...]
+
+# ダイジェスト階層専用（loopを除く8レベル）
+DIGEST_LEVEL_NAMES = [level for level in LEVEL_NAMES if level != "loop"]
+# ["weekly", "monthly", "quarterly", "annual", "triennial", "decadal", "multi_decadal", "centurial"]
 ```
 
 ### PLACEHOLDER定数

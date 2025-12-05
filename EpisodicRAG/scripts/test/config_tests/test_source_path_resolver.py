@@ -28,7 +28,7 @@ import pytest
 from test_helpers import TempPluginEnvironment
 
 from application.config import DigestConfig
-from domain.constants import LEVEL_CONFIG
+from domain.constants import DIGEST_LEVEL_NAMES, LEVEL_CONFIG
 from domain.exceptions import ConfigError
 
 # =============================================================================
@@ -64,9 +64,10 @@ class TestGetSourceDir:
         assert result == config.get_level_dir("quarterly")
 
     def test_all_levels_return_valid_paths(self, temp_plugin_env: "TempPluginEnvironment") -> None:
-        """全レベルで有効なパスを返す"""
+        """全ダイジェストレベルで有効なパスを返す"""
         config = DigestConfig(plugin_root=temp_plugin_env.plugin_root)
-        for level in LEVEL_CONFIG.keys():
+        # Note: loop は source="raw" のため除外（ソースディレクトリを持たない）
+        for level in DIGEST_LEVEL_NAMES:
             result = config.get_source_dir(level)
             assert isinstance(result, Path)
 
@@ -142,7 +143,8 @@ class TestSourcePathIntegration:
         """get_source_dirとget_source_patternの整合性"""
         config = DigestConfig(plugin_root=temp_plugin_env.plugin_root)
 
-        for level in LEVEL_CONFIG.keys():
+        # Note: loop は source="raw" のため除外（ソースディレクトリを持たない）
+        for level in DIGEST_LEVEL_NAMES:
             source_dir = config.get_source_dir(level)
             pattern = config.get_source_pattern(level)
 

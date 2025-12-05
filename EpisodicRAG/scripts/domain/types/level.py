@@ -15,6 +15,9 @@ class LevelConfigData(TypedDict):
 
     Example:
         {"prefix": "W", "digits": 4, "dir": "1_Weekly", "source": "loops", "next": "monthly", "threshold": 5}
+
+    Note:
+        loop レベルは threshold: None（閾値なし、手動トリガー）
     """
 
     prefix: str
@@ -22,7 +25,7 @@ class LevelConfigData(TypedDict):
     dir: str
     source: str
     next: Optional[str]
-    threshold: int
+    threshold: Optional[int]  # loop レベルは None
 
 
 class LevelHierarchyEntry(TypedDict):

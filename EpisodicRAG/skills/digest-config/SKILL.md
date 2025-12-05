@@ -38,11 +38,13 @@ EpisodicRAG プラグインの設定を対話的に変更するスキルです�
 
 ### 概要
 
-1. Claudeが `show` コマンドで現在の設定を取得
-2. ユーザーに変更項目を質問
-3. 変更内容を確認
-4. `set` または `update` コマンドで設定を更新
-5. 結果をユーザーに報告
+| Step | 実行内容 | 使用スクリプト/処理 |
+|------|---------|-------------------|
+| 1 | 現在の設定取得 | `python -m interfaces.digest_config show` |
+| 2 | 変更項目を質問 | Claude がユーザーに質問 |
+| 3 | 変更内容確認 | Claude がユーザーに確認 |
+| 4 | 設定更新 | `python -m interfaces.digest_config set --key "..." --value ...` |
+| 5 | 結果報告 | Claude がユーザーに報告 |
 
 ---
 

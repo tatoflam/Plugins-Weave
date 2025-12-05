@@ -41,6 +41,7 @@ from interfaces import (
 7. [ヘルパー関数](#ヘルパー関数interfacesinterface_helperspy)
 8. [CLI共通ヘルパー](#cli共通ヘルパーinterfacescli_helperspy) *(v4.1.0+)*
 9. [ShadowStateChecker（内部CLI）](#shadowstatechecker内部cli)
+10. [FindPluginRoot CLI](#findpluginroot-clifind_plugin_rootpy) *(v5.0.0+)*
 
 ---
 
@@ -516,6 +517,53 @@ python -m interfaces.shadow_state_checker monthly
   "source_count": 2,
   "placeholder_fields": ["abstract", "impression"],
   "message": "Placeholders detected in: abstract, impression - run DigestAnalyzer"
+}
+```
+
+---
+
+## FindPluginRoot CLI（find_plugin_root.py） *(v5.0.0+)*
+
+EpisodicRAGプラグインルートを自動検出するCLI。任意のディレクトリから実行可能。
+
+```python
+@dataclass
+class FindResult:
+    status: str  # "ok" | "error"
+    plugin_root: Optional[str] = None
+    error: Optional[str] = None
+```
+
+| メソッド | 説明 | 戻り値 |
+|---------|------|--------|
+| `find_plugin_root(search_paths)` | プラグインルートを検索 | `FindResult` |
+| `is_valid_plugin_root(path)` | パスが有効なプラグインルートか判定 | `bool` |
+
+**使用例（CLI）**:
+
+```bash
+cd scripts
+
+# JSON形式で出力（デフォルト）
+python -m interfaces.find_plugin_root --output json
+
+# テキスト形式で出力
+python -m interfaces.find_plugin_root --output text
+
+# カスタム検索パスを指定
+python -m interfaces.find_plugin_root --search-paths ~/DEV ~/.claude/plugins
+```
+
+**検索動作**:
+1. デフォルト検索パス: `~/.claude/plugins`, `~`
+2. `EpisodicRAG`ディレクトリを再帰検索（最大深度5）
+3. `.claude-plugin/GrandDigest.template.txt`の存在で有効なプラグインルートを判定
+
+**出力例**:
+```json
+{
+  "status": "ok",
+  "plugin_root": "/home/user/.claude/plugins/EpisodicRAG-Plugin@Plugins-Weave/EpisodicRAG"
 }
 ```
 

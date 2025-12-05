@@ -37,13 +37,13 @@ from test_helpers import create_test_loop_file
 from application.config import DigestConfig
 from application.grand import GrandDigestManager, ShadowGrandDigestManager
 from application.tracking import DigestTimesTracker
-from domain.constants import LEVEL_CONFIG, LEVEL_NAMES, build_level_hierarchy
+from domain.constants import DIGEST_LEVEL_NAMES, LEVEL_CONFIG, build_level_hierarchy
 
 # slow + integration マーカーを適用（ファイル全体）
 pytestmark = [pytest.mark.slow, pytest.mark.integration]
 
-# 全8層の順序
-LEVEL_ORDER = LEVEL_NAMES  # ["weekly", "monthly", "quarterly", "annual", ...]
+# 全8層の順序（loopを除く - Shadow/GrandDigest構造用）
+LEVEL_ORDER = DIGEST_LEVEL_NAMES  # ["weekly", "monthly", "quarterly", "annual", ...]
 
 
 class TestFullCascadeInitialization:

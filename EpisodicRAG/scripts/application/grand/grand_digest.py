@@ -41,7 +41,7 @@ from typing import cast
 
 from application.config import DigestConfig
 from domain.constants import (
-    LEVEL_NAMES,
+    DIGEST_LEVEL_NAMES,
     LOG_PREFIX_STATE,
     LOG_PREFIX_VALIDATE,
 )
@@ -103,7 +103,7 @@ class GrandDigestManager:
                 "last_updated": datetime.now().isoformat(),
                 "version": DIGEST_FORMAT_VERSION,
             },
-            "major_digests": {level: {"overall_digest": None} for level in LEVEL_NAMES},
+            "major_digests": {level: {"overall_digest": None} for level in DIGEST_LEVEL_NAMES},
         }
 
     def load_or_create(self) -> GrandDigestData:

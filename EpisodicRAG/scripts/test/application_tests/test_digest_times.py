@@ -86,10 +86,11 @@ class TestDigestTimesTracker:
 
     @pytest.mark.unit
     def test_load_or_create_initializes_all_levels(self, tracker) -> None:
-        """load_or_createが全8レベルを初期化"""
+        """load_or_createが全9レベルを初期化（loop + 8ダイジェストレベル）"""
         data = tracker.load_or_create()
 
         expected_levels = [
+            "loop",
             "weekly",
             "monthly",
             "quarterly",
@@ -101,6 +102,25 @@ class TestDigestTimesTracker:
         ]
         for level in expected_levels:
             assert level in data
+
+    @pytest.mark.unit
+    def test_load_or_create_includes_loop_level(self, tracker) -> None:
+        """load_or_createがloopレベルを含む"""
+        data = tracker.load_or_create()
+
+        assert "loop" in data
+        assert data["loop"]["last_processed"] is None
+
+    @pytest.mark.integration
+    def test_save_loop_level(self, tracker) -> None:
+        """loopレベルの保存と読み込み"""
+        input_files = ["L00255.txt", "L00256.txt", "L00257.txt"]
+        tracker.save("loop", input_files)
+
+        data = tracker.load_or_create()
+
+        assert "timestamp" in data["loop"]
+        assert data["loop"]["last_processed"] == 257
 
     @pytest.mark.integration
     def test_save_updates_timestamp(self, tracker) -> None:

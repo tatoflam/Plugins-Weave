@@ -150,11 +150,18 @@ After modifying plugin code, retest with:
 
 **Overview**: Traditional method of directly manipulating the plugin directory.
 
-#### 1. Execute Setup Script
+#### 1. Execute Setup
+
+Run the `@digest-setup` skill in Claude Code, or use the Python CLI manually:
 
 ```bash
-cd plugins-weave/EpisodicRAG
-bash scripts/setup.sh
+cd plugins-weave/EpisodicRAG/scripts
+
+# Check status
+python -m interfaces.digest_setup check
+
+# Execute setup (specify JSON config)
+python -m interfaces.digest_setup init --config '{"base_dir": ".", "paths": {"loops_dir": "data/Loops", "digests_dir": "data/Digests", "essences_dir": "data/Essences"}}'
 ```
 
 #### 2. Verify Configuration
@@ -226,14 +233,6 @@ python -m interfaces.digest_auto
 ```
 
 > **Note**: Usage via skills (`@digest-setup`, etc.) is still available.
-
-### generate_digest_auto.sh - Automatic Digest Generation
-
-Automatically generates hierarchical Digests.
-
-```bash
-bash scripts/generate_digest_auto.sh
-```
 
 ---
 
@@ -425,6 +424,28 @@ Summary: 2 broken links in 1 file
 - Composite link validation (`file.md#section`)
 - Broken link fix suggestions
 - JSON output (for CI/CD integration)
+
+### JSON Validator (validate_json.py)
+
+Schema validation tool for config.json and config.template.json.
+
+```bash
+cd plugins-weave/EpisodicRAG/scripts
+
+# Basic validation
+python -m tools.validate_json config.json
+
+# Template conformance check
+python -m tools.validate_json config.json --template config.template.json
+
+# Path format validation
+python -m tools.validate_json config.json --check-paths
+```
+
+**Features**:
+- JSON syntax validation
+- Structure conformance check against config.template.json
+- Path format validation (relative/absolute paths)
 
 ### Pre-commit Verification
 

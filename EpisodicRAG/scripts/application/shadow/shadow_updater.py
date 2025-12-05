@@ -166,6 +166,7 @@ class ShadowUpdater:
             - 新規ファイルがない場合は何も行わない
             - Shadowファイルが存在しない場合は自動作成
             - 追加後、Claude分析待ちのプレースホルダーが設定される
+            - loop.last_processed が更新される（重複検出を防止）
 
         Example:
             >>> updater.update_shadow_for_new_loops()
@@ -184,6 +185,10 @@ class ShadowUpdater:
 
         # Shadowに増分追加
         self.add_files_to_shadow("weekly", new_files)
+
+        # loop レベルの last_processed を更新（重複検出を防止）
+        file_names = [f.name for f in new_files]
+        self.file_detector.times_tracker.save("loop", file_names)
 
     def cascade_update_on_digest_finalize(self, level: str) -> None:
         """

@@ -30,17 +30,17 @@ EpisodicRAGシステムの基本操作を提供するコマンドです。
 
 ## MUST TO DO（エラー防止）
 
-1. **config.jsonを最初に読む**
-   - 配置: `../.claude-plugin/config.json`（このファイルからの相対パス）
-   - `base_dir`, `paths`を確認してから処理を開始すること
-
-2. **TodoWriteを積極的に使う**
-   - `generate_digest_auto.sh`の出力に従ってタスクを作成
-   - ファイル更新ごとに完了をマーク
-
-3. **スクリプト出力を信頼する**
+1. **digest_entry.py でパス情報を取得**
+   ```bash
+   cd scripts && python -m interfaces.digest_entry --output json
+   ```
+   - plugin_root, loops_path, digests_path が出力される
    - パスやJSONスキーマを推測しない
-   - スクリプトが出力したパス・構造をそのまま使用
+
+2. **このファイルのTodoリストに従う**
+   - 下記「パターン1 Todoリスト」「パターン2 Todoリスト」を使用
+   - **ステップを飛ばさない**（特にProvisional保存）
+   - ファイル更新ごとに完了をマーク
 
 ---
 
@@ -80,41 +80,87 @@ EpisodicRAGシステムの基本操作を提供するコマンドです。
 
 ### パターン1: `/digest` (引数なし - 新Loop検出)
 
-1. **generate_digest_auto.sh 実行** - 新Loopファイル検出
-2. **ShadowGrandDigest更新確認** - プレースホルダー追加確認
-3. **DigestAnalyzer並列起動** - 各Loopファイルのlong/short分析
-4. **Provisional保存** - individual_digests自動生成
-5. **Shadow統合更新** - overall_digest更新
-6. **次アクション提示** - Weekly生成可能か確認
+**⚠️ 重要: 以下のTodoリストをTodoWriteで作成し、順番に実行すること**
+
+```
+TodoWrite items for Pattern 1:
+1. digest_entry.py実行 - 新Loopファイル検出
+2. ShadowGrandDigest更新 - プレースホルダー追加
+3. DigestAnalyzer並列起動 - 各Loopのlong/short分析
+4. Provisional保存実行 - individual_digests自動生成
+5. Shadow統合更新 - overall_digest更新
+6. 次アクション提示 - Weekly生成可能か確認
+```
+
+**各ステップの詳細**:
+
+| Step | 実行内容 | 使用スクリプト/処理 |
+|------|---------|-------------------|
+| 1 | 新Loopファイル検出 | `python -m interfaces.digest_entry` |
+| 2 | Shadow更新（自動） | Step 1で自動実行される |
+| 3 | 各Loopを分析 | Task(DigestAnalyzer) 並列起動 |
+| 4 | individual_digests保存 | `python -m interfaces.save_provisional_digest weekly --stdin --append` |
+| 5 | overall_digest更新 | ShadowGrandDigest.txtを直接編集 |
+| 6 | 次アクション提示 | digest_entry.pyの出力を参照 |
 
 ### パターン2: `/digest <type>` (階層確定)
 
-1. **generate_digest_auto.sh 実行** - 対象レベル確認
-2. **shadow_state_checker.py 実行** - プレースホルダー有無判定
-3. **DigestAnalyzer並列起動** - 必要な場合のみ
-4. **Provisional保存** - 次階層用individual_digests
-5. **タイトル提案** - ユーザー承認取得
-6. **finalize_from_shadow.py 実行** - Digest確定
-7. **次階層Provisional作成** - short版生成
-8. **次階層Shadow統合更新** - overall_digest更新
-9. **完了確認** - 結果表示
+**⚠️ 重要: 以下のTodoリストをTodoWriteで作成し、順番に実行すること**
+
+```
+TodoWrite items for Pattern 2:
+1. digest_entry.py実行 - 対象レベル状態確認
+2. プレースホルダー確認 - DigestAnalyzer要否判定
+3. DigestAnalyzer並列起動 - 必要な場合のみ
+4. Provisional保存実行 - 次階層用individual_digests
+5. タイトル提案 - ユーザー承認取得
+6. finalize_from_shadow.py実行 - Digest確定
+7. 完了確認 - 結果表示
+```
+
+**各ステップの詳細**:
+
+| Step | 実行内容 | 使用スクリプト/処理 |
+|------|---------|-------------------|
+| 1 | 対象レベル状態確認 | `python -m interfaces.digest_entry <level>` |
+| 2 | プレースホルダー確認 | shadow_state.placeholder_fields を確認 |
+| 3 | 各source_fileを分析 | Task(DigestAnalyzer) 並列起動（必要時のみ） |
+| 4 | next階層individual保存 | `python -m interfaces.save_provisional_digest <next_level> --stdin --append` |
+| 5 | タイトル提案 | Claudeが提案、ユーザー承認 |
+| 6 | Digest確定 | `python -m interfaces.finalize_from_shadow <level> "タイトル"` |
+| 7 | 完了確認 | finalize出力を確認 |
 
 ---
 
 ## CLIスクリプト
 
-### generate_digest_auto.sh
+### digest_entry.py
 
-メインフロー制御スクリプト。
+メインエントリポイント（パス情報・状態確認）。
 
-**配置先**: `scripts/generate_digest_auto.sh`
+**配置先**: `scripts/interfaces/digest_entry.py`
 
 ```bash
 # パターン1: 新Loop検出
-cd scripts && bash generate_digest_auto.sh
+cd scripts && python -m interfaces.digest_entry
 
-# パターン2: 階層確定
-cd scripts && bash generate_digest_auto.sh weekly
+# パターン2: 階層確定準備
+cd scripts && python -m interfaces.digest_entry weekly
+```
+
+**出力例（Pattern 1）**:
+```json
+{
+  "status": "ok",
+  "pattern": 1,
+  "plugin_root": "/path/to/EpisodicRAG",
+  "loops_path": "/path/to/Loops",
+  "digests_path": "/path/to/Digests",
+  "new_loops": ["L00256", "L00257"],
+  "new_loops_count": 2,
+  "weekly_source_count": 3,
+  "weekly_threshold": 5
+}
 ```
 
 ---

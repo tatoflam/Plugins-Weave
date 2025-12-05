@@ -31,7 +31,7 @@ import pytest
 from application.grand import GrandDigestManager
 
 # Domain層
-from domain.constants import LEVEL_NAMES
+from domain.constants import DIGEST_LEVEL_NAMES, LEVEL_NAMES
 from domain.exceptions import DigestError
 from domain.version import DIGEST_FORMAT_VERSION
 
@@ -63,10 +63,11 @@ class TestGrandDigestManagerUnit:
 
     @pytest.mark.unit
     def test_get_template_has_all_levels(self, grand_manager) -> None:
-        """get_template() は全8レベルを含む"""
+        """get_template() は全8ダイジェストレベルを含む（loopを除く）"""
         template = grand_manager.get_template()
 
-        assert set(template["major_digests"].keys()) == set(LEVEL_NAMES)
+        # Note: GrandDigest uses DIGEST_LEVEL_NAMES (excludes loop)
+        assert set(template["major_digests"].keys()) == set(DIGEST_LEVEL_NAMES)
 
     @pytest.mark.unit
     def test_get_template_metadata_has_version(self, grand_manager) -> None:
@@ -89,7 +90,8 @@ class TestGrandDigestManagerUnit:
         """get_template() の各レベルにoverall_digestキーが存在"""
         template = grand_manager.get_template()
 
-        for level in LEVEL_NAMES:
+        # Note: GrandDigest uses DIGEST_LEVEL_NAMES (excludes loop)
+        for level in DIGEST_LEVEL_NAMES:
             assert "overall_digest" in template["major_digests"][level]
 
     @pytest.mark.unit
@@ -97,7 +99,8 @@ class TestGrandDigestManagerUnit:
         """get_template() の初期状態ではoverall_digestはNone"""
         template = grand_manager.get_template()
 
-        for level in LEVEL_NAMES:
+        # Note: GrandDigest uses DIGEST_LEVEL_NAMES (excludes loop)
+        for level in DIGEST_LEVEL_NAMES:
             assert template["major_digests"][level]["overall_digest"] is None
 
     @pytest.mark.unit

@@ -29,7 +29,13 @@ from application.config import DigestConfig
 # 分割したモジュールをインポート
 from application.shadow import FileDetector, ShadowIO, ShadowTemplate, ShadowUpdater
 from application.tracking import DigestTimesTracker
-from domain.constants import LEVEL_CONFIG, LEVEL_NAMES, LOG_SEPARATOR, build_level_hierarchy
+from domain.constants import (
+    DIGEST_LEVEL_NAMES,
+    LEVEL_CONFIG,
+    LEVEL_NAMES,
+    LOG_SEPARATOR,
+    build_level_hierarchy,
+)
 from domain.file_constants import GRAND_DIGEST_FILENAME, SHADOW_GRAND_DIGEST_FILENAME
 from domain.types import OverallDigestData
 from infrastructure import get_structured_logger, log_warning
@@ -66,7 +72,8 @@ class ShadowGrandDigestManager:
         self.shadow_digest_file = self.essences_path / SHADOW_GRAND_DIGEST_FILENAME
 
         # レベル設定（共通定数を参照）
-        self.levels = LEVEL_NAMES
+        # ShadowGrandDigestはダイジェスト構造なのでDIGEST_LEVEL_NAMES（loopを除く）を使用
+        self.levels = DIGEST_LEVEL_NAMES
         self.level_hierarchy = build_level_hierarchy()  # SSoT関数を使用
         self.level_config = LEVEL_CONFIG
 

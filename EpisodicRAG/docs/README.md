@@ -2,7 +2,7 @@
 
 # EpisodicRAG AI Specification Hub
 
-[![Version](https://img.shields.io/badge/version-4.1.0-blue.svg)](https://github.com/Bizuayeu/Plugins-Weave)
+[![Version](https://img.shields.io/badge/version-5.0.0-blue.svg)](https://github.com/Bizuayeu/Plugins-Weave)
 
 AI/Claudeエージェント向けの技術仕様ハブです。
 
@@ -14,6 +14,7 @@ AI/Claudeエージェント向けの技術仕様ハブです。
 
 ## 目次
 
+- [v5.0.0 Breaking Changes](#v500-breaking-changes)
 - [v4.0.0 Breaking Changes](#v400-breaking-changes)
 - [Command Specifications](#command-specifications)
 - [Skill Specifications](#skill-specifications)
@@ -22,6 +23,23 @@ AI/Claudeエージェント向けの技術仕様ハブです。
 - [Learning Resources](#learning-resources)
 - [Developer Documentation](#developer-documentation)
 - [Documentation Map](#documentation-map)
+
+---
+
+## v5.0.0 Breaking Changes
+
+### プラグインルート自動検出
+`/digest` 実行時の `config.json` 検出エラーを防止。
+任意のディレクトリから `/digest` を実行可能に。
+
+### Loopレベル追加
+`last_digest_times.json` に Loop 層を追加。
+全レベル（Loop含む）で最新の `/digest` 対象を把握可能に。
+
+### シェルスクリプト廃止
+対話型プロセスを md ファイルに一本化（可読性向上、読み飛ばし防止）。
+
+> 📖 詳細: [CHANGELOG.md](../CHANGELOG.md#500---2025-12-05)
 
 ---
 

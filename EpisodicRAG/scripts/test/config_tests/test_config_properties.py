@@ -35,7 +35,7 @@ import pytest
 from hypothesis import HealthCheck, assume, given, settings
 from hypothesis import strategies as st
 
-from domain.constants import LEVEL_CONFIG, LEVEL_NAMES
+from domain.constants import DIGEST_LEVEL_NAMES, LEVEL_CONFIG, LEVEL_NAMES
 
 # Property-Based Test マーカー
 pytestmark = pytest.mark.property
@@ -44,8 +44,10 @@ pytestmark = pytest.mark.property
 # Strategies
 # =============================================================================
 
-# 有効なレベル名
-valid_levels = st.sampled_from(LEVEL_NAMES)
+# 有効なレベル名（ダイジェストレベル - loop除く）
+# Note: loop は dir が空文字列、threshold が None のため、
+#       ダイジェストレベル固有のテストでは除外
+valid_levels = st.sampled_from(DIGEST_LEVEL_NAMES)
 
 # 有効なパス文字列（英数字とアンダースコア、ハイフン、スラッシュ）
 valid_path_chars = st.text(
@@ -234,30 +236,30 @@ class TestConfigStructureInvariants:
         各レベルのプレフィックスは一意である
         """
         prefixes = [LEVEL_CONFIG[level_name]["prefix"] for level_name in LEVEL_NAMES]
-        # 注意: "L" は loop 用に予約されているが LEVEL_NAMES には含まれない
+        # 全レベル（loop含む）のプレフィックスは一意
         assert len(prefixes) == len(set(prefixes)), "プレフィックスは一意であること"
 
     @given(level=valid_levels)
     @settings(max_examples=50)
     def test_level_config_dir_uniqueness(self, level) -> None:
         """
-        各レベルのdirは一意である
+        各ダイジェストレベルのdirは一意である
         """
-        dirs = [LEVEL_CONFIG[level_name]["dir"] for level_name in LEVEL_NAMES]
+        dirs = [LEVEL_CONFIG[level_name]["dir"] for level_name in DIGEST_LEVEL_NAMES]
         assert len(dirs) == len(set(dirs)), "dirは一意であること"
 
     @given(level=valid_levels)
     @settings(max_examples=50)
     def test_level_config_dir_ordering(self, level) -> None:
         """
-        dirの番号は階層順序と一致する
+        dirの番号は階層順序と一致する（ダイジェストレベルのみ）
         """
         config = LEVEL_CONFIG[level]
         dir_value = config["dir"]
 
         # 番号を抽出
         dir_number = int(dir_value.split("_")[0])
-        level_index = LEVEL_NAMES.index(level)
+        level_index = DIGEST_LEVEL_NAMES.index(level)
 
         # 番号は1から始まり、レベルインデックス+1と一致
         assert dir_number == level_index + 1, (

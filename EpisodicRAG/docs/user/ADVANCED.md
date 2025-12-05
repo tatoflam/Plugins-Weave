@@ -2,7 +2,7 @@
 
 # Advanced Features - EpisodicRAG Plugin
 
-> **対応バージョン**: EpisodicRAG Plugin v4.0.0+ / ファイルフォーマット 1.0
+> **対応バージョン**: EpisodicRAG Plugin v5.0.0+ / ファイルフォーマット 1.0
 
 このドキュメントでは、EpisodicRAGプラグインの高度な機能について説明します。
 

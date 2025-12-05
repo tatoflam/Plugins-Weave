@@ -38,17 +38,29 @@ EpisodicRAG プラグインの初期セットアップを対話的に実行す�
 
 ### 概要
 
-1. 既存設定ファイル確認（再設定確認）
-2. 対話的Q&A（Claudeが実施）
-   - Q1: Loopファイル配置先
-   - Q2: Digestsファイル配置先
-   - Q3: Essencesファイル配置先
-   - Q4: 外部Identity.md
-   - Q5: Threshold設定
-3. 設定ファイル作成
-4. ディレクトリ作成（8階層 + Provisional）
-5. 初期ファイル作成（テンプレートからコピー）
-6. 完了報告（外部パス警告含む）
+| Step | 実行内容 | 使用スクリプト/処理 |
+|------|---------|-------------------|
+| 1 | セットアップ状態確認 | `python -m interfaces.digest_setup check` |
+| 2 | 対話的Q&A | Claude がユーザーに質問（下記参照） |
+| 3 | 設定値収集・JSON構築 | Claude が回答を JSON に構築 |
+| 4 | セットアップ実行 | `python -m interfaces.digest_setup init --config '{...}'` |
+| 5 | 結果報告 | Claude がユーザーに報告 |
+
+### 対話的Q&A（Step 2）
+
+Claude がユーザーに確認する項目：
+- Q1: Loopファイル配置先
+- Q2: Digestsファイル配置先
+- Q3: Essencesファイル配置先
+- Q4: 外部Identity.md
+- Q5: Threshold設定
+
+### CLI内部処理（Step 4）
+
+`init` コマンド実行時に以下が自動処理されます：
+- 設定ファイル作成
+- ディレクトリ作成（8階層 + Provisional）
+- 初期ファイル作成（テンプレートからコピー）
 
 ---
 
@@ -132,14 +144,6 @@ python -m interfaces.digest_setup init --config '{
 ```bash
 python -m interfaces.digest_setup init --config '...' --force
 ```
-
-### Claudeによる対話フロー
-
-1. Claudeは `check` コマンドでセットアップ状態を確認
-2. ユーザーに対話的に設定値を質問
-3. 収集した設定を JSON に構築
-4. `init` コマンドでセットアップを実行
-5. 結果をユーザーに報告
 
 ---
 

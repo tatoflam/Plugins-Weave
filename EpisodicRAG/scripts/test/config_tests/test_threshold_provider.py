@@ -9,7 +9,7 @@ config/threshold_provider.py のテスト
 import pytest
 
 from application.config.threshold_provider import ThresholdProvider
-from domain.constants import LEVEL_CONFIG, LEVEL_NAMES
+from domain.constants import DIGEST_LEVEL_NAMES, LEVEL_CONFIG, LEVEL_NAMES
 from domain.exceptions import ConfigError
 
 
@@ -29,9 +29,9 @@ class TestThresholdProvider:
         }
 
     @pytest.mark.unit
-    @pytest.mark.parametrize("level", LEVEL_NAMES)
+    @pytest.mark.parametrize("level", DIGEST_LEVEL_NAMES)
     def test_get_threshold_for_each_level(self, default_config, level) -> None:
-        """全8レベルの閾値取得"""
+        """全8ダイジェストレベルの閾値取得"""
         provider = ThresholdProvider(default_config)
 
         result = provider.get_threshold(level)

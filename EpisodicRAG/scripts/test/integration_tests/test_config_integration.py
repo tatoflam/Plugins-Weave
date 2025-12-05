@@ -34,7 +34,7 @@ if TYPE_CHECKING:
 from application.config import DigestConfig
 from application.shadow import FileDetector
 from application.tracking import DigestTimesTracker
-from domain.constants import LEVEL_CONFIG, LEVEL_NAMES
+from domain.constants import DIGEST_LEVEL_NAMES, LEVEL_CONFIG, LEVEL_NAMES
 from domain.exceptions import ConfigError
 
 # integration マーカーを適用（ファイル全体）
@@ -61,10 +61,11 @@ class TestConfigPathResolution:
     def test_level_dirs_accessible_from_config(
         self, temp_plugin_env: "TempPluginEnvironment"
     ) -> None:
-        """全レベルディレクトリにアクセス可能"""
+        """全ダイジェストレベルディレクトリにアクセス可能"""
         config = DigestConfig(plugin_root=temp_plugin_env.plugin_root)
 
-        for level in LEVEL_NAMES:
+        # Note: loop は dir="" のため除外（Loopsディレクトリは別管理）
+        for level in DIGEST_LEVEL_NAMES:
             level_dir = config.get_level_dir(level)
             assert level_dir.exists(), f"Level dir for {level} should exist"
             assert level_dir.name == LEVEL_CONFIG[level]["dir"]
@@ -72,10 +73,11 @@ class TestConfigPathResolution:
     def test_provisional_dirs_accessible_from_config(
         self, temp_plugin_env: "TempPluginEnvironment"
     ) -> None:
-        """全レベルのProvisionalディレクトリにアクセス可能"""
+        """全ダイジェストレベルのProvisionalディレクトリにアクセス可能"""
         config = DigestConfig(plugin_root=temp_plugin_env.plugin_root)
 
-        for level in LEVEL_NAMES:
+        # Note: loop は dir="" のため除外（Loopsディレクトリは別管理）
+        for level in DIGEST_LEVEL_NAMES:
             prov_dir = config.get_provisional_dir(level)
             assert prov_dir.exists(), f"Provisional dir for {level} should exist"
             assert prov_dir.name == "Provisional"
@@ -142,10 +144,11 @@ class TestThresholdApplication:
     """閾値設定がApplication層で正しく適用されることを確認"""
 
     def test_default_thresholds_available(self, temp_plugin_env: "TempPluginEnvironment") -> None:
-        """デフォルト閾値が全レベルで利用可能"""
+        """デフォルト閾値が全ダイジェストレベルで利用可能"""
         config = DigestConfig(plugin_root=temp_plugin_env.plugin_root)
 
-        for level in LEVEL_NAMES:
+        # Note: loop は threshold=None のため除外（閾値なし、手動トリガー）
+        for level in DIGEST_LEVEL_NAMES:
             threshold = config.get_threshold(level)
             assert isinstance(threshold, int)
             assert threshold >= 1
@@ -218,8 +221,10 @@ class TestEndToEndConfigFlow:
         assert len(new_files) == 3
 
         # 5. 処理済みとして記録
+        # Note: find_new_files("weekly")はloop.last_processedを参照するため
+        #       "loop"レベルに保存する
         filenames = [f.name for f in new_files]
-        times_tracker.save("weekly", filenames)
+        times_tracker.save("loop", filenames)
 
         # 6. 再検出時は空
         new_files_after = detector.find_new_files("weekly")

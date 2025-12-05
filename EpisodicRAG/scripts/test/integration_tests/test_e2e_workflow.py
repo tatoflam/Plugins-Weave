@@ -37,7 +37,7 @@ from test_helpers import create_test_loop_file
 from application.config import DigestConfig
 from application.grand import GrandDigestManager, ShadowGrandDigestManager
 from application.tracking import DigestTimesTracker
-from domain.constants import LEVEL_NAMES
+from domain.constants import DIGEST_LEVEL_NAMES, LEVEL_NAMES
 from interfaces import DigestFinalizerFromShadow
 
 # slow マーカーを適用（ファイル全体）
@@ -109,9 +109,10 @@ class TestE2ELoopDetectionToShadow:
         new_files = shadow_manager._detector.find_new_files("weekly")
         assert len(new_files) == 3
 
-        # last_processedを更新
+        # last_processedを更新（loopレベルを更新）
+        # Note: find_new_files("weekly")はloop.last_processedを参照
         file_names = [f.name for f in new_files]
-        times_tracker.save("weekly", file_names)
+        times_tracker.save("loop", file_names)
 
         # 追加: 2つのLoopファイルを作成
         for i in range(4, 6):
@@ -153,10 +154,11 @@ class TestE2EDigestPromotion:
         times_file.write_text("{}")
 
         # GrandDigest.txt を初期化
+        # Note: GrandDigest uses DIGEST_LEVEL_NAMES (excludes loop)
         grand_file = temp_plugin_env.essences_path / "GrandDigest.txt"
         grand_template = {
             "metadata": {"version": "test"},
-            "major_digests": {level: {"overall_digest": None} for level in LEVEL_NAMES},
+            "major_digests": {level: {"overall_digest": None} for level in DIGEST_LEVEL_NAMES},
         }
         with open(grand_file, 'w', encoding='utf-8') as f:
             json.dump(grand_template, f, ensure_ascii=False, indent=2)
@@ -298,10 +300,11 @@ class TestE2EFullWorkflow:
         times_file.write_text("{}")
 
         # GrandDigest.txt を初期化
+        # Note: GrandDigest uses DIGEST_LEVEL_NAMES (excludes loop)
         grand_file = temp_plugin_env.essences_path / "GrandDigest.txt"
         grand_template = {
             "metadata": {"version": "test"},
-            "major_digests": {level: {"overall_digest": None} for level in LEVEL_NAMES},
+            "major_digests": {level: {"overall_digest": None} for level in DIGEST_LEVEL_NAMES},
         }
         with open(grand_file, 'w', encoding='utf-8') as f:
             json.dump(grand_template, f, ensure_ascii=False, indent=2)
@@ -393,6 +396,10 @@ class TestE2EFullWorkflow:
 
         new_files = shadow_manager._detector.find_new_files("weekly")
         shadow_manager.add_files_to_shadow("weekly", new_files)
+
+        # loop.last_processedを更新（Pattern 1相当）
+        file_names = [f.name for f in new_files]
+        times_tracker.save("loop", file_names)
 
         # Shadowを完成させる
         shadow_data = shadow_manager._io.load_or_create()

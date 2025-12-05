@@ -268,6 +268,48 @@ class TestUpdateShadowForNewLoops:
         overall = shadow_data["latest_digests"]["weekly"]["overall_digest"]
         assert len(overall["source_files"]) == 2
 
+    @pytest.mark.integration
+    def test_updates_loop_last_processed(
+        self,
+        updater,
+        temp_plugin_env: "TempPluginEnvironment",
+        times_tracker: "DigestTimesTracker",
+    ) -> None:
+        """update_shadow_for_new_loops が loop.last_processed を更新する"""
+        # 初期状態: loop.last_processed は None
+        initial_data = times_tracker.load_or_create()
+        assert initial_data["loop"]["last_processed"] is None
+
+        # Loopファイルを作成（254, 255, 256）
+        create_test_loop_file(temp_plugin_env.loops_path, 254)
+        create_test_loop_file(temp_plugin_env.loops_path, 255)
+        create_test_loop_file(temp_plugin_env.loops_path, 256)
+
+        # 実行
+        updater.update_shadow_for_new_loops()
+
+        # 検証: loop.last_processed が最大番号（256）に更新される
+        updated_data = times_tracker.load_or_create()
+        assert updated_data["loop"]["last_processed"] == 256
+
+    @pytest.mark.integration
+    def test_does_not_update_loop_when_no_new_files(
+        self,
+        updater,
+        times_tracker: "DigestTimesTracker",
+    ) -> None:
+        """新規ファイルがない場合は loop.last_processed を更新しない"""
+        # 初期状態: loop.last_processed は None
+        initial_data = times_tracker.load_or_create()
+        assert initial_data["loop"]["last_processed"] is None
+
+        # 実行（新規ファイルなし）
+        updater.update_shadow_for_new_loops()
+
+        # 検証: loop.last_processed は None のまま
+        updated_data = times_tracker.load_or_create()
+        assert updated_data["loop"]["last_processed"] is None
+
 
 # =============================================================================
 # cascade_update_on_digest_finalize テスト

@@ -20,6 +20,7 @@ Usage:
         BaseMetadata,
         DigestMetadata,
         # Constants
+        DIGEST_LEVEL_NAMES,
         LEVEL_CONFIG,
         LEVEL_NAMES,
         PLACEHOLDER_LIMITS,
@@ -40,6 +41,7 @@ Usage:
 # Version
 # Constants
 from domain.constants import (
+    DIGEST_LEVEL_NAMES,
     LEVEL_CONFIG,
     LEVEL_NAMES,
     PLACEHOLDER_END,
@@ -159,6 +161,7 @@ __all__ = [
     "__version__",
     "DIGEST_FORMAT_VERSION",
     # Constants
+    "DIGEST_LEVEL_NAMES",
     "LEVEL_CONFIG",
     "LEVEL_NAMES",
     "PLACEHOLDER_LIMITS",

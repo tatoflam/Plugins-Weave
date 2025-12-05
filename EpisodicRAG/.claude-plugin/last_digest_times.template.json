@@ -1,4 +1,8 @@
 {
+  "loop": {
+    "timestamp": "",
+    "last_processed": null
+  },
   "weekly": {
     "timestamp": "",
     "last_processed": null

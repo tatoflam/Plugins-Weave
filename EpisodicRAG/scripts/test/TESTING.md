@@ -68,7 +68,7 @@ test/
 ├── conftest.py              # 共通フィクスチャ
 ├── test_helpers.py          # テストヘルパー
 ├── test_constants.py        # テスト用定数
-├── domain_tests/            # 純粋なビジネスロジック (32 files)
+├── domain_tests/            # 純粋なビジネスロジック (33 files)
 │   └── test_*_properties.py # Property-based (5 files)
 ├── config_tests/            # Config層3層化対応 (14 files) [v4.0.0+]
 │   └── test_config_properties.py
@@ -84,12 +84,12 @@ test/
 │   ├── config/              # PathValidatorChain [v4.1.0+]
 │   ├── test_file_scanner_properties.py
 │   └── test_json_repository_properties.py
-├── interfaces_tests/        # エントリポイント (22 files)
+├── interfaces_tests/        # エントリポイント (23 files)
 │   └── provisional/         # Provisional処理
 ├── integration_tests/       # E2Eシナリオ (14 files)
 ├── cli_integration_tests/   # CLI E2E (4 files) [v4.0.0+]
 ├── performance_tests/       # ベンチマーク (1 file)
-└── tools_tests/             # 開発ツール (2 files) [v4.1.0+]
+└── tools_tests/             # 開発ツール (3 files) [v4.1.0+]
 ```
 
 ---
@@ -100,15 +100,15 @@ test/
 
 | 層 | 主なテストファイル | ファイル数 |
 |----|-------------------|-----------|
-| **Domain** | `test_validators.py`, `test_file_naming.py`, `test_level_registry.py`, `test_formatter_registry.py`, `test_types_imports.py`, `test_level_literals.py` | 32 |
+| **Domain** | `test_validators.py`, `test_file_naming.py`, `test_level_registry.py`, `test_formatter_registry.py`, `test_types_imports.py`, `test_level_literals.py`, `test_constants.py` | 33 |
 | **Config** | `test_config.py`, `test_path_resolver.py`, `test_threshold_provider.py`, `test_config_builder.py` | 14 |
 | **Infrastructure** | `test_json_repository.py`, `test_file_scanner.py`, `test_logging_config.py`, `test_path_validators.py` | 12 |
 | **Application** | `test_shadow_*.py`, `test_grand_digest.py`, `test_cascade_orchestrator.py`, `test_persistence.py` | 20 |
-| **Interfaces** | `test_finalize_from_shadow.py`, `test_*_cli_*.py`, `test_setup_*.py`, `test_auto_*.py`, `test_cli_helpers.py` | 22 |
+| **Interfaces** | `test_finalize_from_shadow.py`, `test_*_cli_*.py`, `test_setup_*.py`, `test_auto_*.py`, `test_cli_helpers.py`, `test_find_plugin_root.py` | 23 |
 | **Integration** | `test_e2e_workflow.py`, `test_full_cascade.py`, `test_config_integration.py` | 14 |
 | **CLI Integration** | `test_digest_*_cli.py`, `test_workflow_cli.py` | 4 |
 | **Performance** | `test_benchmarks.py` | 1 |
-| **Tools** | `test_check_footer.py`, `test_link_checker.py` | 2 |
+| **Tools** | `test_check_footer.py`, `test_link_checker.py`, `test_validate_json.py` | 3 |
 | **Property** | `test_*_properties.py` (全11ファイル、各層に分散) | 11 |
 
 > 📊 最新のテスト数: `pytest --collect-only | tail -1`
@@ -392,7 +392,8 @@ pytest scripts/test/cli_integration_tests/test_digest_setup_cli.py -v
 ```
 tools_tests/
 ├── test_check_footer.py     # Digestフッター検証
-└── test_link_checker.py     # ドキュメントリンクチェック
+├── test_link_checker.py     # ドキュメントリンクチェック
+└── test_validate_json.py    # JSON検証ツール
 ```
 
 ---

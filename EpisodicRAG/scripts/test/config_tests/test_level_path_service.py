@@ -25,7 +25,7 @@ if TYPE_CHECKING:
 
 
 from application.config.level_path_service import LevelPathService
-from domain.constants import LEVEL_CONFIG, LEVEL_NAMES
+from domain.constants import DIGEST_LEVEL_NAMES, LEVEL_CONFIG, LEVEL_NAMES
 from domain.exceptions import ConfigError
 
 
@@ -38,9 +38,9 @@ class TestLevelPathService:
         return LevelPathService(temp_plugin_env.digests_path)
 
     @pytest.mark.unit
-    @pytest.mark.parametrize("level", LEVEL_NAMES)
+    @pytest.mark.parametrize("level", DIGEST_LEVEL_NAMES)
     def test_get_level_dir_for_each_level(self, service, level) -> None:
-        """全8レベルのディレクトリパス取得"""
+        """全8ダイジェストレベルのディレクトリパス取得"""
         result = service.get_level_dir(level)
 
         assert result.is_absolute()
@@ -48,9 +48,9 @@ class TestLevelPathService:
         assert result.name == expected_dir_name
 
     @pytest.mark.unit
-    @pytest.mark.parametrize("level", LEVEL_NAMES)
+    @pytest.mark.parametrize("level", DIGEST_LEVEL_NAMES)
     def test_get_provisional_dir_for_each_level(self, service, level) -> None:
-        """全8レベルのProvisionalディレクトリパス取得"""
+        """全8ダイジェストレベルのProvisionalディレクトリパス取得"""
         result = service.get_provisional_dir(level)
 
         assert result.is_absolute()

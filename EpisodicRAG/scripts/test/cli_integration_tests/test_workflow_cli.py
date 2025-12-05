@@ -274,45 +274,6 @@ class TestHealthCheckWorkflowE2E:
 
 
 # =============================================================================
-# generate_digest_auto.sh E2E テスト（オプション）
-# =============================================================================
-
-
-@pytest.mark.cli
-class TestGenerateDigestAutoShE2E:
-    """
-    generate_digest_auto.sh のE2Eテスト
-
-    Note:
-        Windows環境ではGit Bashが必要。
-        Git Bashが見つからない場合はスキップ。
-    """
-
-    def test_shell_script_no_args(self, configured_cli_runner: CLIRunner) -> None:
-        """引数なしで新Loop検出モード"""
-        result = configured_cli_runner.run_generate_digest_auto_sh()
-
-        # Git Bashが見つからない場合はスキップ
-        if "Git Bash not found" in result.stderr:
-            pytest.skip("Git Bash not available on this system")
-
-        # スクリプトが実行可能であることを確認
-        # （実際の動作はスクリプトの実装に依存）
-        assert result.exit_code in [0, 1, -1]  # 成功、エラー、またはタイムアウト
-
-    def test_shell_script_with_level_arg(self, configured_cli_runner: CLIRunner) -> None:
-        """レベル引数ありで階層確定モード"""
-        result = configured_cli_runner.run_generate_digest_auto_sh(level="weekly")
-
-        # Git Bashが見つからない場合はスキップ
-        if "Git Bash not found" in result.stderr:
-            pytest.skip("Git Bash not available on this system")
-
-        # スクリプトが実行可能であることを確認
-        assert result.exit_code in [0, 1, -1]
-
-
-# =============================================================================
 # エンドツーエンド完全ワークフロー E2E テスト
 # =============================================================================
 

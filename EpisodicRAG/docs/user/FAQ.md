@@ -2,7 +2,7 @@
 
 # よくある質問 (FAQ)
 
-> **対応バージョン**: EpisodicRAG Plugin v4.0.0+ / ファイルフォーマット 1.0
+> **対応バージョン**: EpisodicRAG Plugin v5.0.0+ / ファイルフォーマット 1.0
 
 EpisodicRAGプラグインに関するよくある質問と回答集です。
 

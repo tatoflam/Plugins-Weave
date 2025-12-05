@@ -11,6 +11,7 @@ from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
 
 from domain.constants import (
+    DIGEST_LEVEL_NAMES,
     LEVEL_CONFIG,
     LEVEL_NAMES,
     PLACEHOLDER_END,
@@ -195,10 +196,13 @@ class TestLevelConfigProperties:
         assert digits > 0
 
     @pytest.mark.property
-    @given(level=st.sampled_from(LEVEL_NAMES))
+    @given(level=st.sampled_from(DIGEST_LEVEL_NAMES))
     @settings(max_examples=50)
     def test_dirは非空文字列(self, level) -> None:
-        """各レベルのdirは非空の文字列"""
+        """各ダイジェストレベルのdirは非空の文字列
+
+        Note: loop は dir="" のため除外（Loopsディレクトリは別管理）
+        """
         dir_name = LEVEL_CONFIG[level]["dir"]
         assert isinstance(dir_name, str)
         assert len(dir_name) > 0

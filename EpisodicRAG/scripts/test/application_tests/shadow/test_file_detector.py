@@ -33,7 +33,7 @@ from test_helpers import create_test_loop_file
 from application.config import DigestConfig
 from application.shadow import FileDetector
 from application.tracking import DigestTimesTracker
-from domain.constants import LEVEL_CONFIG
+from domain.constants import DIGEST_LEVEL_NAMES, LEVEL_CONFIG
 
 # slow マーカーを適用（ファイル全体）
 pytestmark = pytest.mark.slow
@@ -83,9 +83,10 @@ class TestFileDetectorGetSourcePath:
         assert result == temp_plugin_env.loops_path
 
     @pytest.mark.unit
-    def test_all_levels_have_valid_source(self, detector) -> None:
-        """全レベルが有効なソースパスを持つ"""
-        for level in LEVEL_CONFIG.keys():
+    def test_all_digest_levels_have_valid_source(self, detector) -> None:
+        """全ダイジェストレベルが有効なソースパスを持つ"""
+        # Note: loop は source="raw" のため除外（ソースパスを持たない）
+        for level in DIGEST_LEVEL_NAMES:
             result = detector.get_source_path(level)
             assert isinstance(result, Path)
 
@@ -183,7 +184,8 @@ class TestFileDetectorFindNewFiles:
             create_test_loop_file(temp_plugin_env.loops_path, i)
 
         # last_processedをL00003に設定
-        times_tracker.save("weekly", ["L00003_test.txt"])
+        # Note: find_new_files("weekly")はloop.last_processedを参照
+        times_tracker.save("loop", ["L00003_test.txt"])
 
         result = detector.find_new_files("weekly")
 
@@ -207,7 +209,8 @@ class TestFileDetectorFindNewFiles:
             create_test_loop_file(temp_plugin_env.loops_path, i)
 
         # last_processedをL00003に設定（最後のファイル）
-        times_tracker.save("weekly", ["L00003_test.txt"])
+        # Note: find_new_files("weekly")はloop.last_processedを参照
+        times_tracker.save("loop", ["L00003_test.txt"])
 
         result = detector.find_new_files("weekly")
         assert result == []
@@ -294,3 +297,70 @@ class TestFileDetectorInit:
         assert "monthly" in detector.level_hierarchy
         assert detector.level_hierarchy["monthly"]["source"] == "weekly"
         assert detector.level_hierarchy["monthly"]["next"] == "quarterly"
+
+
+# =============================================================================
+# FileDetector._get_detection_level テスト
+# =============================================================================
+
+
+class TestFileDetectorGetDetectionLevel:
+    """_get_detection_level メソッドのテスト"""
+
+    @pytest.fixture
+    def detector(self, config: "DigestConfig", times_tracker: "DigestTimesTracker"):
+        """テスト用FileDetector"""
+        return FileDetector(config, times_tracker)
+
+    @pytest.mark.unit
+    def test_weekly_returns_loop(self, detector) -> None:
+        """weeklyレベルは loop を参照する"""
+        result = detector._get_detection_level("weekly")
+        assert result == "loop"
+
+    @pytest.mark.unit
+    def test_monthly_returns_monthly(self, detector) -> None:
+        """monthlyレベルは monthly を参照する"""
+        result = detector._get_detection_level("monthly")
+        assert result == "monthly"
+
+    @pytest.mark.unit
+    def test_other_levels_return_same(self, detector) -> None:
+        """他のレベルは自身を参照する"""
+        for level in ["quarterly", "annual", "triennial", "decadal", "multi_decadal", "centurial"]:
+            result = detector._get_detection_level(level)
+            assert result == level
+
+
+class TestFileDetectorFindNewFilesUsesLoopLevel:
+    """find_new_files が loop レベルを使用することを検証"""
+
+    @pytest.fixture
+    def detector(self, config: "DigestConfig", times_tracker: "DigestTimesTracker"):
+        """テスト用FileDetector"""
+        return FileDetector(config, times_tracker)
+
+    @pytest.mark.integration
+    def test_find_new_files_uses_loop_level_for_weekly(
+        self,
+        detector,
+        temp_plugin_env: "TempPluginEnvironment",
+        times_tracker: "DigestTimesTracker",
+    ) -> None:
+        """weeklyのfind_new_filesがloop.last_processedを参照"""
+        # Loopファイルを作成（254-258）
+        for i in range(254, 259):
+            create_test_loop_file(temp_plugin_env.loops_path, i)
+
+        # loop.last_processed = 255 に設定
+        times_tracker.save("loop", ["L00255_test.txt"])
+
+        result = detector.find_new_files("weekly")
+
+        # L00256, L00257, L00258 のみが検出される（255より後）
+        assert len(result) == 3
+        filenames = [f.name for f in result]
+        assert any("L00256" in name for name in filenames)
+        assert any("L00257" in name for name in filenames)
+        assert any("L00258" in name for name in filenames)
+        assert not any("L00255" in name for name in filenames)

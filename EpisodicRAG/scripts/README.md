@@ -39,7 +39,10 @@ scripts/
 ├── application/      # ユースケース
 │   └── config/       # DigestConfig（Facade）
 ├── interfaces/       # エントリーポイント
-├── tools/            # 開発ツール（ドキュメント生成など）
+├── tools/            # 開発ツール
+│   ├── check_footer.py    # フッターチェック
+│   ├── link_checker.py    # リンク検証
+│   └── validate_json.py   # JSON検証
 └── test/             # テスト
 ```
 
@@ -69,15 +72,24 @@ interfaces/       ← application/
 | `version.py` | バージョン定数（`__version__`, `DIGEST_FORMAT_VERSION`） |
 | `constants.py` | `LEVEL_CONFIG`, `PLACEHOLDER_*`, `DEFAULT_THRESHOLDS` |
 | `exceptions.py` | カスタム例外（`EpisodicRAGError`, `ValidationError`, etc.） |
+| `protocols.py` | Protocol定義（型ヒント用インターフェース） |
 | `types/` | TypedDict定義パッケージ（`BaseMetadata`, `DigestMetadata`, Literal型等）*(v4.1.0+パッケージ化)* |
+| `validators/` | バリデーションパッケージ（`digest_validators`, `runtime_checks`, `helpers`, `type_validators`） |
 | `file_naming.py` | ファイル命名ユーティリティ（`extract_file_number()`, `format_digest_number()`） |
-| `error_formatter/` | エラーメッセージの標準化パッケージ（`CompositeErrorFormatter`, `FormatterRegistry`）|
+| `file_constants.py` | ファイル関連定数 |
+| `validation.py` | バリデーションロジック |
+| `validation_helpers.py` | バリデーションヘルパー関数 |
+| `text_utils.py` | テキスト処理ユーティリティ |
+| `level_metadata.py` | レベルメタデータ定義 |
+| `level_behaviors.py` | レベル固有振る舞い定義 |
 | `level_registry.py` | レベル固有振る舞いのRegistry（Strategy Pattern） |
+| `error_formatter/` | エラーメッセージの標準化パッケージ（`CompositeErrorFormatter`, `FormatterRegistry`）|
 
 ```python
 from domain import LEVEL_CONFIG, __version__, ValidationError
 from domain.file_naming import extract_file_number, format_digest_number
 from domain.level_registry import get_level_registry
+from domain.validators import digest_validators, runtime_checks
 ```
 
 ### infrastructure/ - 外部I/O
@@ -87,12 +99,15 @@ from domain.level_registry import get_level_registry
 | `json_repository/` | JSON操作パッケージ（`load_json`, `save_json`, `ChainedLoader`）|
 | `file_scanner.py` | ファイルスキャン（`scan_files`, `get_max_numbered_file`） |
 | `logging_config.py` | ロギング設定（`log_info`, `log_warning`, `log_error`） |
+| `structured_logging.py` | 構造化ロギング |
+| `error_handling.py` | エラーハンドリングユーティリティ |
 | `user_interaction.py` | ユーザー確認プロンプト（`get_default_confirm_callback`） |
 
 ```python
 from infrastructure import load_json, save_json, log_info, log_error
 from infrastructure.file_scanner import scan_files, get_max_numbered_file
 from infrastructure.user_interaction import get_default_confirm_callback
+from infrastructure.error_handling import handle_error
 ```
 
 ### application/ - ビジネスロジック
@@ -125,6 +140,8 @@ from application.validators import validate_dict, is_valid_list
 | `config_cli.py` | - | 設定CLIエントリーポイント |
 | `interface_helpers.py` | - | ヘルパー関数（`sanitize_filename`, `get_next_digest_number`） |
 | `cli_helpers.py` | - | CLI共通ヘルパー（`output_json`, `output_error`）*(v4.1.0+)* |
+| `find_plugin_root.py` | - | プラグインルート検出 |
+| `digest_entry.py` | - | Digestエントリーポイント |
 | `provisional/` | - | Provisionalマージ処理（`file_manager`, `input_loader`, `merger`, `validator`） |
 
 ```python
@@ -161,10 +178,10 @@ from application.config import ThresholdProvider
 
 ## Shell Scripts
 
-| Script | Purpose |
-|--------|---------|
-| `setup.sh` | 開発環境セットアップ |
-| `generate_digest_auto.sh` | 自動Digest生成 |
+> **Note**: シェルスクリプトは廃止されました。Python CLI を使用してください。
+>
+> - セットアップ: `python -m interfaces.digest_setup`
+> - Digest生成: `/digest` コマンド（commands/digest.md 参照）
 
 ---
 
@@ -181,6 +198,7 @@ test/
 ├── conftest.py              # 共通フィクスチャ
 ├── test_constants.py        # 定数テスト
 ├── test_helpers.py          # ヘルパーテスト
+├── TESTING.md               # テスト方針ドキュメント
 ├── domain_tests/            # domain層テスト
 ├── infrastructure_tests/    # infrastructure層テスト
 ├── application_tests/       # application層テスト

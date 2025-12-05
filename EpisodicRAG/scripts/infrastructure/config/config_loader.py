@@ -107,7 +107,7 @@ class ConfigLoader:
         if not self.config_file.exists():
             raise ConfigError(
                 f"{file_not_found_message(self.config_file)}\n"
-                "Run setup first: bash scripts/setup.sh"
+                "Run @digest-setup skill"
             )
 
         try:

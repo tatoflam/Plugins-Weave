@@ -20,7 +20,7 @@ from typing import Dict, List, Optional
 
 from application.config.level_path_service import LevelPathService
 from domain.config.config_constants import REQUIRED_CONFIG_KEYS, THRESHOLD_KEYS
-from domain.constants import LEVEL_CONFIG, LEVEL_NAMES
+from domain.constants import DIGEST_LEVEL_NAMES, LEVEL_CONFIG, LEVEL_NAMES
 from domain.types import ConfigData, as_dict
 from domain.validators.helpers import collect_type_error as _collect_type_error
 
@@ -235,8 +235,9 @@ class ConfigValidator:
                 errors.append(f"{name} directory missing: {path}")
 
         # レベルディレクトリのチェック（level_path_service が提供された場合のみ）
+        # DIGEST_LEVEL_NAMES を使用（loopはディレクトリを持たない）
         if self.level_path_service is not None:
-            for level in LEVEL_NAMES:
+            for level in DIGEST_LEVEL_NAMES:
                 level_dir = self.level_path_service.get_level_dir(level)
                 prov_dir = self.level_path_service.get_provisional_dir(level)
 

@@ -1,4 +1,4 @@
-<!-- Last synced: 2025-12-03 -->
+<!-- Last synced: 2025-12-05 -->
 English | [日本語](CHANGELOG.md)
 
 # Changelog
@@ -12,10 +12,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Table of Contents
 
+- [v5.x](#500---2025-12-05)
 - [v4.x](#410---2025-12-03)
 - [v3.x](#330---2025-11-29)
 - [Archive (v2.x and earlier)](#archive-v2x-and-earlier)
 - [Versioning Rules](#versioning-rules)
+
+---
+
+## [5.0.0] - 2025-12-05
+
+> **⚠️ Migration Note**: Migration from v4.x or earlier is deprecated. Plugin reinstallation is recommended.
+> Existing conversation records (GrandDigest, ShadowGrandDigest, Loop files, etc.) can be used as-is.
+
+### Breaking Changes
+
+- **Plugin root auto-detection**
+  - Prevents `config.json` detection errors during `/digest`
+  - Enables `/digest` execution from any directory
+
+- **Loop level added**
+  - Added Loop layer to `last_digest_times.json`
+  - All levels (including Loop) can now track latest `/digest` targets
+
+- **Shell scripts deprecated**
+  - Consolidated interactive processes into md files
+  - Purpose: Improved readability, prevention of skipped steps
 
 ---
 

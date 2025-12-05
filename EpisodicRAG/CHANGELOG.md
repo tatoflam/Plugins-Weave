@@ -11,10 +11,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 目次 / Table of Contents
 
+- [v5.x](#500---2025-12-05)
 - [v4.x](#410---2025-12-03)
 - [v3.x](#330---2025-11-29)
 - [Archive (v2.x以前)](#archive-v2x-and-earlier)
 - [バージョニング規則](#バージョニング規則)
+
+---
+
+## [5.0.0] - 2025-12-05
+
+> **⚠️ 移行について**: v4.x以前からの移行は非推奨です。プラグインの再インストールを推奨します。
+> 既存の対話記録（GrandDigest, ShadowGrandDigest, Loopファイル等）はそのまま使用できます。
+
+### Breaking Changes
+
+- **プラグインルート自動検出**
+  - `/digest` 実行時の `config.json` 検出エラーを防止
+  - 任意のディレクトリから `/digest` を実行可能に
+
+- **Loopレベル追加**
+  - `last_digest_times.json` に Loop 層を追加
+  - 全レベル（Loop含む）で最新の `/digest` 対象を把握可能に
+
+- **シェルスクリプト廃止**
+  - 対話型プロセスを md ファイルに一本化
+  - 目的: 可読性向上、読み飛ばし防止
 
 ---
 

@@ -18,7 +18,7 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-from domain.constants import LEVEL_CONFIG, LEVEL_NAMES
+from domain.constants import DIGEST_LEVEL_NAMES, LEVEL_CONFIG
 from domain.exceptions import FileIOError
 from domain.file_constants import (
     CONFIG_FILENAME,
@@ -68,7 +68,7 @@ class AnalysisResult:
 class DigestAutoAnalyzer:
     """健全性診断クラス"""
 
-    # 階層の親子関係とレベル順序は domain.constants.LEVEL_CONFIG, LEVEL_NAMES を使用
+    # 階層の親子関係とレベル順序は domain.constants.LEVEL_CONFIG, DIGEST_LEVEL_NAMES を使用
 
     def __init__(self, plugin_root: Optional[Path] = None):
         """
@@ -263,7 +263,7 @@ class DigestAutoAnalyzer:
         placeholders = []
         latest_digests = shadow_data.get("latest_digests", {})
 
-        for level in LEVEL_NAMES:
+        for level in DIGEST_LEVEL_NAMES:
             level_data = latest_digests.get(level, {})
             overall_digest = level_data.get("overall_digest")
 
@@ -281,7 +281,7 @@ class DigestAutoAnalyzer:
         gaps = {}
         latest_digests = shadow_data.get("latest_digests", {})
 
-        for level in LEVEL_NAMES:
+        for level in DIGEST_LEVEL_NAMES:
             level_data = latest_digests.get(level, {})
             overall_digest = level_data.get("overall_digest")
 
@@ -322,7 +322,7 @@ class DigestAutoAnalyzer:
         # 各階層のファイル数をカウント
         level_counts: Dict[str, int] = {}
 
-        for level in LEVEL_NAMES:
+        for level in DIGEST_LEVEL_NAMES:
             level_cfg = LEVEL_CONFIG[level]
             source = level_cfg["source"]
             # 設定ファイルのthreshold_keyまたはLEVEL_CONFIGのデフォルト値を使用

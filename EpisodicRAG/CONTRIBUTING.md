@@ -149,11 +149,18 @@ Claude Codeで以下を実行：
 
 **概要**: プラグインディレクトリを直接操作する従来の方法です。
 
-#### 1. セットアップスクリプト実行
+#### 1. セットアップ実行
+
+Claude Code で `@digest-setup` スキルを実行するか、手動で Python CLI を使用:
 
 ```bash
-cd plugins-weave/EpisodicRAG
-bash scripts/setup.sh
+cd plugins-weave/EpisodicRAG/scripts
+
+# 状態確認
+python -m interfaces.digest_setup check
+
+# セットアップ実行（JSON設定を指定）
+python -m interfaces.digest_setup init --config '{"base_dir": ".", "paths": {"loops_dir": "data/Loops", "digests_dir": "data/Digests", "essences_dir": "data/Essences"}}'
 ```
 
 #### 2. 設定確認
@@ -225,14 +232,6 @@ python -m interfaces.digest_auto
 ```
 
 > **Note**: スキル経由の使用（`@digest-setup` 等）も引き続き可能です。
-
-### generate_digest_auto.sh - 自動Digest生成
-
-階層的Digestを自動生成します。
-
-```bash
-bash scripts/generate_digest_auto.sh
-```
 
 ---
 
@@ -396,6 +395,28 @@ Summary: 2 broken links in 1 file
 - 複合リンク（`file.md#section`）の検証
 - 壊れたリンクの修正案提示
 - JSON出力（CI/CD統合用）
+
+### JSON検証（validate_json.py）
+
+config.json と config.template.json のスキーマ検証ツール。
+
+```bash
+cd plugins-weave/EpisodicRAG/scripts
+
+# 基本検証
+python -m tools.validate_json config.json
+
+# テンプレート整合性チェック
+python -m tools.validate_json config.json --template config.template.json
+
+# パス形式検証
+python -m tools.validate_json config.json --check-paths
+```
+
+**機能**:
+- JSON構文の検証
+- config.template.json との構造整合性チェック
+- パス形式の検証（相対パス/絶対パス）
 
 ### Pre-commit 検証
 

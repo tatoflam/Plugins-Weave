@@ -228,10 +228,12 @@ class CascadeOrchestrator:
         ここでは確認のみ。
         """
         _logger.info(f"[Step 1/4] Shadow昇格確認: {level}")
+        _logger.state("step_promote", level=level)
 
         digest = self.cascade_processor.get_shadow_digest_for_level(level)
 
         if not digest:
+            _logger.decision("promote_result", has_digest=False)
             return CascadeStepResult(
                 step_name="promote",
                 status=CascadeStepStatus.NO_DATA,
@@ -239,6 +241,7 @@ class CascadeOrchestrator:
             )
 
         file_count = len(digest.get("source_files", []))
+        _logger.decision("promote_result", has_digest=True, file_count=file_count)
         return CascadeStepResult(
             step_name="promote",
             status=CascadeStepStatus.SUCCESS,
@@ -255,10 +258,12 @@ class CascadeOrchestrator:
             Tuple of (step result, list of new files)
         """
         _logger.info(f"[Step 2/4] 新規ファイル検出: {next_level}")
+        _logger.state("step_detect", next_level=next_level)
 
         new_files = self.file_detector.find_new_files(next_level)
 
         if not new_files:
+            _logger.file_op("detect_result", count=0)
             result = CascadeStepResult(
                 step_name="detect",
                 status=CascadeStepStatus.NO_DATA,
@@ -269,6 +274,7 @@ class CascadeOrchestrator:
         file_names = [f.name for f in new_files[:5]]
         suffix = "..." if len(new_files) > 5 else ""
 
+        _logger.file_op("detect_result", count=len(new_files))
         result = CascadeStepResult(
             step_name="detect",
             status=CascadeStepStatus.SUCCESS,
@@ -286,9 +292,11 @@ class CascadeOrchestrator:
         Step 3: 次レベルのShadowにファイル追加
         """
         _logger.info(f"[Step 3/4] Shadowにファイル追加中: {len(new_files)}件 → {next_level}")
+        _logger.state("step_add", next_level=next_level, file_count=len(new_files))
 
         self.file_appender.add_files_to_shadow(next_level, new_files)
 
+        _logger.file_op("add_result", added=len(new_files))
         return CascadeStepResult(
             step_name="add",
             status=CascadeStepStatus.SUCCESS,
@@ -302,9 +310,11 @@ class CascadeOrchestrator:
         Step 4: 現在レベルのShadowをクリア
         """
         _logger.info(f"[Step 4/4] Shadowクリア: {level}")
+        _logger.state("step_clear", level=level)
 
         self.cascade_processor.clear_shadow_level(level)
 
+        _logger.file_op("clear_result", cleared=True)
         return CascadeStepResult(
             step_name="clear",
             status=CascadeStepStatus.SUCCESS,

@@ -29,9 +29,10 @@ class TestLevelConfig:
     """LEVEL_CONFIG定数の構造検証"""
 
     @pytest.mark.unit
-    def test_全8レベルが定義されている(self) -> None:
-        """weekly〜centurialまで8レベルが存在する"""
+    def test_全9レベルが定義されている(self) -> None:
+        """loop〜centurialまで9レベルが存在する"""
         expected_levels = [
+            "loop",
             "weekly",
             "monthly",
             "quarterly",
@@ -85,9 +86,9 @@ class TestLevelNames:
         assert LEVEL_NAMES == list(LEVEL_CONFIG.keys())
 
     @pytest.mark.unit
-    def test_8要素のリスト(self) -> None:
-        """8階層分の名前が含まれる"""
-        assert len(LEVEL_NAMES) == 8
+    def test_9要素のリスト(self) -> None:
+        """9階層分の名前が含まれる（loop + 8ダイジェストレベル）"""
+        assert len(LEVEL_NAMES) == 9
 
 
 # =============================================================================
@@ -259,14 +260,21 @@ class TestLevelConfigThresholds:
 
     @pytest.mark.unit
     def test_全レベルのしきい値が定義されている(self) -> None:
-        """全8レベル分のしきい値がLEVEL_CONFIGに定義されている"""
+        """全9レベル分のしきい値がLEVEL_CONFIGに定義されている"""
         for level in LEVEL_NAMES:
             assert "threshold" in LEVEL_CONFIG[level], f"{level}にthresholdキーがない"
 
     @pytest.mark.unit
-    def test_全ての値が正の整数(self) -> None:
-        """しきい値は全て正の整数"""
-        for level in LEVEL_NAMES:
+    def test_ダイジェストレベルの値が正の整数(self) -> None:
+        """ダイジェストレベル（loop以外）のしきい値は全て正の整数"""
+        from domain.constants import DIGEST_LEVEL_NAMES
+
+        for level in DIGEST_LEVEL_NAMES:
             threshold = LEVEL_CONFIG[level]["threshold"]
             assert isinstance(threshold, int), f"{level}のしきい値は整数であるべき"
             assert threshold > 0, f"{level}のしきい値は正の値であるべき"
+
+    @pytest.mark.unit
+    def test_loopのしきい値はNone(self) -> None:
+        """loopレベルのしきい値はNone（閾値なし、手動トリガー）"""
+        assert LEVEL_CONFIG["loop"]["threshold"] is None

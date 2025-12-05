@@ -11,8 +11,12 @@ from typing import List, Optional
 
 from application.config import DigestConfig
 from application.tracking import DigestTimesTracker
-from domain.constants import LEVEL_CONFIG, build_level_hierarchy
+from domain.constants import LEVEL_CONFIG, SOURCE_TYPE_LOOPS, build_level_hierarchy
 from domain.file_naming import filter_files_after
+from infrastructure import get_structured_logger
+
+# 構造化ロガー
+_logger = get_structured_logger(__name__)
 
 
 class FileDetector:
@@ -32,6 +36,32 @@ class FileDetector:
 
         # レベル階層情報を構築（SSoT関数を使用）
         self.level_hierarchy = build_level_hierarchy()
+
+    def _get_detection_level(self, level: str) -> str:
+        """
+        検出に使用するレベルを返す
+
+        weeklyの新規Loop検出は loop.last_processed を参照する。
+        他のレベルは自身の last_processed を参照する。
+
+        Args:
+            level: ダイジェストレベル
+
+        Returns:
+            検出に使用するレベル名
+
+        Example:
+            >>> detector._get_detection_level("weekly")
+            "loop"
+            >>> detector._get_detection_level("monthly")
+            "monthly"
+        """
+        # weeklyの新規Loop検出は loop レベルを参照
+        if level == "weekly":
+            source = self.level_config[level].get("source")
+            if source == SOURCE_TYPE_LOOPS:
+                return "loop"
+        return level
 
     def get_max_file_number(self, level: str) -> Optional[int]:
         """
@@ -90,13 +120,24 @@ class FileDetector:
             >>> [f.name for f in new_files]
             ['L00186_test.txt', 'L00187_test.txt']
         """
-        max_file_number = self.get_max_file_number(level)
+        _logger.state("find_new_files", level=level)
+
+        # 検出に使用するレベルを取得（weeklyはloopを参照）
+        detection_level = self._get_detection_level(level)
+        max_file_number = self.get_max_file_number(detection_level)
+
+        _logger.decision(
+            "detection_criteria",
+            detection_level=detection_level,
+            max_num=max_file_number,
+        )
 
         # 統一メソッドを使用してソースディレクトリとパターンを取得
         source_dir = self.config.get_source_dir(level)
         pattern = self.config.get_source_pattern(level)
 
         if not source_dir.exists():
+            _logger.file_op("found", count=0, reason="source_dir_not_exists")
             return []
 
         # ファイルを検出
@@ -104,7 +145,10 @@ class FileDetector:
 
         if max_file_number is None:
             # 初回は全ファイルを検出
+            _logger.file_op("found", count=len(all_files), filter="none_initial")
             return all_files
 
         # 統一関数を使用してフィルタリング
-        return filter_files_after(all_files, max_file_number)
+        result = filter_files_after(all_files, max_file_number)
+        _logger.file_op("found", count=len(result), filtered_from=len(all_files))
+        return result

@@ -16,7 +16,7 @@ import pytest
 from hypothesis import HealthCheck, assume, given, settings
 from hypothesis import strategies as st
 
-from domain.constants import LEVEL_CONFIG, LEVEL_NAMES, build_level_hierarchy
+from domain.constants import DIGEST_LEVEL_NAMES, LEVEL_CONFIG, LEVEL_NAMES, build_level_hierarchy
 
 # Property-Based Test マーカー
 pytestmark = pytest.mark.property
@@ -25,8 +25,9 @@ pytestmark = pytest.mark.property
 # Strategies
 # =============================================================================
 
-# 有効なレベル名
-valid_levels = st.sampled_from(LEVEL_NAMES)
+# 有効なレベル名（ダイジェストレベル - loop除く）
+# Note: loop は threshold=None のため、閾値関連テストでは除外
+valid_levels = st.sampled_from(DIGEST_LEVEL_NAMES)
 
 # ファイル数（0〜100）
 valid_file_counts = st.integers(min_value=0, max_value=100)
