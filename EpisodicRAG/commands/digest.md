@@ -85,7 +85,7 @@ EpisodicRAGシステムの基本操作を提供するコマンドです。
 ```
 TodoWrite items for Pattern 1:
 1. digest_entry.py実行 - 新Loopファイル検出
-2. ShadowGrandDigest更新 - プレースホルダー追加
+2. Shadow source_files更新 - 新規Loopファイル名を追加
 3. DigestAnalyzer並列起動 - 各Loopのlong/short分析
 4. Provisional保存実行 - individual_digests自動生成
 5. Shadow統合更新 - overall_digest更新
@@ -98,7 +98,7 @@ TodoWrite items for Pattern 1:
 | Step | 実行内容 | 使用スクリプト/処理 |
 |------|---------|-------------------|
 | 1 | 新Loopファイル検出 | `python -m interfaces.digest_entry` |
-| 2 | Shadow更新 | 新規Loopをsource_filesに追加（CLIスキルまたは手動編集） |
+| 2 | Shadow更新 | `weekly.overall_digest.source_files`に新規Loopファイル名を追加 |
 | 3 | 各Loopを分析 | Task(DigestAnalyzer) 並列起動 |
 | 4 | individual_digests保存 | `python -m interfaces.save_provisional_digest weekly --stdin --append` |
 | 5 | overall_digest更新 | ShadowGrandDigest.txtを直接編集 |
