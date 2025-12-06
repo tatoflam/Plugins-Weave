@@ -156,12 +156,20 @@ cd scripts && python -m interfaces.digest_entry weekly
   "plugin_root": "/path/to/EpisodicRAG",
   "loops_path": "/path/to/Loops",
   "digests_path": "/path/to/Digests",
+  "essences_path": "/path/to/Identities",
   "new_loops": ["L00256", "L00257"],
   "new_loops_count": 2,
   "weekly_source_count": 3,
   "weekly_threshold": 5
 }
 ```
+
+| フィールド | 用途 |
+|-----------|------|
+| `plugin_root` | プラグイン本体（スクリプト等） |
+| `loops_path` | Loopファイル格納先 |
+| `digests_path` | Digest階層格納先（1_Weekly〜8_Centurial） |
+| `essences_path` | GrandDigest / ShadowGrandDigest格納先 |
 
 ---
 
