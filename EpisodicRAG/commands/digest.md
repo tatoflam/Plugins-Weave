@@ -84,38 +84,30 @@ EpisodicRAGシステムの基本操作を提供するコマンドです。
 
 ```
 TodoWrite items for Pattern 1:
-1. digest_entry.py実行 - 新Loopファイル検出
-2. Shadow source_files更新 - 新規Loopファイル名を追加
-3. DigestAnalyzer並列起動 - 各Loopのlong/short分析
-4. Provisional保存実行 - individual_digests自動生成
-5. Shadow統合更新 - overall_digest更新
-6. update_digest_times実行 - loop処理完了を記録
-7. 次アクション提示 - Weekly生成可能か確認
+1. パス情報・新規Loop確認 - digest_entry.py実行
+2. SDG読み込み - ShadowGrandDigest.txtを読み込む
+3. source_files追加 - 新規Loopファイル名を追加
+4. DigestAnalyzer起動 - 各Loopの分析を並列起動
+5. 分析結果受信 - long/short分析結果を受け取る
+6. Provisional保存 - short結果をProvisionalにアペンド
+7. SDG統合更新 - long結果で4要素を更新
+8. 処理完了記録 - update_digest_times実行
+9. 次アクション提示 - threshold値を参照
 ```
 
 **各ステップの詳細**:
 
 | Step | 実行内容 | 使用スクリプト/処理 |
 |------|---------|-------------------|
-| 1 | 新Loopファイル検出 | `python -m interfaces.digest_entry` |
-| 2 | Shadow更新 | `weekly.overall_digest.source_files`に新規Loopファイル名を追加 |
-| 3 | 各Loopを分析 | Task(DigestAnalyzer) 並列起動 |
-| 4 | individual_digests保存 | `python -m interfaces.save_provisional_digest weekly --stdin --append` |
-| 5 | overall_digest更新 | ShadowGrandDigest.txtを直接編集 |
-| 6 | loop処理完了記録 | `python -m interfaces.update_digest_times loop <最終番号>` |
-| 7 | 次アクション提示 | digest_entry.pyの出力を参照 |
-
-#### 新Loop追加時のoverall_digest処理
-
-新規LoopをShadowに追加する際、既存の`abstract`の状態で動作が分岐：
-
-| 状態 | 条件 | 動作 |
-|------|------|------|
-| プレースホルダー | abstractが空または`<!-- PLACEHOLDER`含む | 全フィールドをプレースホルダーに初期化 |
-| 分析済み | abstractに実データ存在 | 既存分析を保持（再分析必要の警告表示） |
-
-**注意**: 分析済み状態で新Loopを追加した場合、Step 5「Shadow統合更新」で
-全source_filesを含む再分析が必要です。
+| 1 | パス情報・新規Loop確認 | `python -m interfaces.digest_entry` |
+| 2 | SDG読み込み | `essences_path`のShadowGrandDigest.txtを読み込む |
+| 3 | source_files追加 | SDGの`weekly.overall_digest.source_files`に新規Loopファイル名を追加 |
+| 4 | DigestAnalyzer起動 | Step 3のLoop別に`Task(DigestAnalyzer)`を並列起動 |
+| 5 | 分析結果受信 | 各DigestAnalyzerからlong/short分析結果を受け取る |
+| 6 | Provisional保存 | short結果をProvisionalWeeklyにアペンド（`save_provisional_digest`） |
+| 7 | SDG統合更新 | long結果を統合しSDGの4要素を更新（digest_type, keywords, abstract, impression） |
+| 8 | 処理完了記録 | `python -m interfaces.update_digest_times loop <最終番号>` |
+| 9 | 次アクション提示 | digest_entry.py出力とthreshold値を参照 |
 
 ### パターン2: `/digest <type>` (階層確定)
 
