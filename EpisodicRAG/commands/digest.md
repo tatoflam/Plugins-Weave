@@ -218,15 +218,15 @@ Provisional保存。
 **配置先**: `scripts/interfaces/save_provisional_digest.py`
 
 ```bash
-# 標準入力から読み込み（推奨）
-cat digest.json | python -m interfaces.save_provisional_digest weekly --stdin --append
-
-# ファイルパス指定
+# ファイルパス指定（基本）
 python -m interfaces.save_provisional_digest weekly digest.json --append
+
+# 標準入力から読み込み（長いJSONの場合）
+cat digest.json | python -m interfaces.save_provisional_digest weekly --stdin --append
 ```
 
-> **⚠️ 重要**: JSONはファイルまたは`--stdin`で渡してください。
-> コマンドライン引数で直接JSON文字列を渡すと、長いテキストが切り詰められる可能性があります。
+> **💡 ヒント**: JSONは直接引数で渡すのが基本です。
+> コマンドライン引数の長さ制限に引っかかった場合のみ、一時ファイルの利用を検討してください。
 
 ---
 

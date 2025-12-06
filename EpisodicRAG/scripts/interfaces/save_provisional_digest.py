@@ -127,15 +127,16 @@ class ProvisionalDigestSaver:
             )
             return get_next_digest_number(self.config.digests_path, level), individual_digests
 
-        _logger.info(
-            f"既存Provisionalに追加: {format_digest_number(level, current_num)}_Individual.txt"
-        )
-
         # Load and merge with existing data
         existing_data = self.file_manager.load_existing_provisional(level, current_num)
         if existing_data:
             existing_digests = validate_provisional_structure(existing_data)
             individual_digests = self.merger.merge(existing_digests, individual_digests)
+
+        # メッセージはマージ成功後に表示（バリデーションエラー時は表示されない）
+        _logger.info(
+            f"既存Provisionalに追加: {format_digest_number(level, current_num)}_Individual.txt"
+        )
 
         return current_num, individual_digests
 
