@@ -283,7 +283,7 @@ TodoWrite items for Pattern 2:
 7. 完了確認 - 結果表示
 ```
 
-**各ステップの詳細**:
+**各ステップの概要**:
 
 | Step | 実行内容 | 使用スクリプト/処理 |
 |------|---------|-------------------|
@@ -295,253 +295,176 @@ TodoWrite items for Pattern 2:
 | 6 | Digest確定 | `python -m interfaces.finalize_from_shadow <level> "タイトル"` |
 | 7 | 完了確認 | finalize出力を確認 |
 
----
+### 各ステップの詳細
 
-## CLIスクリプト
+#### Step 1: 対象レベル状態確認
 
-### digest_entry.py
+**実行ディレクトリ**: `{plugin_root}/scripts`
 
-メインエントリポイント（パス情報・状態確認）。
-
-**配置先**: `scripts/interfaces/digest_entry.py`
-
+**コマンド**:
 ```bash
-# パターン1: 新Loop検出
-cd scripts && python -m interfaces.digest_entry
-
-# パターン2: 階層確定準備
-cd scripts && python -m interfaces.digest_entry weekly
+python -m interfaces.digest_entry <level>
 ```
 
-**出力例（Pattern 1）**:
+**例**: Weekly確定の場合
+```bash
+python -m interfaces.digest_entry weekly
+```
+
+**出力から確認する項目**:
+- `pattern`: 2であることを確認
+- `shadow_state.source_files`: 確定対象のファイルリスト
+- `shadow_state.placeholder_fields`: DigestAnalyzer要否判定用
+
+**出力例（Pattern 2）**:
 ```json
 {
   "status": "ok",
-  "pattern": 1,
+  "pattern": 2,
+  "level": "weekly",
   "plugin_root": "/path/to/EpisodicRAG",
-  "loops_path": "/path/to/Loops",
   "digests_path": "/path/to/Digests",
   "essences_path": "/path/to/Identities",
-  "new_loops": ["L00256", "L00257"],
-  "new_loops_count": 2,
-  "weekly_source_count": 3,
-  "weekly_threshold": 5
-}
-```
-
-| フィールド | 用途 |
-|-----------|------|
-| `plugin_root` | プラグイン本体（スクリプト等） |
-| `loops_path` | Loopファイル格納先 |
-| `digests_path` | Digest階層格納先（1_Weekly〜8_Centurial） |
-| `essences_path` | GrandDigest / ShadowGrandDigest格納先 |
-
----
-
-### shadow_state_checker.py
-
-Shadow状態判定（プレースホルダー有無確認）。
-
-**配置先**: `scripts/interfaces/shadow_state_checker.py`
-
-```bash
-python -m interfaces.shadow_state_checker weekly
-```
-
-**出力例（分析済み）**:
-```json
-{
-  "status": "ok",
-  "level": "weekly",
-  "analyzed": true,
-  "source_files": ["L00001", "L00002", "L00003"],
-  "source_count": 3,
-  "placeholder_fields": [],
-  "message": "All fields analyzed"
-}
-```
-
-**出力例（プレースホルダーあり）**:
-```json
-{
-  "status": "ok",
-  "level": "weekly",
-  "analyzed": false,
-  "source_files": ["L00001", "L00002"],
-  "source_count": 2,
-  "placeholder_fields": ["abstract", "impression"],
-  "message": "Placeholders detected - run DigestAnalyzer"
+  "shadow_state": {
+    "source_files": ["L00256_xxx.txt", "L00257_xxx.txt", ...],
+    "source_count": 5,
+    "placeholder_fields": [],
+    "analyzed": true
+  },
+  "next_level": "monthly"
 }
 ```
 
 ---
 
-### save_provisional_digest.py
+#### Step 2: プレースホルダー確認
 
-Provisional保存。
+**確認方法**: Step 1出力の`shadow_state.placeholder_fields`を確認
 
-**配置先**: `scripts/interfaces/save_provisional_digest.py`
+**判定**:
+- `placeholder_fields`が空配列 `[]` → 分析済み、Step 3スキップ可能
+- `placeholder_fields`に値あり（例: `["abstract", "impression"]`）→ DigestAnalyzer必要
 
-```bash
-# ファイルパス指定（基本）
-python -m interfaces.save_provisional_digest weekly digest.json --append
+---
 
-# 標準入力から読み込み（長いJSONの場合）
-cat digest.json | python -m interfaces.save_provisional_digest weekly --stdin --append
+#### Step 3: DigestAnalyzer並列起動（必要時のみ）
+
+**前提条件**: Step 2でプレースホルダーが検出された場合のみ実行
+
+**使用ツール**: `Task(subagent_type="EpisodicRAG-Plugin:DigestAnalyzer")`
+
+**起動方法**: shadow_state.source_filesの各ファイルに対して**並列**でTaskを起動
+
+**ファイルパスの構築**:
+- Weekly確定時: `{loops_path}/{source_file}`（Loopファイル）
+- Monthly以上: `{digests_path}/1_Weekly/{source_file}`（Digestファイル）
+
+**プロンプト例**:
+```python
+Task(
+    subagent_type="EpisodicRAG-Plugin:DigestAnalyzer",
+    description=f"Analyze {source_file} for Weekly digest",
+    prompt=f"""
+分析対象ファイル: {file_path}
+
+このファイルを深層分析し、以下の形式でJSON出力してください：
+{{
+  "digest_type": "...",
+  "keywords": [...],
+  "abstract": {{"long": "...", "short": "..."}},
+  "impression": {{"long": "...", "short": "..."}}
+}}
+"""
+)
 ```
 
-> **💡 ヒント**: JSONは直接引数で渡すのが基本です。
-> コマンドライン引数の長さ制限に引っかかった場合のみ、一時ファイルの利用を検討してください。
+**出力の使い分け**:
+- **long版**: 現階層のoverall_digest用（ShadowGrandDigest更新）
+- **short版**: 次階層のindividual_digests用（Provisional保存）
 
-**入力JSONフォーマット**（必須形式）:
+---
 
+#### Step 4: Provisional保存（次階層用）
+
+**実行ディレクトリ**: `{plugin_root}/scripts`
+
+**コマンド**:
+```bash
+python -m interfaces.save_provisional_digest <next_level> --stdin --append
+```
+
+**注意**: `<next_level>`は現在レベルの**次**（weekly→monthly, monthly→quarterly）
+
+**例**: Weekly確定時（次階層はmonthly）
+```bash
+python -m interfaces.save_provisional_digest monthly --stdin --append
+```
+
+**入力JSON**:
 ```json
 {
   "individual_digests": [
     {
-      "source_file": "L00260_タイトル.txt",
-      "digest_type": "テーマ（10-20文字）",
-      "keywords": ["キーワード1", "キーワード2", "..."],
-      "abstract": {
-        "long": "2400文字の詳細分析",
-        "short": "300文字の要約"
-      },
-      "impression": {
-        "long": "800文字の所感",
-        "short": "100文字の要約"
-      }
+      "source_file": "W0052_タイトル.txt",
+      "digest_type": "...",
+      "keywords": ["..."],
+      "abstract": {"long": "...", "short": "..."},
+      "impression": {"long": "...", "short": "..."}
     }
   ]
 }
 ```
 
-**重要**: `abstract`と`impression`は必ず`{long, short}`形式を使用。
-文字列のみの形式（`"abstract": "テキスト"`）は**エラー**になります。
+---
+
+#### Step 5: タイトル提案
+
+**操作**: Claudeが分析結果に基づきタイトルを提案し、ユーザー承認を取得
+
+**提案形式**: タイトルのみ（プレフィックス・番号は不要）
+- ✅ 正しい例: `"理論的深化・実装加速・社会発信"`
+- ❌ 誤った例: `"W0052_理論的深化..."` （プレフィックス不要）
+
+**提案時のポイント**:
+- 分析したsource_filesの共通テーマを抽出
+- 10-30文字程度で簡潔に
 
 ---
 
-### finalize_from_shadow.py
+#### Step 6: Digest確定
 
-Digest確定。
+**実行ディレクトリ**: `{plugin_root}/scripts`
 
-**配置先**: `scripts/interfaces/finalize_from_shadow.py`
-
+**コマンド**:
 ```bash
-python -m interfaces.finalize_from_shadow weekly "承認されたタイトル"
+python -m interfaces.finalize_from_shadow <level> "承認されたタイトル"
+```
+
+**例**:
+```bash
+python -m interfaces.finalize_from_shadow weekly "理論的深化・実装加速・社会発信"
 ```
 
 **実行内容**:
-- RegularDigest作成（overall_digestのみ）
+- RegularDigest作成（`Digests/1_Weekly/W0052_タイトル.txt`）
 - ProvisionalDigestをRegularDigestにマージ
 - GrandDigest更新
-- 次レベルのShadowへカスケード
+- 次レベルのShadowへカスケード（source_filesに追加）
 - last_digest_times.json更新
 - Provisionalファイル削除
 
 ---
 
-### update_digest_times.py
+#### Step 7: 完了確認
 
-last_digest_times.json更新（パターン1フロー用）。
+**確認項目**:
+- finalize出力の`status`が`"ok"`であること
+- 作成されたファイルパス
+- GrandDigest更新の成功
 
-**配置先**: `scripts/interfaces/update_digest_times.py`
-
-```bash
-# Loop処理完了記録
-python -m interfaces.update_digest_times loop 259
-
-# その他のレベルも指定可能
-python -m interfaces.update_digest_times weekly 51
-```
-
-**用途**:
-- パターン1フロー（新Loop検出）でloop処理完了を記録
-- `finalize_from_shadow.py`を呼ばないワークフローで使用
-
----
-
-## Claude対話処理
-
-以下の処理はAI分析が必要なため、Claudeが直接実行します。
-
-### DigestAnalyzer並列起動
-
-各source_fileに対してDigestAnalyzerを**並列起動**し、long/short両方を生成します。
-
-> 📖 DigestAnalyzerの分析方針・出力フォーマットは [digest-analyzer.md](../agents/digest-analyzer.md) を参照
-
-#### パターンA: 単一ファイル分析
-
-```python
-Task(
-    subagent_type="EpisodicRAG-Plugin:DigestAnalyzer",
-    description="Analyze L00001 for digest generation",
-    prompt="""
-分析対象ファイル: C:\Users\anyth\DEV\homunculus\Weave\EpisodicRAG\Loops\L00001_認知アーキテクチャ論.txt
-
-このLoopファイルを深層分析し、以下の形式でJSON出力してください：
-{
-  "digest_type": "...",
-  "keywords": [...],
-  "abstract": {"long": "...", "short": "..."},
-  "impression": {"long": "...", "short": "..."}
-}
-"""
-)
-```
-
-#### パターンB: 複数ファイル並列分析（Weekly生成時）
-
-ShadowGrandDigest.weeklyのsource_filesから各Loopを並列分析：
-
-```python
-source_files = ["L00001_認知アーキテクチャ論.txt", "L00002_AI長期記憶論.txt", ...]
-
-# 各Loopに対してDigestAnalyzerを並列起動
-for source_file in source_files:
-    Task(
-        subagent_type="EpisodicRAG-Plugin:DigestAnalyzer",
-        description=f"Analyze {source_file} for Weekly digest",
-        prompt=f"分析対象ファイル: {loops_path}/{source_file}\n..."
-    )
-```
-
-#### パターンC: 複数Digestファイル並列分析（Monthly以上）
-
-Weekly DigestからMonthlyを生成する場合も同様に並列起動：
-
-```python
-source_files = ["W0001_覚醒.txt", "W0002_実装.txt", ...]
-
-for source_file in source_files:
-    Task(
-        subagent_type="EpisodicRAG-Plugin:DigestAnalyzer",
-        description=f"Analyze {source_file} for Monthly digest",
-        prompt=f"分析対象ファイル: {digests_path}/{source_file}\n..."
-    )
-```
-
-#### 出力の使い分け
-
-- **long版**（abstract.long, impression.long）: 現階層のoverall_digest用（ShadowGrandDigest更新）
-- **short版**（abstract.short, impression.short）: 次階層のindividual_digests用（Provisional保存）
-
-### タイトル提案
-
-分析結果に基づいてタイトルを提案し、ユーザー承認を取得。
-
-**注意**: タイトルのみ提案（プレフィックスと番号は不要）
-- [OK] 正しい例: "理論的深化・実装加速・社会発信"
-- [NG] 誤った例: "W0043_理論的深化..." (プレフィックス不要)
-
-### Shadow統合更新
-
-次階層Shadowのsource_filesから各ファイルのoverall_digestを読み込み、
-メインエージェントが統合分析を実行：
-- digest_type: 複数ファイルの統合テーマ（10-20文字）
-- keywords: 5個の統合キーワード（各20-50文字）
-- abstract: 2400文字の統合分析
-- impression: 800文字の所感・展望
+**次アクション**:
+- 次階層の状態を`python -m interfaces.digest_entry <next_level>`で確認
+- threshold達成時は次階層の確定へ
 
 ---
 
