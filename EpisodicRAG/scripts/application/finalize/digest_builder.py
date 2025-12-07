@@ -40,7 +40,7 @@ Note:
 """
 
 from datetime import datetime
-from typing import Any, Dict, List
+from typing import Any, List
 
 from domain.text_utils import extract_long_value, extract_short_value
 from domain.types import IndividualDigestData, OverallDigestData, RegularDigestData
@@ -115,7 +115,7 @@ class RegularDigestBuilder:
     @staticmethod
     def _normalize_individual_digests(
         individual_digests: List[IndividualDigestData],
-    ) -> List[Dict[str, Any]]:
+    ) -> List[IndividualDigestData]:
         """
         individual_digestsのabstract/impressionからshort版を抽出する。
 

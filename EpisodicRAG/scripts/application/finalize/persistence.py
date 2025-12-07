@@ -7,7 +7,7 @@ RegularDigestの保存、GrandDigest更新、カスケード処理を担当
 """
 
 from pathlib import Path
-from typing import Callable, List, Optional, cast
+from typing import Callable, Optional, cast
 
 from application.config import DigestConfig
 from application.grand import GrandDigestManager, ShadowGrandDigestManager

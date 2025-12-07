@@ -499,8 +499,8 @@ class TestDigestPersistenceCascadeDetails:
     ) -> None:
         """カスケードが次レベルのShadowを更新"""
         # Loopファイルを作成してShadowに追加
-        loop1 = create_test_loop_file(temp_plugin_env.loops_path, 1)
-        loop2 = create_test_loop_file(temp_plugin_env.loops_path, 2)
+        create_test_loop_file(temp_plugin_env.loops_path, 1)
+        create_test_loop_file(temp_plugin_env.loops_path, 2)
         shadow_manager.update_shadow_for_new_loops()
 
         # weekly のカスケード処理（monthly に伝播）

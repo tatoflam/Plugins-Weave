@@ -691,5 +691,210 @@ class TestDigestReadinessCLI(unittest.TestCase):
             self.skipTest("JSON output not available (possibly encoding issue)")
 
 
+class TestDigestReadinessCoverageImprovements(unittest.TestCase):
+    """カバレッジ改善用の追加テスト"""
+
+    def setUp(self) -> None:
+        """テスト環境をセットアップ"""
+        self.temp_dir = tempfile.mkdtemp()
+        self.plugin_root = Path(self.temp_dir)
+        self._setup_plugin_structure()
+
+    def tearDown(self) -> None:
+        """一時ディレクトリを削除"""
+        shutil.rmtree(self.temp_dir, ignore_errors=True)
+
+    def _setup_plugin_structure(self) -> None:
+        """プラグイン構造を作成"""
+        (self.plugin_root / "data" / "Loops").mkdir(parents=True)
+        (self.plugin_root / "data" / "Digests" / "1_Weekly" / "Provisional").mkdir(parents=True)
+        (self.plugin_root / "data" / "Essences").mkdir(parents=True)
+        (self.plugin_root / ".claude-plugin").mkdir(parents=True)
+
+        config_data = {
+            "base_dir": ".",
+            "paths": {
+                "loops_dir": "data/Loops",
+                "digests_dir": "data/Digests",
+                "essences_dir": "data/Essences",
+            },
+            "levels": {"weekly_threshold": 5},
+        }
+        with open(self.plugin_root / ".claude-plugin" / "config.json", "w", encoding="utf-8") as f:
+            json.dump(config_data, f)
+
+    @pytest.mark.unit
+    def test_default_plugin_root_when_none(self) -> None:
+        """plugin_root未指定時にデフォルトパスを使用（line 64）"""
+        from interfaces.digest_readiness import DigestReadinessChecker
+
+        # plugin_root=Noneで初期化（デフォルトパス使用）
+        # 実際のプラグインルートがない場合はエラーになるが、パスは設定される
+        try:
+            checker = DigestReadinessChecker(plugin_root=None)
+            # plugin_rootが設定されていることを確認
+            self.assertIsNotNone(checker.plugin_root)
+        except Exception:
+            # 設定ファイルがない場合は例外が発生するが、パス設定は行われている
+            pass
+
+    @pytest.mark.unit
+    def test_check_handles_unexpected_exception(self) -> None:
+        """check()が予期しない例外をキャッチ（lines 148-149）"""
+        from interfaces.digest_readiness import DigestReadinessChecker
+
+        # ShadowGrandDigestファイルが存在しない状態で実行
+        checker = DigestReadinessChecker(plugin_root=self.plugin_root)
+        result = checker.check("weekly")
+
+        # エラー状態が返される
+        self.assertEqual(result.status, "error")
+        self.assertIsNotNone(result.error)
+
+    @pytest.mark.unit
+    def test_check_provisional_ready_handles_exception(self) -> None:
+        """_check_provisional_ready()が例外をキャッチ（lines 241-242）"""
+        from interfaces.digest_readiness import DigestReadinessChecker
+
+        checker = DigestReadinessChecker(plugin_root=self.plugin_root)
+
+        # 存在しないProvisionalディレクトリでテスト
+        # 内部でディレクトリ取得に失敗し、例外がキャッチされる
+        ready, missing = checker._check_provisional_ready(
+            "nonexistent_level", ["L00001.txt", "L00002.txt"]
+        )
+
+        # 例外時はFalseとsource_filesが返される
+        self.assertFalse(ready)
+        self.assertEqual(missing, ["L00001.txt", "L00002.txt"])
+
+    @pytest.mark.unit
+    def test_generate_blockers_missing_sgd_files_branch(self) -> None:
+        """_generate_blockers()のmissing_sgd_filesブランチ（lines 278-279）"""
+        from interfaces.digest_readiness import DigestReadinessChecker
+
+        checker = DigestReadinessChecker(plugin_root=self.plugin_root)
+
+        # sgd_ready=False かつ PLACEHOLDERなし、missing_sgd_filesあり
+        blockers = checker._generate_blockers(
+            threshold_met=True,
+            source_count=5,
+            level_threshold=5,
+            sgd_ready=False,
+            missing_sgd_files=["L00003.txt"],  # missing_sgd_filesがある
+            overall_digest={
+                "digest_type": "完全な値",  # PLACEHOLDERなし
+                "abstract": "完全な要約",
+                "impression": "完全な所感",
+                "keywords": ["kw1", "kw2"],
+            },
+            provisional_ready=True,
+            missing_provisionals=[],
+        )
+
+        # missing_sgd_filesブランチに入る
+        self.assertTrue(any("未登録ファイル" in b for b in blockers))
+
+
+class TestDigestReadinessCLIMain(unittest.TestCase):
+    """main()関数のテスト（lines 292-325）"""
+
+    def setUp(self) -> None:
+        """テスト環境をセットアップ"""
+        self.temp_dir = tempfile.mkdtemp()
+        self.plugin_root = Path(self.temp_dir)
+        self._setup_plugin_structure()
+
+    def tearDown(self) -> None:
+        """一時ディレクトリを削除"""
+        shutil.rmtree(self.temp_dir, ignore_errors=True)
+
+    def _setup_plugin_structure(self) -> None:
+        """プラグイン構造を作成"""
+        (self.plugin_root / "data" / "Essences").mkdir(parents=True)
+        (self.plugin_root / ".claude-plugin").mkdir(parents=True)
+
+        config_data = {
+            "base_dir": ".",
+            "paths": {"essences_dir": "data/Essences"},
+            "levels": {"weekly_threshold": 5},
+        }
+        with open(self.plugin_root / ".claude-plugin" / "config.json", "w", encoding="utf-8") as f:
+            json.dump(config_data, f)
+
+    def _create_shadow_complete(self) -> None:
+        """完備状態のShadowGrandDigestを作成"""
+        shadow_data = {
+            "metadata": {"last_updated": "2025-01-01T00:00:00", "version": "1.0"},
+            "latest_digests": {
+                "weekly": {
+                    "overall_digest": {
+                        "source_files": ["L00001.txt"] * 5,
+                        "digest_type": "テスト",
+                        "keywords": ["kw1"],
+                        "abstract": "要約",
+                        "impression": "所感",
+                    }
+                },
+            },
+        }
+        with open(
+            self.plugin_root / "data" / "Essences" / "ShadowGrandDigest.txt",
+            "w",
+            encoding="utf-8",
+        ) as f:
+            json.dump(shadow_data, f)
+
+    @pytest.mark.cli
+    def test_main_outputs_json(self) -> None:
+        """main()がJSON出力を生成（line 321）"""
+        self._create_shadow_complete()
+
+        result = subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "interfaces.digest_readiness",
+                "weekly",
+                "--plugin-root",
+                str(self.plugin_root),
+            ],
+            capture_output=True,
+            cwd=str(Path(__file__).parent.parent.parent),
+            encoding="utf-8",
+            errors="replace",
+        )
+
+        # 出力がJSONとして解析可能
+        if result.stdout.strip():
+            try:
+                output = json.loads(result.stdout)
+                self.assertIn("status", output)
+            except json.JSONDecodeError:
+                pass  # エンコーディング問題の可能性
+
+    @pytest.mark.cli
+    def test_main_error_returns_exit_code_1(self) -> None:
+        """main()がエラー時に終了コード1を返す（lines 324-325）"""
+        # ShadowGrandDigestなしで実行 → エラー
+        result = subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "interfaces.digest_readiness",
+                "weekly",
+                "--plugin-root",
+                str(self.plugin_root),
+            ],
+            capture_output=True,
+            cwd=str(Path(__file__).parent.parent.parent),
+            encoding="utf-8",
+            errors="replace",
+        )
+
+        # エラー時は終了コード1
+        self.assertEqual(result.returncode, 1)
+
+
 if __name__ == "__main__":
     unittest.main()

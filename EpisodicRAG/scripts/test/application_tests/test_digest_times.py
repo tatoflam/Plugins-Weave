@@ -306,3 +306,76 @@ class TestDigestTimesTracker:
         assert data["loop"]["last_processed"] == 261
         assert data["weekly"]["last_processed"] == 53
         assert data["monthly"]["last_processed"] == 51  # W0051から抽出
+
+
+class TestDigestTimesTrackerCoverageImprovements:
+    """カバレッジ改善用の追加テスト"""
+
+    @pytest.fixture
+    def mock_config(self, temp_plugin_env: "TempPluginEnvironment"):
+        """モック設定を提供"""
+        mock = MagicMock()
+        mock.plugin_root = temp_plugin_env.plugin_root
+        return mock
+
+    @pytest.fixture
+    def tracker(self, mock_config):
+        """DigestTimesTrackerインスタンスを提供"""
+        return DigestTimesTracker(mock_config)
+
+    @pytest.mark.unit
+    def test_extract_file_numbers_with_invalid_type(self, tracker, caplog) -> None:
+        """extract_file_numbersに無効な型を渡すと警告ログを出力（lines 70-72）"""
+        import logging
+
+        # 辞書を渡す（リストではない）
+        with caplog.at_level(logging.WARNING):
+            result = tracker.extract_file_numbers("weekly", {"invalid": "type"})  # type: ignore
+
+        # 空リストが返される
+        assert result == []
+        # 警告ログが出力される
+        assert any("not a list" in record.message for record in caplog.records)
+
+    @pytest.mark.unit
+    def test_extract_file_numbers_with_string(self, tracker, caplog) -> None:
+        """extract_file_numbersに文字列を渡すと警告ログを出力（lines 70-72）"""
+        import logging
+
+        # 文字列を渡す（リストではない）
+        with caplog.at_level(logging.WARNING):
+            result = tracker.extract_file_numbers("weekly", "not_a_list")  # type: ignore
+
+        # 空リストが返される
+        assert result == []
+        # 警告ログが出力される
+        assert any("not a list" in record.message for record in caplog.records)
+
+    @pytest.mark.unit
+    def test_extract_last_processed_empty_list(self, tracker) -> None:
+        """_extract_last_processedに空リストを渡すとNoneを返す（line 89）"""
+        result = tracker._extract_last_processed([])
+        assert result is None
+
+    @pytest.mark.unit
+    def test_save_with_empty_list_logs_warning(self, tracker, caplog) -> None:
+        """saveに空リストを渡すと警告ログを出力（line 124）"""
+        import logging
+
+        with caplog.at_level(logging.WARNING):
+            tracker.save("weekly", [])
+
+        # 警告ログが出力される
+        assert any("空です" in record.message for record in caplog.records)
+
+    @pytest.mark.integration
+    def test_save_with_files_logs_last_processed(self, tracker, caplog) -> None:
+        """saveでファイルがある場合、最終処理番号がログ出力される（line 134）"""
+        import logging
+
+        with caplog.at_level(logging.INFO):
+            tracker.save("weekly", ["L00001_test.txt", "L00002_test.txt"])
+
+        # last_processedがログに含まれる
+        # ログメッセージを確認
+        assert any("last_digest_times" in record.message for record in caplog.records)
