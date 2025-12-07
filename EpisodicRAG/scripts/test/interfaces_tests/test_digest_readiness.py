@@ -454,11 +454,7 @@ class TestDigestReadinessEdgeCases(unittest.TestCase):
         """overall_digestが空のShadowGrandDigestを作成"""
         shadow_data = {
             "metadata": {"last_updated": "2025-01-01T00:00:00"},
-            "latest_digests": {
-                "weekly": {
-                    "overall_digest": {}
-                }
-            },
+            "latest_digests": {"weekly": {"overall_digest": {}}},
         }
         with open(
             self.plugin_root / "data" / "Essences" / "ShadowGrandDigest.txt",
