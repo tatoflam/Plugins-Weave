@@ -217,9 +217,7 @@ class DigestFinalizerFromShadow:
         self._persistence.update_grand_digest(level, regular_digest, new_digest_name)
 
         # ===== 処理3-5: カスケードとクリーンアップ =====
-        self._persistence.process_cascade_and_cleanup(
-            level, next_num, provisional_file_to_delete
-        )
+        self._persistence.process_cascade_and_cleanup(level, next_num, provisional_file_to_delete)
 
         _logger.info(LOG_SEPARATOR)
         _logger.info("ダイジェスト確定処理完了！")

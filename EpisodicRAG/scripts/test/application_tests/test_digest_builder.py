@@ -217,7 +217,9 @@ class TestRegularDigestBuilderBuild:
         assert overall["impression"] == "テスト用の所感・展望です。"
 
     @pytest.mark.unit
-    def test_individual_digests_structure_preserved(self, valid_shadow_digest, individual_digests) -> None:
+    def test_individual_digests_structure_preserved(
+        self, valid_shadow_digest, individual_digests
+    ) -> None:
         """individual_digestsの構造（source_file等）が保持される"""
         result = RegularDigestBuilder.build(
             level="weekly",

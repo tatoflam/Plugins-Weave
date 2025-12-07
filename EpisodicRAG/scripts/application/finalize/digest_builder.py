@@ -40,7 +40,7 @@ Note:
 """
 
 from datetime import datetime
-from typing import Any, List
+from typing import Any, List, cast
 
 from domain.text_utils import extract_long_value, extract_short_value
 from domain.types import IndividualDigestData, OverallDigestData, RegularDigestData
@@ -135,7 +135,7 @@ class RegularDigestBuilder:
             >>> normalized[0]["abstract"]
             '短い'
         """
-        normalized = []
+        normalized: List[IndividualDigestData] = []
         for digest in individual_digests:
             normalized_digest = dict(digest)  # コピー作成
             normalized_digest["abstract"] = RegularDigestBuilder._extract_short_or_string(
@@ -144,7 +144,7 @@ class RegularDigestBuilder:
             normalized_digest["impression"] = RegularDigestBuilder._extract_short_or_string(
                 digest.get("impression", "")
             )
-            normalized.append(normalized_digest)
+            normalized.append(cast(IndividualDigestData, normalized_digest))
         return normalized
 
     @staticmethod
