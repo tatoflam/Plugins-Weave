@@ -191,8 +191,6 @@ class DigestReadinessChecker:
         """keywordsにPLACEHOLDERが含まれるか判定"""
         if keywords is None:
             return True
-        if not isinstance(keywords, list):
-            return True
         if len(keywords) == 0:
             return True
         for kw in keywords:
@@ -274,7 +272,7 @@ class DigestReadinessChecker:
             if placeholder_fields:
                 blockers.append(f"SDG未完備: PLACEHOLDERあり ({', '.join(placeholder_fields)})")
             elif missing_sdg_files:
-                blockers.append(f"SDG未完備: source_filesに未登録ファイルあり")
+                blockers.append("SDG未完備: source_filesに未登録ファイルあり")
 
         if not provisional_ready:
             if missing_provisionals:
