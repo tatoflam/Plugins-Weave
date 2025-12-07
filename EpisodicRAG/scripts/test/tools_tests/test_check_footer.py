@@ -479,7 +479,7 @@ class TestMain:
 
         with patch("tools.check_footer.run_check") as mock_run:
             mock_run.return_value = mock_results
-            with patch("tools.check_footer.print_report") as mock_print:
+            with patch("tools.check_footer.print_report"):
                 with patch("tools.check_footer.Path") as mock_path_cls:
                     # パス設定のモック
                     mock_path = MagicMock()

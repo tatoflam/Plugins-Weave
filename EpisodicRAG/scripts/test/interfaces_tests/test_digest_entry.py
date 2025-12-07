@@ -7,9 +7,8 @@ digest_entry テスト
 """
 
 import json
-import sys
 from pathlib import Path
-from typing import Any, Dict
+from typing import Dict
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -22,7 +21,6 @@ from interfaces.digest_entry import (
     run_pattern2,
 )
 from interfaces.shadow_state_checker import ShadowStateResult
-
 
 # =============================================================================
 # DigestEntryResult データクラステスト
