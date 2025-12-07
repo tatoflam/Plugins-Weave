@@ -169,16 +169,16 @@ class DigestPersistence:
         else:
             _logger.info(f"[Step 3] スキップ（{level}は最上位、カスケード不要）")
 
-    def _update_digest_times(self, level: str, source_files: List[str]) -> None:
+    def _update_digest_times(self, level: str, digest_number: int) -> None:
         """
-        last_digest_timesを更新
+        last_digest_timesを更新（ダイジェスト番号で保存）
 
         Args:
             level: ダイジェストレベル
-            source_files: ソースファイルリスト
+            digest_number: 確定したダイジェスト番号
         """
         _logger.info(f"[Step 4] last_digest_times.json更新: {level}")
-        self.times_tracker.save(level, source_files)
+        self.times_tracker.save_digest_number(level, digest_number)
 
     def _cleanup_provisional_file(self, provisional_file: Optional[Path]) -> None:
         """
@@ -198,27 +198,27 @@ class DigestPersistence:
                 log_warning(f"Provisionalダイジェストの削除に失敗: {e}")
 
     def process_cascade_and_cleanup(
-        self, level: str, source_files: List[str], provisional_file_to_delete: Optional[Path]
+        self, level: str, digest_number: int, provisional_file_to_delete: Optional[Path]
     ) -> None:
         """
         カスケード処理とProvisional削除（オーケストレーター）
 
         Args:
             level: ダイジェストレベル
-            source_files: ソースファイルリスト
+            digest_number: 確定したダイジェスト番号
             provisional_file_to_delete: 削除するProvisionalファイル
 
         Example:
             >>> persistence = DigestPersistence(config, grand_manager, shadow_manager, tracker)
-            >>> persistence.process_cascade_and_cleanup("weekly", ["W0040.txt", "W0041.txt"], provisional_path)
+            >>> persistence.process_cascade_and_cleanup("weekly", 52, provisional_path)
             # ShadowGrandDigestのカスケード更新、last_digest_times更新、Provisional削除が実行される
         """
         log_debug(f"{LOG_PREFIX_STATE} process_cascade_and_cleanup: level={level}")
-        log_debug(f"{LOG_PREFIX_STATE} source_files_count: {len(source_files)}")
+        log_debug(f"{LOG_PREFIX_STATE} digest_number: {digest_number}")
         log_debug(f"{LOG_PREFIX_FILE} provisional_to_delete: {provisional_file_to_delete}")
 
         self._update_shadow_cascade(level)
-        self._update_digest_times(level, source_files)
+        self._update_digest_times(level, digest_number)
         self._cleanup_provisional_file(provisional_file_to_delete)
 
         log_debug(f"{LOG_PREFIX_STATE} cascade_and_cleanup completed for level={level}")

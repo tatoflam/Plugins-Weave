@@ -319,17 +319,37 @@ class TestFileDetectorGetDetectionLevel:
         assert result == "loop"
 
     @pytest.mark.unit
-    def test_monthly_returns_monthly(self, detector) -> None:
-        """monthlyレベルは monthly を参照する"""
+    def test_monthly_returns_weekly(self, detector) -> None:
+        """monthlyレベルは weekly を参照する（ソースはweekly）"""
         result = detector._get_detection_level("monthly")
+        assert result == "weekly"
+
+    @pytest.mark.unit
+    def test_quarterly_returns_monthly(self, detector) -> None:
+        """quarterlyレベルは monthly を参照する"""
+        result = detector._get_detection_level("quarterly")
         assert result == "monthly"
 
     @pytest.mark.unit
-    def test_other_levels_return_same(self, detector) -> None:
-        """他のレベルは自身を参照する"""
-        for level in ["quarterly", "annual", "triennial", "decadal", "multi_decadal", "centurial"]:
-            result = detector._get_detection_level(level)
-            assert result == level
+    def test_annual_returns_quarterly(self, detector) -> None:
+        """annualレベルは quarterly を参照する"""
+        result = detector._get_detection_level("annual")
+        assert result == "quarterly"
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize(
+        "level,expected_source",
+        [
+            ("triennial", "annual"),
+            ("decadal", "triennial"),
+            ("multi_decadal", "decadal"),
+            ("centurial", "multi_decadal"),
+        ],
+    )
+    def test_higher_levels_return_source_level(self, detector, level, expected_source) -> None:
+        """上位レベルはそれぞれのソースレベルを参照する"""
+        result = detector._get_detection_level(level)
+        assert result == expected_source
 
 
 class TestFileDetectorFindNewFilesUsesLoopLevel:
@@ -364,3 +384,77 @@ class TestFileDetectorFindNewFilesUsesLoopLevel:
         assert any("L00257" in name for name in filenames)
         assert any("L00258" in name for name in filenames)
         assert not any("L00255" in name for name in filenames)
+
+
+class TestFileDetectorFindNewFilesUsesSourceLevel:
+    """find_new_files がソースレベルの last_processed を使用することを検証"""
+
+    @pytest.fixture
+    def detector(self, config: "DigestConfig", times_tracker: "DigestTimesTracker"):
+        """テスト用FileDetector"""
+        return FileDetector(config, times_tracker)
+
+    @pytest.mark.integration
+    def test_monthly_find_new_files_uses_weekly_last_processed(
+        self,
+        detector,
+        temp_plugin_env: "TempPluginEnvironment",
+        times_tracker: "DigestTimesTracker",
+        config: "DigestConfig",
+    ) -> None:
+        """
+        Monthly新規ファイル検出は weekly.last_processed を参照する
+
+        Setup:
+          - weekly.last_processed = 52
+          - monthly.last_processed = 10
+          - W0050.txt, W0051.txt, W0052.txt, W0053.txt が存在
+
+        Expected:
+          - find_new_files("monthly") → [W0053.txt] のみ検出
+          - （W0052以下は既に処理済み）
+        """
+        # Setup: Weeklyディレクトリを作成しファイルを配置
+        weekly_dir = config.digests_path / "1_Weekly"
+        weekly_dir.mkdir(parents=True, exist_ok=True)
+        for i in [50, 51, 52, 53]:
+            (weekly_dir / f"W00{i}_Test.txt").touch()
+
+        # Setup: last_digest_times を設定
+        times_tracker.save_digest_number("weekly", 52)
+        times_tracker.save_digest_number("monthly", 10)
+
+        # Execute
+        result = detector.find_new_files("monthly")
+
+        # Assert: W0053 のみ検出（W0052までは処理済み）
+        assert len(result) == 1
+        assert "W0053" in result[0].name
+
+    @pytest.mark.integration
+    def test_quarterly_find_new_files_uses_monthly_last_processed(
+        self,
+        detector,
+        temp_plugin_env: "TempPluginEnvironment",
+        times_tracker: "DigestTimesTracker",
+        config: "DigestConfig",
+    ) -> None:
+        """
+        Quarterly新規ファイル検出は monthly.last_processed を参照する
+        """
+        # Setup: Monthlyディレクトリを作成しファイルを配置
+        monthly_dir = config.digests_path / "2_Monthly"
+        monthly_dir.mkdir(parents=True, exist_ok=True)
+        for i in [8, 9, 10, 11]:
+            (monthly_dir / f"M00{i:02d}_Test.txt").touch()
+
+        # Setup: last_digest_times を設定
+        times_tracker.save_digest_number("monthly", 10)
+        times_tracker.save_digest_number("quarterly", 3)
+
+        # Execute
+        result = detector.find_new_files("quarterly")
+
+        # Assert: M0011 のみ検出（M0010までは処理済み）
+        assert len(result) == 1
+        assert "M0011" in result[0].name

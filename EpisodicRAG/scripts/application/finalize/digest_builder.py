@@ -40,9 +40,9 @@ Note:
 """
 
 from datetime import datetime
-from typing import Any, List
+from typing import Any, Dict, List
 
-from domain.text_utils import extract_long_value
+from domain.text_utils import extract_long_value, extract_short_value
 from domain.types import IndividualDigestData, OverallDigestData, RegularDigestData
 from domain.version import DIGEST_FORMAT_VERSION
 
@@ -93,6 +93,59 @@ class RegularDigestBuilder:
             この実装はdomain.text_utils.extract_long_valueに委譲しています。
         """
         return extract_long_value(value, default)
+
+    @staticmethod
+    def _extract_short_or_string(value: Any, default: str = "") -> str:
+        """
+        LongShortTextからshort版を抽出、または文字列をそのまま返す。
+
+        Args:
+            value: LongShortText型 {"long": str, "short": str} または 文字列
+            default: 値が取得できない場合のデフォルト値
+
+        Returns:
+            short版の文字列（文字列の場合はそのまま返す）
+        """
+        if isinstance(value, dict):
+            return extract_short_value(value, default)
+        if isinstance(value, str):
+            return value if value else default
+        return default
+
+    @staticmethod
+    def _normalize_individual_digests(
+        individual_digests: List[IndividualDigestData],
+    ) -> List[Dict[str, Any]]:
+        """
+        individual_digestsのabstract/impressionからshort版を抽出する。
+
+        DigestAnalyzerは{"long": str, "short": str}形式で出力するが、
+        RegularDigestには文字列形式（short版のみ）で保存する。
+        overall_digestにはlong版、individual_digestsにはshort版を使用。
+
+        Args:
+            individual_digests: 個別ダイジェストリスト（LongShortText形式対応）
+
+        Returns:
+            abstract/impressionが文字列として正規化されたリスト
+
+        Example:
+            >>> digests = [{"source_file": "L001.txt", "abstract": {"long": "長い", "short": "短い"}}]
+            >>> normalized = RegularDigestBuilder._normalize_individual_digests(digests)
+            >>> normalized[0]["abstract"]
+            '短い'
+        """
+        normalized = []
+        for digest in individual_digests:
+            normalized_digest = dict(digest)  # コピー作成
+            normalized_digest["abstract"] = RegularDigestBuilder._extract_short_or_string(
+                digest.get("abstract", "")
+            )
+            normalized_digest["impression"] = RegularDigestBuilder._extract_short_or_string(
+                digest.get("impression", "")
+            )
+            normalized.append(normalized_digest)
+        return normalized
 
     @staticmethod
     def build(
@@ -147,5 +200,7 @@ class RegularDigestBuilder:
                 "abstract": abstract,
                 "impression": impression,
             },
-            "individual_digests": individual_digests,
+            "individual_digests": RegularDigestBuilder._normalize_individual_digests(
+                individual_digests
+            ),
         }

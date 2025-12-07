@@ -11,7 +11,7 @@ from typing import List, Optional
 
 from application.config import DigestConfig
 from application.tracking import DigestTimesTracker
-from domain.constants import LEVEL_CONFIG, SOURCE_TYPE_LOOPS, build_level_hierarchy
+from domain.constants import LEVEL_CONFIG, SOURCE_TYPE_LOOPS, SOURCE_TYPE_RAW, build_level_hierarchy
 from domain.file_naming import filter_files_after
 from infrastructure import get_structured_logger
 
@@ -39,29 +39,37 @@ class FileDetector:
 
     def _get_detection_level(self, level: str) -> str:
         """
-        検出に使用するレベルを返す
+        検出に使用するレベル（ソースレベル）を返す
 
-        weeklyの新規Loop検出は loop.last_processed を参照する。
-        他のレベルは自身の last_processed を参照する。
+        新規ファイル検出時、そのレベルのソースファイルの last_processed を参照する。
+        例: monthly の新規ファイル検出には weekly.last_processed を使用
 
         Args:
             level: ダイジェストレベル
 
         Returns:
-            検出に使用するレベル名
+            検出に使用するソースレベル名
 
         Example:
             >>> detector._get_detection_level("weekly")
             "loop"
             >>> detector._get_detection_level("monthly")
+            "weekly"
+            >>> detector._get_detection_level("quarterly")
             "monthly"
         """
-        # weeklyの新規Loop検出は loop レベルを参照
-        if level == "weekly":
-            source = self.level_config[level].get("source")
-            if source == SOURCE_TYPE_LOOPS:
-                return "loop"
-        return level
+        source = self.level_config[level].get("source")
+
+        # source が "loops" の場合は "loop" を返す
+        if source == SOURCE_TYPE_LOOPS:
+            return "loop"
+
+        # source が "raw" の場合（loopレベル）は自身を返す
+        if source == SOURCE_TYPE_RAW:
+            return level
+
+        # それ以外はソースレベル名をそのまま返す
+        return source
 
     def get_max_file_number(self, level: str) -> Optional[int]:
         """

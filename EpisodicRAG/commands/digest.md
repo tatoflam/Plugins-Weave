@@ -65,12 +65,12 @@ EpisodicRAGシステムの基本操作を提供するコマンドです。
 ```
 TodoWrite items for Pattern 1:
 1. パス情報・新規Loop確認 - digest_entry.pyを実行
-2. SDG読み込み - ShadowGrandDigest.txtを読み込む
+2. SGD読み込み - ShadowGrandDigest.txtを読み込む
 3. source_files追加 - 新規Loopファイル名を追加
 4. DigestAnalyzer起動 - 各Loopファイルの分析を並列起動
 5. 分析結果受信 - long/short分析結果を受け取る
 6. Provisional保存 - short結果をProvisionalにアペンド
-7. SDG統合更新 - long結果で4要素を更新
+7. SGD統合更新 - long結果で4要素を更新
 8. 処理完了記録 - update_digest_timesを実行
 9. 次アクション提示 - threshold値を参照
 ```
@@ -80,12 +80,12 @@ TodoWrite items for Pattern 1:
 | Step | 実行内容 | 使用スクリプト/処理 |
 |------|---------|-------------------|
 | 1 | パス情報・新規Loop確認 | `python -m interfaces.digest_entry` |
-| 2 | SDG読み込み | `essences_path`のShadowGrandDigest.txtを読み込む |
-| 3 | source_files追加 | SDGの`weekly.overall_digest.source_files`に新規Loopファイル名を追加 |
+| 2 | SGD読み込み | `essences_path`のShadowGrandDigest.txtを読み込む |
+| 3 | source_files追加 | SGDの`weekly.overall_digest.source_files`に新規Loopファイル名を追加 |
 | 4 | DigestAnalyzer起動 | Step 3のLoopファイル別に`Task(DigestAnalyzer)`を並列起動 |
 | 5 | 分析結果受信 | 各DigestAnalyzerからlong/short分析結果を受け取る |
 | 6 | Provisional保存 | short結果をProvisionalWeeklyにアペンド（`save_provisional_digest`） |
-| 7 | SDG統合更新 | long結果を統合しSDGの4要素を更新（digest_type, keywords, abstract, impression） |
+| 7 | SGD統合更新 | long結果を統合しSGDの4要素を更新（digest_type, keywords, abstract, impression） |
 | 8 | 処理完了記録 | `python -m interfaces.update_digest_times loop <最終番号>` |
 | 9 | 次アクション提示 | digest_entry.py出力とthreshold値を参照 |
 
@@ -111,7 +111,7 @@ python -m interfaces.digest_entry --output json
 
 ---
 
-#### Step 2: SDG読み込み
+#### Step 2: SGD読み込み
 
 **対象ファイル**: `{essences_path}/ShadowGrandDigest.txt`
 
@@ -206,7 +206,7 @@ python -m interfaces.save_provisional_digest weekly --stdin --append
 
 ---
 
-#### Step 7: SDG統合更新
+#### Step 7: SGD統合更新
 
 **対象ファイル**: `{essences_path}/ShadowGrandDigest.txt`
 
@@ -278,10 +278,10 @@ ShadowGrandDigest.weekly に追加しました。
 TodoWrite items for Pattern 2:
 1. パス情報・Digest対象確認 - digest_entry.pyを実行
 2. Digest要否判断 - threshold値未満ならアラート後、続行/中断を確認
-3. 再分析要否判断 - digest_readiness.pyでSDG/Provisional完備を確認
+3. 再分析要否判断 - digest_readiness.pyでSGD/Provisional完備を確認
 4. DigestAnalyzer起動 - 各Digest対象ファイルの分析を並列起動
 5. 分析結果受信 - long/short分析結果を受け取る
-6. SDGとProvisional更新 - 分析結果をアペンド
+6. SGDとProvisional更新 - 分析結果をアペンド
 7. Digest名確定 - ユーザーにタイトルを提案して承認を取得
 8. Digestカスケード - finalize_from_shadow.pyを実行
 9. 処理完了提示 - GrandDigestと次階層のDigest要否を確認
@@ -296,7 +296,7 @@ TodoWrite items for Pattern 2:
 | 3 | 再分析要否判断 | `python -m interfaces.digest_readiness <level>` |
 | 4 | DigestAnalyzer起動 | Task(DigestAnalyzer) 並列起動（Step 3で必要と判定された場合） |
 | 5 | 分析結果受信 | 各DigestAnalyzerからlong/short分析結果を受け取る |
-| 6 | SDGとProvisional更新 | SDGの4要素更新 + save_provisional_digest実行 |
+| 6 | SGDとProvisional更新 | SGDの4要素更新 + save_provisional_digest実行 |
 | 7 | Digest名確定 | Claudeが提案、ユーザー承認 |
 | 8 | Digestカスケード | `python -m interfaces.finalize_from_shadow <level> "タイトル"` |
 | 9 | 処理完了提示 | GrandDigest確認 + 次階層のDigest要否を案内 |
@@ -384,7 +384,7 @@ python -m interfaces.digest_readiness <level>
   "source_count": 5,
   "level_threshold": 5,
   "threshold_met": true,
-  "sdg_ready": true,
+  "sgd_ready": true,
   "provisional_ready": true,
   "can_finalize": true,
   "blockers": [],
@@ -400,12 +400,12 @@ python -m interfaces.digest_readiness <level>
   "source_count": 4,
   "level_threshold": 5,
   "threshold_met": false,
-  "sdg_ready": false,
+  "sgd_ready": false,
   "provisional_ready": false,
   "can_finalize": false,
   "blockers": [
     "threshold未達: 4/5 (あと1ファイル必要)",
-    "SDG未完備: PLACEHOLDERあり (abstract, impression)",
+    "SGD未完備: PLACEHOLDERあり (abstract, impression)",
     "Provisional未完備: W0051_xxx.txt が不足"
   ],
   "message": "Digest確定不可: 3件の未達条件あり"
@@ -478,7 +478,7 @@ DigestAnalyzerからJSON形式で結果を受け取る。
 
 ---
 
-#### Step 6: SDGとProvisional更新
+#### Step 6: SGDとProvisional更新
 
 **前提条件**: Step 4-5で分析結果を取得した場合のみ実行
 

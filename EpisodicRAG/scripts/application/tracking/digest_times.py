@@ -153,3 +153,22 @@ class DigestTimesTracker:
         # 共通ロジックで保存
         self._save_level_data(level, last_processed)
         _logger.info(f"last_digest_times.json更新: {level} = {last_processed}")
+
+    def save_digest_number(self, level: str, digest_number: int) -> None:
+        """
+        ダイジェスト番号を直接保存（確定時用）
+
+        finalize_from_shadow時、source_filesの番号ではなく
+        確定したダイジェスト番号を保存するために使用。
+
+        Args:
+            level: ダイジェストレベル（weekly, monthly等）
+            digest_number: 確定したダイジェスト番号
+
+        Example:
+            >>> tracker = DigestTimesTracker(config)
+            >>> tracker.save_digest_number("weekly", 52)
+            # last_digest_times.json の weekly.last_processed が 52 に更新される
+        """
+        self._save_level_data(level, digest_number)
+        _logger.info(f"last_digest_times.json更新（確定）: {level} = {digest_number}")

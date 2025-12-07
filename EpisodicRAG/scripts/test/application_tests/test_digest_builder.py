@@ -217,8 +217,8 @@ class TestRegularDigestBuilderBuild:
         assert overall["impression"] == "テスト用の所感・展望です。"
 
     @pytest.mark.unit
-    def test_individual_digests_preserved(self, valid_shadow_digest, individual_digests) -> None:
-        """individual_digestsがそのまま保持される"""
+    def test_individual_digests_structure_preserved(self, valid_shadow_digest, individual_digests) -> None:
+        """individual_digestsの構造（source_file等）が保持される"""
         result = RegularDigestBuilder.build(
             level="weekly",
             new_digest_name="W0001",
@@ -226,8 +226,14 @@ class TestRegularDigestBuilderBuild:
             shadow_digest=valid_shadow_digest,
             individual_digests=individual_digests,
         )
-        assert result["individual_digests"] == individual_digests
         assert len(result["individual_digests"]) == 2
+        # 元のフィールドが保持される
+        assert result["individual_digests"][0]["source_file"] == "Loop0001_test.txt"
+        assert result["individual_digests"][1]["source_file"] == "Loop0002_test.txt"
+        assert result["individual_digests"][0]["content"] == "Content 1"
+        # abstract/impressionは正規化される（文字列型）
+        assert isinstance(result["individual_digests"][0]["abstract"], str)
+        assert isinstance(result["individual_digests"][0]["impression"], str)
 
     @pytest.mark.unit
     def test_empty_individual_digests(self, valid_shadow_digest) -> None:
@@ -317,3 +323,48 @@ class TestRegularDigestBuilderBuild:
         )
         assert result["overall_digest"]["source_files"] == []
         assert result["overall_digest"]["digest_type"] == "空テスト"
+
+    @pytest.mark.unit
+    def test_individual_digests_abstract_extracts_short_value(self, valid_shadow_digest) -> None:
+        """individual_digestsのabstractがshort版のみ文字列として抽出される"""
+        individual_with_long_short = [
+            {
+                "source_file": "Loop0001.txt",
+                "digest_type": "テスト",
+                "keywords": ["test"],
+                "abstract": {"long": "長いabstract", "short": "短いabstract"},
+                "impression": {"long": "長いimpression", "short": "短いimpression"},
+            }
+        ]
+        result = RegularDigestBuilder.build(
+            level="weekly",
+            new_digest_name="W0001",
+            digest_num="W0001",
+            shadow_digest=valid_shadow_digest,
+            individual_digests=individual_with_long_short,
+        )
+        # abstract/impressionがshort版の文字列として抽出される
+        assert result["individual_digests"][0]["abstract"] == "短いabstract"
+        assert result["individual_digests"][0]["impression"] == "短いimpression"
+
+    @pytest.mark.unit
+    def test_individual_digests_string_abstract_preserved(self, valid_shadow_digest) -> None:
+        """individual_digestsの文字列形式abstract/impressionはそのまま保持される"""
+        individual_with_string = [
+            {
+                "source_file": "Loop0001.txt",
+                "digest_type": "テスト",
+                "keywords": ["test"],
+                "abstract": "すでに文字列のabstract",
+                "impression": "すでに文字列のimpression",
+            }
+        ]
+        result = RegularDigestBuilder.build(
+            level="weekly",
+            new_digest_name="W0001",
+            digest_num="W0001",
+            shadow_digest=valid_shadow_digest,
+            individual_digests=individual_with_string,
+        )
+        assert result["individual_digests"][0]["abstract"] == "すでに文字列のabstract"
+        assert result["individual_digests"][0]["impression"] == "すでに文字列のimpression"

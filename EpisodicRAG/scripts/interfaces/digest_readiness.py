@@ -40,8 +40,8 @@ class DigestReadinessResult:
     source_count: int = 0
     level_threshold: int = 5
     threshold_met: bool = False
-    sdg_ready: bool = False
-    missing_sdg_files: List[str] = field(default_factory=list)
+    sgd_ready: bool = False
+    missing_sgd_files: List[str] = field(default_factory=list)
     provisional_ready: bool = False
     missing_provisionals: List[str] = field(default_factory=list)
     can_finalize: bool = False
@@ -102,7 +102,7 @@ class DigestReadinessChecker:
             threshold_met = source_count >= level_threshold
 
             # SDG完備判定
-            sdg_ready, missing_sdg_files = self._check_sdg_ready(overall_digest, source_files)
+            sgd_ready, missing_sgd_files = self._check_sgd_ready(overall_digest, source_files)
 
             # Provisional完備判定
             provisional_ready, missing_provisionals = self._check_provisional_ready(
@@ -110,15 +110,15 @@ class DigestReadinessChecker:
             )
 
             # can_finalize判定
-            can_finalize = threshold_met and sdg_ready and provisional_ready
+            can_finalize = threshold_met and sgd_ready and provisional_ready
 
             # blockers生成
             blockers = self._generate_blockers(
                 threshold_met,
                 source_count,
                 level_threshold,
-                sdg_ready,
-                missing_sdg_files,
+                sgd_ready,
+                missing_sgd_files,
                 overall_digest,
                 provisional_ready,
                 missing_provisionals,
@@ -136,8 +136,8 @@ class DigestReadinessChecker:
                 source_count=source_count,
                 level_threshold=level_threshold,
                 threshold_met=threshold_met,
-                sdg_ready=sdg_ready,
-                missing_sdg_files=missing_sdg_files,
+                sgd_ready=sgd_ready,
+                missing_sgd_files=missing_sgd_files,
                 provisional_ready=provisional_ready,
                 missing_provisionals=missing_provisionals,
                 can_finalize=can_finalize,
@@ -152,7 +152,7 @@ class DigestReadinessChecker:
                 error=f"Unexpected error: {e}",
             )
 
-    def _check_sdg_ready(
+    def _check_sgd_ready(
         self, overall_digest: Dict[str, Any], source_files: List[str]
     ) -> tuple[bool, List[str]]:
         """
@@ -161,7 +161,7 @@ class DigestReadinessChecker:
         SDG完備 = overall_digest存在 AND 4要素がPLACEHOLDERでない
 
         Returns:
-            (sdg_ready, missing_sdg_files)
+            (sgd_ready, missing_sgd_files)
         """
         if not overall_digest:
             return False, []
@@ -246,8 +246,8 @@ class DigestReadinessChecker:
         threshold_met: bool,
         source_count: int,
         level_threshold: int,
-        sdg_ready: bool,
-        missing_sdg_files: List[str],
+        sgd_ready: bool,
+        missing_sgd_files: List[str],
         overall_digest: Dict[str, Any],
         provisional_ready: bool,
         missing_provisionals: List[str],
@@ -261,7 +261,7 @@ class DigestReadinessChecker:
                 f"threshold未達: {source_count}/{level_threshold} (あと{need}ファイル必要)"
             )
 
-        if not sdg_ready:
+        if not sgd_ready:
             # PLACEHOLDERがある場合
             placeholder_fields = []
             if self._has_placeholder(overall_digest.get("digest_type")):
@@ -275,7 +275,7 @@ class DigestReadinessChecker:
 
             if placeholder_fields:
                 blockers.append(f"SDG未完備: PLACEHOLDERあり ({', '.join(placeholder_fields)})")
-            elif missing_sdg_files:
+            elif missing_sgd_files:
                 blockers.append("SDG未完備: source_filesに未登録ファイルあり")
 
         if not provisional_ready:

@@ -304,17 +304,17 @@ class TestProcessCascadeAndCleanup:
         """Calls shadow_manager.cascade_update_on_digest_finalize"""
         persistence, mock_shadow, _ = persistence_with_mocks
 
-        persistence.process_cascade_and_cleanup("weekly", ["file1.txt"], None)
+        persistence.process_cascade_and_cleanup("weekly", 52, None)
 
         mock_shadow.cascade_update_on_digest_finalize.assert_called_once_with("weekly")
 
-    def test_calls_times_tracker_save(self, persistence_with_mocks) -> None:
-        """Calls times_tracker.save with correct arguments"""
+    def test_calls_times_tracker_save_digest_number(self, persistence_with_mocks) -> None:
+        """Calls times_tracker.save_digest_number with correct arguments"""
         persistence, _, mock_times = persistence_with_mocks
 
-        persistence.process_cascade_and_cleanup("weekly", ["file1.txt", "file2.txt"], None)
+        persistence.process_cascade_and_cleanup("weekly", 52, None)
 
-        mock_times.save.assert_called_once_with("weekly", ["file1.txt", "file2.txt"])
+        mock_times.save_digest_number.assert_called_once_with("weekly", 52)
 
     def test_deletes_provisional_file(self, persistence_with_mocks, tmp_path: Path) -> None:
         """Deletes provisional file when provided"""
@@ -324,7 +324,7 @@ class TestProcessCascadeAndCleanup:
         provisional_file = tmp_path / "W0001_Individual.txt"
         provisional_file.write_text("{}")
 
-        persistence.process_cascade_and_cleanup("weekly", ["file1.txt"], provisional_file)
+        persistence.process_cascade_and_cleanup("weekly", 52, provisional_file)
 
         assert not provisional_file.exists()
 
@@ -335,14 +335,14 @@ class TestProcessCascadeAndCleanup:
         missing_file = tmp_path / "missing.txt"
 
         # Should not raise
-        persistence.process_cascade_and_cleanup("weekly", ["file1.txt"], missing_file)
+        persistence.process_cascade_and_cleanup("weekly", 52, missing_file)
 
     def test_handles_none_provisional_file(self, persistence_with_mocks) -> None:
         """Handles None provisional file gracefully"""
         persistence, _, _ = persistence_with_mocks
 
         # Should not raise
-        persistence.process_cascade_and_cleanup("weekly", ["file1.txt"], None)
+        persistence.process_cascade_and_cleanup("weekly", 52, None)
 
 
 # =============================================================================

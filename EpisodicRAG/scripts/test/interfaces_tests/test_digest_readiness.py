@@ -285,12 +285,12 @@ class TestDigestReadinessChecker(unittest.TestCase):
         self.assertIn("threshold未達", result.blockers[0])
 
     # =========================================================================
-    # sdg_ready テスト
+    # sgd_ready テスト
     # =========================================================================
 
     @pytest.mark.unit
-    def test_sdg_ready_true(self) -> None:
-        """SDG完備の場合 sdg_ready=True"""
+    def test_sgd_ready_true(self) -> None:
+        """SDG完備の場合 sgd_ready=True"""
         sys.path.insert(0, str(self.plugin_root.parent / "scripts"))
         from interfaces.digest_readiness import DigestReadinessChecker
 
@@ -298,12 +298,12 @@ class TestDigestReadinessChecker(unittest.TestCase):
         checker = DigestReadinessChecker(plugin_root=self.plugin_root)
         result = checker.check("weekly")
 
-        self.assertTrue(result.sdg_ready)
-        self.assertEqual(result.missing_sdg_files, [])
+        self.assertTrue(result.sgd_ready)
+        self.assertEqual(result.missing_sgd_files, [])
 
     @pytest.mark.unit
-    def test_sdg_ready_false_placeholder(self) -> None:
-        """PLACEHOLDERがある場合 sdg_ready=False"""
+    def test_sgd_ready_false_placeholder(self) -> None:
+        """PLACEHOLDERがある場合 sgd_ready=False"""
         sys.path.insert(0, str(self.plugin_root.parent / "scripts"))
         from interfaces.digest_readiness import DigestReadinessChecker
 
@@ -311,7 +311,7 @@ class TestDigestReadinessChecker(unittest.TestCase):
         checker = DigestReadinessChecker(plugin_root=self.plugin_root)
         result = checker.check("weekly")
 
-        self.assertFalse(result.sdg_ready)
+        self.assertFalse(result.sgd_ready)
         # PLACEHOLDERがある場合のblockerメッセージ
         sdg_blocker = [b for b in result.blockers if "SDG" in b]
         self.assertTrue(len(sdg_blocker) > 0)
@@ -496,7 +496,7 @@ class TestDigestReadinessEdgeCases(unittest.TestCase):
         result = checker.check("weekly")
 
         self.assertEqual(result.status, "ok")
-        self.assertFalse(result.sdg_ready)
+        self.assertFalse(result.sgd_ready)
 
     @pytest.mark.unit
     def test_none_values_in_digest(self) -> None:
@@ -508,7 +508,7 @@ class TestDigestReadinessEdgeCases(unittest.TestCase):
         result = checker.check("weekly")
 
         self.assertEqual(result.status, "ok")
-        self.assertFalse(result.sdg_ready)
+        self.assertFalse(result.sgd_ready)
 
     @pytest.mark.unit
     def test_has_placeholder_none(self) -> None:
@@ -558,8 +558,8 @@ class TestDigestReadinessEdgeCases(unittest.TestCase):
             threshold_met=False,
             source_count=2,
             level_threshold=5,
-            sdg_ready=False,
-            missing_sdg_files=["file1.txt"],
+            sgd_ready=False,
+            missing_sgd_files=["file1.txt"],
             overall_digest={
                 "digest_type": "<!-- PLACEHOLDER -->",
                 "abstract": "valid",
@@ -585,8 +585,8 @@ class TestDigestReadinessEdgeCases(unittest.TestCase):
             threshold_met=True,
             source_count=5,
             level_threshold=5,
-            sdg_ready=True,
-            missing_sdg_files=[],
+            sgd_ready=True,
+            missing_sgd_files=[],
             overall_digest={},
             provisional_ready=False,
             missing_provisionals=[],

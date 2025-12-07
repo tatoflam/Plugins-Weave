@@ -207,3 +207,102 @@ class TestDigestTimesTracker:
         assert set(weekly_data.keys()) == set(monthly_data.keys())
         assert "timestamp" in weekly_data
         assert "last_processed" in weekly_data
+
+    # ====== save_digest_number() テスト (Pattern 2 バグ修正用) ======
+
+    @pytest.mark.integration
+    def test_save_digest_number_stores_correct_value(self, tracker) -> None:
+        """
+        save_digest_number()でダイジェスト番号が正しく保存される
+
+        Bug修正: finalize_from_shadow時、source_filesの番号ではなく
+        ダイジェスト番号を保存する必要がある
+        """
+        # Weekly確定時、ダイジェスト番号52を直接保存
+        tracker.save_digest_number("weekly", 52)
+
+        data = tracker.load_or_create()
+        assert data["weekly"]["last_processed"] == 52
+
+    @pytest.mark.integration
+    def test_save_digest_number_updates_timestamp(self, tracker) -> None:
+        """save_digest_number()がtimestampを更新"""
+        tracker.save_digest_number("weekly", 52)
+
+        data = tracker.load_or_create()
+        timestamp_str = data["weekly"]["timestamp"]
+        assert timestamp_str is not None
+        assert timestamp_str != ""
+        # ISO形式であることを検証
+        timestamp = datetime.fromisoformat(timestamp_str)
+        assert timestamp is not None
+
+    @pytest.mark.integration
+    def test_save_digest_number_preserves_other_levels(self, tracker) -> None:
+        """save_digest_number()が他のレベルを保持"""
+        # loopを先に設定
+        tracker.update_direct("loop", 260)
+
+        # weeklyをsave_digest_numberで更新
+        tracker.save_digest_number("weekly", 52)
+
+        data = tracker.load_or_create()
+        # loopは保持
+        assert data["loop"]["last_processed"] == 260
+        # weeklyは更新
+        assert data["weekly"]["last_processed"] == 52
+
+    # ====== Pattern 1 リグレッションテスト ======
+
+    @pytest.mark.integration
+    def test_pattern1_update_direct_still_works(self, tracker) -> None:
+        """
+        Pattern 1 リグレッション: update_direct()が引き続き正常動作
+
+        /digest (引数なし) → update_digest_times.py で使用
+        """
+        tracker.update_direct("loop", 260)
+
+        data = tracker.load_or_create()
+        assert data["loop"]["last_processed"] == 260
+
+    @pytest.mark.integration
+    def test_pattern1_and_pattern2_do_not_interfere(self, tracker) -> None:
+        """
+        Pattern 1 と Pattern 2 が干渉しない
+
+        Pattern 1: update_direct("loop", 260)
+        Pattern 2: save_digest_number("weekly", 52)
+        """
+        # Pattern 1: Loop検出
+        tracker.update_direct("loop", 260)
+
+        # Pattern 2: Weekly確定
+        tracker.save_digest_number("weekly", 52)
+
+        data = tracker.load_or_create()
+
+        # Pattern 1 の結果が維持
+        assert data["loop"]["last_processed"] == 260
+        # Pattern 2 の結果が正しい
+        assert data["weekly"]["last_processed"] == 52
+
+    @pytest.mark.integration
+    def test_api_backward_compatibility(self, tracker) -> None:
+        """
+        APIの後方互換性: 既存メソッドのシグネチャが維持される
+
+        update_direct(level, last_processed) と
+        save(level, input_files) は変更なく動作する
+        """
+        # 既存API: update_direct
+        tracker.update_direct("loop", 261)
+        tracker.update_direct("weekly", 53)
+
+        # 既存API: save (source_filesから番号抽出)
+        tracker.save("monthly", ["W0050_test.txt", "W0051_test.txt"])
+
+        data = tracker.load_or_create()
+        assert data["loop"]["last_processed"] == 261
+        assert data["weekly"]["last_processed"] == 53
+        assert data["monthly"]["last_processed"] == 51  # W0051から抽出

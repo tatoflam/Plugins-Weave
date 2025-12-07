@@ -205,15 +205,15 @@ class TestDigestPersistenceProcessCascadeAndCleanup:
         times_tracker: "DigestTimesTracker",
         temp_plugin_env: "TempPluginEnvironment",
     ) -> None:
-        """times_trackerが更新される"""
-        source_files = ["L00001_test.txt", "L00002_test.txt"]
-        persistence.process_cascade_and_cleanup("weekly", source_files, None)
+        """times_trackerが更新される（ダイジェスト番号で保存）"""
+        digest_number = 52
+        persistence.process_cascade_and_cleanup("weekly", digest_number, None)
 
         # times_trackerを確認
         times_data = times_tracker.load_or_create()
-        # last_processed は整数で、処理されたLoop番号を表す
+        # last_processed は整数で、確定したダイジェスト番号を表す
         assert isinstance(times_data["weekly"]["last_processed"], int)
-        assert times_data["weekly"]["last_processed"] == 2  # L00002が最後
+        assert times_data["weekly"]["last_processed"] == 52  # ダイジェスト番号
 
     @pytest.mark.integration
     def test_removes_provisional_file(self, persistence, config: "DigestConfig") -> None:
@@ -226,7 +226,7 @@ class TestDigestPersistenceProcessCascadeAndCleanup:
 
         assert provisional_path.exists()
 
-        persistence.process_cascade_and_cleanup("weekly", ["L00001.txt"], provisional_path)
+        persistence.process_cascade_and_cleanup("weekly", 52, provisional_path)
 
         assert not provisional_path.exists()
 
@@ -234,7 +234,7 @@ class TestDigestPersistenceProcessCascadeAndCleanup:
     def test_handles_none_provisional_file(self, persistence) -> None:
         """Provisionalファイルがない場合も正常に動作"""
         # エラーなく完了すればOK
-        persistence.process_cascade_and_cleanup("weekly", ["L00001.txt"], None)
+        persistence.process_cascade_and_cleanup("weekly", 52, None)
 
     @pytest.mark.integration
     def test_skips_cascade_for_centurial(
@@ -245,7 +245,7 @@ class TestDigestPersistenceProcessCascadeAndCleanup:
     ) -> None:
         """centurialではカスケードがスキップされる"""
         # エラーなく完了すればOK（centurialにはnext=Noneなので）
-        persistence.process_cascade_and_cleanup("centurial", [], None)
+        persistence.process_cascade_and_cleanup("centurial", 1, None)
 
 
 # =============================================================================
@@ -504,8 +504,8 @@ class TestDigestPersistenceCascadeDetails:
         shadow_manager.update_shadow_for_new_loops()
 
         # weekly のカスケード処理（monthly に伝播）
-        source_files = [loop1.name, loop2.name]
-        persistence.process_cascade_and_cleanup("weekly", source_files, None)
+        # ダイジェスト番号52で確定（source_filesではなくダイジェスト番号を渡す）
+        persistence.process_cascade_and_cleanup("weekly", 52, None)
 
         # monthly の shadow が更新されている可能性を確認（エラーなく完了）
         # 具体的な内容検証はカスケードロジックに依存
@@ -525,9 +525,9 @@ class TestDigestPersistenceCascadeDetails:
             "multi_decadal",
         ]
 
-        for level in levels_with_cascade:
-            # エラーなく完了することを確認
-            persistence.process_cascade_and_cleanup(level, [], None)
+        for i, level in enumerate(levels_with_cascade, start=1):
+            # エラーなく完了することを確認（ダイジェスト番号を渡す）
+            persistence.process_cascade_and_cleanup(level, i, None)
 
     @pytest.mark.integration
     def test_provisional_delete_failure_logs_warning(
@@ -538,5 +538,5 @@ class TestDigestPersistenceCascadeDetails:
         fake_provisional = config.get_provisional_dir("weekly") / "NonExistent.txt"
 
         # 削除しようとしてもファイルがないので何も起きない（エラーにならない）
-        persistence.process_cascade_and_cleanup("weekly", [], fake_provisional)
+        persistence.process_cascade_and_cleanup("weekly", 52, fake_provisional)
         # ここまで到達すれば成功

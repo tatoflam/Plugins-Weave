@@ -217,9 +217,8 @@ class DigestFinalizerFromShadow:
         self._persistence.update_grand_digest(level, regular_digest, new_digest_name)
 
         # ===== 処理3-5: カスケードとクリーンアップ =====
-        source_files = shadow_digest.get("source_files", [])
         self._persistence.process_cascade_and_cleanup(
-            level, source_files, provisional_file_to_delete
+            level, next_num, provisional_file_to_delete
         )
 
         _logger.info(LOG_SEPARATOR)

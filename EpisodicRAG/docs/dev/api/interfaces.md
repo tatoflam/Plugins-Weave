@@ -594,8 +594,8 @@ class DigestReadinessResult:
     source_count: int = 0
     level_threshold: int = 5
     threshold_met: bool = False
-    sdg_ready: bool = False
-    missing_sdg_files: List[str] = field(default_factory=list)
+    sgd_ready: bool = False
+    missing_sgd_files: List[str] = field(default_factory=list)
     provisional_ready: bool = False
     missing_provisionals: List[str] = field(default_factory=list)
     can_finalize: bool = False
@@ -606,9 +606,9 @@ class DigestReadinessResult:
 
 **判定ロジック**:
 - `threshold_met`: `source_count >= level_threshold`
-- `sdg_ready`: overall_digest存在 AND 4要素がPLACEHOLDERでない
+- `sgd_ready`: overall_digest存在 AND 4要素がPLACEHOLDERでない
 - `provisional_ready`: source_files全てにindividual_digestsエントリ存在
-- `can_finalize`: `threshold_met AND sdg_ready AND provisional_ready`
+- `can_finalize`: `threshold_met AND sgd_ready AND provisional_ready`
 
 **使用例（CLI）**:
 
@@ -630,7 +630,7 @@ python -m interfaces.digest_readiness weekly
   "source_count": 4,
   "level_threshold": 5,
   "threshold_met": false,
-  "sdg_ready": true,
+  "sgd_ready": true,
   "provisional_ready": false,
   "can_finalize": false,
   "blockers": [
