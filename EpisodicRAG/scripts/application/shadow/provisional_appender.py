@@ -103,7 +103,9 @@ class ProvisionalAppender:
         new_number = "0001".zfill(digits)
         return provisional_dir / f"{prefix}{new_number}_Individual.txt"
 
-    def _load_or_create_provisional(self, provisional_path: Path, next_level: str) -> Dict[str, Any]:
+    def _load_or_create_provisional(
+        self, provisional_path: Path, next_level: str
+    ) -> Dict[str, Any]:
         """
         Provisionalファイルを読み込み、存在しなければ新規作成
 
@@ -136,9 +138,7 @@ class ProvisionalAppender:
             "individual_digests": [],
         }
 
-    def _build_individual_entry(
-        self, finalized_digest: RegularDigestData
-    ) -> Dict[str, Any]:
+    def _build_individual_entry(self, finalized_digest: RegularDigestData) -> Dict[str, Any]:
         """
         確定ダイジェストから個別エントリを構築
 
@@ -195,9 +195,7 @@ class ProvisionalAppender:
                 return True
         return False
 
-    def append_to_next_provisional(
-        self, level: str, finalized_digest: RegularDigestData
-    ) -> None:
+    def append_to_next_provisional(self, level: str, finalized_digest: RegularDigestData) -> None:
         """
         次レベルのProvisionalに確定ダイジェストを追加
 
