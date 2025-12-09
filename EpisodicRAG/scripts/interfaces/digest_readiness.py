@@ -27,6 +27,7 @@ from infrastructure.json_repository import load_json
 if sys.platform == "win32" and "pytest" not in sys.modules:
     import io
 
+    sys.stdin = io.TextIOWrapper(sys.stdin.buffer, encoding="utf-8")
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
     sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8")
 

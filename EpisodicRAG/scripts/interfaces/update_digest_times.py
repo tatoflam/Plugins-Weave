@@ -23,8 +23,9 @@ import io
 import sys
 from pathlib import Path
 
-# Windows環境でUTF-8出力を有効化（CLI実行時のみ）
+# Windows環境でUTF-8入出力を有効化（CLI実行時のみ）
 if sys.platform == "win32" and __name__ == "__main__":
+    sys.stdin = io.TextIOWrapper(sys.stdin.buffer, encoding="utf-8")
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
     sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8")
 

@@ -218,6 +218,17 @@ python -m interfaces.save_provisional_digest weekly --stdin --append
 
 **操作**: Editツールで各フィールドを更新
 
+**source_filesフォーマット規約**:
+配列要素は1行ずつ記述すること（視認性向上のため）：
+```json
+"source_files": [
+  "L00266_ファイル名1.txt",
+  "L00267_ファイル名2.txt"
+]
+```
+
+インライン形式 `["file1.txt", "file2.txt"]` は避ける。
+
 ---
 
 #### Step 8: 処理完了記録
