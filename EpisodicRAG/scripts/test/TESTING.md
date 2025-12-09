@@ -105,7 +105,7 @@ test/
 | **Config** | `test_config.py`, `test_path_resolver.py`, `test_threshold_provider.py`, `test_config_builder.py` | 15 |
 | **Infrastructure** | `test_json_repository.py`, `test_file_scanner.py`, `test_logging_config.py`, `test_path_validators.py` | 12 |
 | **Application** | `test_shadow_*.py`, `test_grand_digest.py`, `test_cascade_orchestrator.py`, `test_persistence.py` | 24 |
-| **Interfaces** | `test_finalize_from_shadow.py`, `test_*_cli_*.py`, `test_setup_*.py`, `test_auto_*.py`, `test_cli_helpers.py`, `test_find_plugin_root.py`, `test_digest_readiness.py`, `test_digest_entry.py` | 26 |
+| **Interfaces** | `test_finalize_from_shadow.py`, `test_*_cli_*.py`, `test_setup_*.py`, `test_auto_*.py`, `test_cli_helpers.py`, `test_find_plugin_root.py`, `test_digest_readiness.py`, `test_digest_entry.py`, `test_encoding.py` | 27 |
 | **Integration** | `test_e2e_workflow.py`, `test_full_cascade.py`, `test_config_integration.py` | 14 |
 | **CLI Integration** | `test_digest_*_cli.py`, `test_workflow_cli.py` | 4 |
 | **Performance** | `test_benchmarks.py` | 1 |
@@ -396,6 +396,35 @@ tools_tests/
 ├── test_link_checker.py       # ドキュメントリンクチェック
 ├── test_validate_json.py      # JSON検証ツール
 └── test_bandit_integration.py # セキュリティスキャン統合 (v5.0.0+)
+```
+
+---
+
+## Encoding Tests [v4.2.0+]
+
+Windows環境でのstdin UTF-8エンコーディングテスト。
+
+```
+interfaces_tests/
+└── test_encoding.py          # stdin日本語入力の文字化け防止テスト
+```
+
+### テスト内容
+
+| テスト名 | 検証内容 |
+|---------|---------|
+| `test_save_provisional_digest_japanese_input_no_garble` | 日本語JSONの文字化け防止 |
+| `test_source_file_name_preserved` | source_fileフィールドの日本語保持 |
+
+### 背景
+
+Windows環境でsubprocess経由でstdinに日本語を渡す際、UTF-8エンコーディングが正しく設定されていないと文字化け（`???`パターン）が発生する。このテストは `io.TextIOWrapper` によるstdin UTF-8ラッパーの動作を検証する。
+
+### 実行方法
+
+```bash
+# エンコーディングテストのみ
+pytest scripts/test/interfaces_tests/test_encoding.py -v
 ```
 
 ---

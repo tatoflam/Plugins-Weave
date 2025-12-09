@@ -18,7 +18,7 @@ class TestStdinEncoding:
     @pytest.fixture
     def scripts_dir(self):
         """scriptsディレクトリのパス"""
-        return Path(__file__).parent.parent
+        return Path(__file__).parent.parent.parent
 
     @pytest.fixture
     def temp_plugin_root(self):
