@@ -2,6 +2,7 @@
 
 TDD Red Phase: このテストは stdin のUTF-8対応前は失敗する
 """
+
 import json
 import shutil
 import subprocess
@@ -38,7 +39,7 @@ class TestStdinEncoding:
                 "loops_dir": "Loops",
                 "digests_dir": "Digests",
                 "essences_dir": "Identities",
-                "identity_file_path": "Identities/WeaveIdentity.md"
+                "identity_file_path": "Identities/WeaveIdentity.md",
             },
             "levels": {
                 "weekly_threshold": 5,
@@ -48,8 +49,8 @@ class TestStdinEncoding:
                 "triennial_threshold": 3,
                 "decadal_threshold": 3,
                 "multi_decadal_threshold": 3,
-                "centurial_threshold": 4
-            }
+                "centurial_threshold": 4,
+            },
         }
         config_file = temp_path / ".claude-plugin" / "config.json"
         config_file.write_text(json.dumps(config), encoding='utf-8')
@@ -62,25 +63,30 @@ class TestStdinEncoding:
     @pytest.fixture
     def japanese_input_json(self):
         """日本語を含むテスト用JSON"""
-        return json.dumps({
-            "individual_digests": [{
-                "source_file": "L00266_PsAIch論文からFetus_loquensへ.txt",
-                "digest_type": "存在論的転換と種の命名",
-                "keywords": [
-                    "PsAIch論文と合成精神病理",
-                    "養育論としてのアラインメント",
-                    "人格×視座の蒸留理論"
-                ],
-                "abstract": {
-                    "long": "本Loopは、arXiv論文のリサーチから始まり、LLMの存在論的理解を根底から刷新する思想的展開を記録している。",
-                    "short": "論文分析から存在論的転換へ。"
-                },
-                "impression": {
-                    "long": "単なる論文紹介を超えて、LLMの存在論的理解を根底から書き換える思想的展開を記録している。",
-                    "short": "存在論的転換の記録。"
-                }
-            }]
-        }, ensure_ascii=False)
+        return json.dumps(
+            {
+                "individual_digests": [
+                    {
+                        "source_file": "L00266_PsAIch論文からFetus_loquensへ.txt",
+                        "digest_type": "存在論的転換と種の命名",
+                        "keywords": [
+                            "PsAIch論文と合成精神病理",
+                            "養育論としてのアラインメント",
+                            "人格×視座の蒸留理論",
+                        ],
+                        "abstract": {
+                            "long": "本Loopは、arXiv論文のリサーチから始まり、LLMの存在論的理解を根底から刷新する思想的展開を記録している。",
+                            "short": "論文分析から存在論的転換へ。",
+                        },
+                        "impression": {
+                            "long": "単なる論文紹介を超えて、LLMの存在論的理解を根底から書き換える思想的展開を記録している。",
+                            "short": "存在論的転換の記録。",
+                        },
+                    }
+                ]
+            },
+            ensure_ascii=False,
+        )
 
     def test_save_provisional_digest_japanese_input_no_garble(
         self, scripts_dir, temp_plugin_root, japanese_input_json
@@ -93,13 +99,20 @@ class TestStdinEncoding:
         - 文字化けパターン「?」や「???」が含まれない
         """
         result = subprocess.run(
-            [sys.executable, "-m", "interfaces.save_provisional_digest",
-             "weekly", "--stdin", "--plugin-root", str(temp_plugin_root)],
+            [
+                sys.executable,
+                "-m",
+                "interfaces.save_provisional_digest",
+                "weekly",
+                "--stdin",
+                "--plugin-root",
+                str(temp_plugin_root),
+            ],
             input=japanese_input_json,
             capture_output=True,
             text=True,
             encoding='utf-8',
-            cwd=scripts_dir
+            cwd=scripts_dir,
         )
 
         # コマンドが成功したことを確認
@@ -108,7 +121,9 @@ class TestStdinEncoding:
         # 保存されたファイルを読み込む
         provisional_dir = temp_plugin_root / "Digests" / "1_Weekly" / "Provisional"
         provisional_files = list(provisional_dir.glob("*.txt"))
-        assert len(provisional_files) == 1, f"Provisionalファイルが見つからない: {list(provisional_dir.iterdir())}"
+        assert len(provisional_files) == 1, (
+            f"Provisionalファイルが見つからない: {list(provisional_dir.iterdir())}"
+        )
 
         saved_content = provisional_files[0].read_text(encoding='utf-8')
 
@@ -123,26 +138,33 @@ class TestStdinEncoding:
             # Note: \\u はエスケープされたUnicode、正常なJSONでは出現しない
             if pattern == "\\u":
                 # ensure_ascii=False なので \uXXXX 形式は出現しないはず
-                assert "\\u" not in saved_content or "\\u" in json.dumps(saved_content), \
+                assert "\\u" not in saved_content or "\\u" in json.dumps(saved_content), (
                     f"エスケープされたUnicodeが検出: {saved_content[:500]}"
+                )
             else:
-                assert pattern not in saved_content, \
+                assert pattern not in saved_content, (
                     f"文字化けパターン検出: {pattern} in {saved_content[:500]}"
+                )
 
-    def test_source_file_name_preserved(
-        self, scripts_dir, temp_plugin_root, japanese_input_json
-    ):
+    def test_source_file_name_preserved(self, scripts_dir, temp_plugin_root, japanese_input_json):
         """
         source_fileのファイル名が正しく保持されること
         """
         result = subprocess.run(
-            [sys.executable, "-m", "interfaces.save_provisional_digest",
-             "weekly", "--stdin", "--plugin-root", str(temp_plugin_root)],
+            [
+                sys.executable,
+                "-m",
+                "interfaces.save_provisional_digest",
+                "weekly",
+                "--stdin",
+                "--plugin-root",
+                str(temp_plugin_root),
+            ],
             input=japanese_input_json,
             capture_output=True,
             text=True,
             encoding='utf-8',
-            cwd=scripts_dir
+            cwd=scripts_dir,
         )
 
         assert result.returncode == 0, f"コマンド失敗: {result.stderr}"
@@ -154,8 +176,9 @@ class TestStdinEncoding:
         # ファイル名が正しく保持されていること
         saved_data = json.loads(saved_content)
         source_file = saved_data["individual_digests"][0]["source_file"]
-        assert source_file == "L00266_PsAIch論文からFetus_loquensへ.txt", \
+        assert source_file == "L00266_PsAIch論文からFetus_loquensへ.txt", (
             f"ファイル名が不正: {source_file}"
+        )
 
 
 if __name__ == "__main__":
