@@ -16,7 +16,7 @@ EpisodicRAGシステムの基本操作を提供するコマンドです。
 - [パターン1: /digest（新Loop検出）](#パターン1-digest新loop検出)
 - [パターン2: /digest type（階層確定）](#パターン2-digest-type階層確定)
 - [セットアップ・管理用スキル](#セットアップ管理用スキル)
-- [エラー出力例](#エラー出力例)
+- [重要な注意事項](#重要な注意事項)
 
 ---
 
@@ -677,17 +677,34 @@ Quarterly生成まであと2個のMonthlyが必要です。
 
 ---
 
-## エラー出力例
+## 重要な注意事項
 
-### 設定ファイルが存在しない
+### 1. スクリプト実行時のパス
 
-```json
-{
-  "status": "error",
-  "error": "Config file not found",
-  "action": "Run @digest-setup first"
-}
+スクリプト実行は**インストール済みプラグインパス**を優先してください。
+
+```bash
+# 推奨（日常使用）
+cd ~/.claude/plugins/marketplaces/plugins-weave/EpisodicRAG/scripts
+
+# 開発時のみ（パスは環境依存）
+cd <your-dev-folder>/plugins-weave/EpisodicRAG/scripts
 ```
+
+**注意**: 開発用パスで実行すると、設定ファイルの参照先が異なりエラーになる場合があります。
+
+### 2. 出力の保存方法
+
+DigestAnalyzerの出力は長文JSON（4000文字以上）のため、
+**stdinパイプで渡すこと**を推奨します。
+
+```bash
+echo '{"individual_digests": [...]}' | python -m interfaces.save_provisional_digest weekly --stdin --append
+```
+
+**注意**:
+- コマンドライン引数での直接渡しは、長文で切断される可能性があるため使用しないでください
+- 保存後、必ずProvisionalファイルの内容を確認し、入力データと一致しているか検証してください
 
 ---
 **EpisodicRAG** by Weave | [GitHub](https://github.com/Bizuayeu/Plugins-Weave)
