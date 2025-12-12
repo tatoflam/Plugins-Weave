@@ -11,12 +11,11 @@ EpisodicRAGシステムの基本操作を提供するコマンドです。
 ## 目次
 
 - [用語説明](#用語説明)
-- [注意事項](#注意事項)
+- [重要な注意事項](#重要な注意事項)
 - [基本的な使い方](#基本的な使い方)
 - [パターン1: /digest（新Loop検出）](#パターン1-digest新loop検出)
 - [パターン2: /digest type（階層確定）](#パターン2-digest-type階層確定)
 - [セットアップ・管理用スキル](#セットアップ管理用スキル)
-- [重要な注意事項](#重要な注意事項)
 
 ---
 
@@ -26,7 +25,36 @@ EpisodicRAGシステムの基本操作を提供するコマンドです。
 
 ---
 
-## 注意事項
+## 重要な注意事項
+
+### 1. スクリプト実行時のパス
+
+スクリプト実行は**インストール済みプラグインパス**を優先してください。
+
+```bash
+# 推奨（日常使用）
+cd ~/.claude/plugins/marketplaces/plugins-weave/EpisodicRAG/scripts
+
+# 開発時のみ（パスは環境依存）
+cd <your-dev-folder>/plugins-weave/EpisodicRAG/scripts
+```
+
+**注意**: 開発用パスで実行すると、設定ファイルの参照先が異なりエラーになる場合があります。
+
+### 2. 出力の保存方法
+
+DigestAnalyzerの出力は長文JSON（4000文字以上）のため、
+**stdinパイプで渡すこと**を推奨します。
+
+```bash
+echo '{"individual_digests": [...]}' | python -m interfaces.save_provisional_digest weekly --stdin --append
+```
+
+**注意**:
+- コマンドライン引数での直接渡しは、長文で切断される可能性があるため使用しないでください
+- 保存後、必ずProvisionalファイルの内容を確認し、入力データと一致しているか検証してください
+
+### 3. UIメッセージ出力
 
 > **UIメッセージ出力時は必ずコードブロックで囲むこと！**
 > VSCode拡張では単一改行が空白に変換されるため、
@@ -674,37 +702,6 @@ Quarterly生成まであと2個のMonthlyが必要です。
 | `@digest-setup` | 初期セットアップ | [digest-setup SKILL.md](../skills/digest-setup/SKILL.md) |
 | `@digest-auto` | 最適階層の推奨 | [digest-auto SKILL.md](../skills/digest-auto/SKILL.md) |
 | `@digest-config` | 設定変更 | [digest-config SKILL.md](../skills/digest-config/SKILL.md) |
-
----
-
-## 重要な注意事項
-
-### 1. スクリプト実行時のパス
-
-スクリプト実行は**インストール済みプラグインパス**を優先してください。
-
-```bash
-# 推奨（日常使用）
-cd ~/.claude/plugins/marketplaces/plugins-weave/EpisodicRAG/scripts
-
-# 開発時のみ（パスは環境依存）
-cd <your-dev-folder>/plugins-weave/EpisodicRAG/scripts
-```
-
-**注意**: 開発用パスで実行すると、設定ファイルの参照先が異なりエラーになる場合があります。
-
-### 2. 出力の保存方法
-
-DigestAnalyzerの出力は長文JSON（4000文字以上）のため、
-**stdinパイプで渡すこと**を推奨します。
-
-```bash
-echo '{"individual_digests": [...]}' | python -m interfaces.save_provisional_digest weekly --stdin --append
-```
-
-**注意**:
-- コマンドライン引数での直接渡しは、長文で切断される可能性があるため使用しないでください
-- 保存後、必ずProvisionalファイルの内容を確認し、入力データと一致しているか検証してください
 
 ---
 **EpisodicRAG** by Weave | [GitHub](https://github.com/Bizuayeu/Plugins-Weave)
