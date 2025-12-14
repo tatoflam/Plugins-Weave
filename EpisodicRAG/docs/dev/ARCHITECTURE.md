@@ -137,6 +137,7 @@ scripts/
 │       ├── config_repository.py     # load_config
 │       ├── path_resolver.py         # PathResolver
 │       ├── path_validators.py       # PathValidatorChain (v4.1.0+)
+│       ├── persistent_path.py       # get_persistent_config_dir (v5.2.0+)
 │       ├── plugin_root_resolver.py  # find_plugin_root
 │       └── error_messages.py        # エラーメッセージヘルパー
 │
@@ -289,6 +290,7 @@ from domain.config import REQUIRED_CONFIG_KEYS
 | **Infrastructure** | `scan_files()` | ファイル検出 | [infrastructure.md](api/infrastructure.md) |
 | **Infrastructure** | `ConfigLoader` | 設定ファイル読み込み | [infrastructure.md](api/infrastructure.md) |
 | **Infrastructure** | `PathResolver` | パス解決 | [infrastructure.md](api/infrastructure.md) |
+| **Infrastructure** | `get_persistent_config_dir()` | 永続化設定ディレクトリ取得 *(v5.2.0+)* | [infrastructure.md](api/infrastructure.md) |
 | **Application** | `DigestConfig` | 設定管理Facade | [config.md](api/config.md) |
 | **Application** | `ShadowUpdater` | Shadow更新Facade | [application.md](api/application.md) |
 | **Application** | `ShadowIO` | Shadow読み書き | [application.md](api/application.md) |
