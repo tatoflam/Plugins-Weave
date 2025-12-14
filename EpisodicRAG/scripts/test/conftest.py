@@ -191,9 +191,7 @@ def mock_persistent_config_dir(
 
         with ExitStack() as stack:
             for target in patch_targets:
-                stack.enter_context(
-                    patch(target, return_value=env.persistent_config_dir)
-                )
+                stack.enter_context(patch(target, return_value=env.persistent_config_dir))
             yield
     else:
         # temp_plugin_envを使用しないテストはモックなしで実行

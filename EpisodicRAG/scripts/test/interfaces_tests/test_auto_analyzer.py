@@ -110,9 +110,7 @@ class TestDigestAutoAnalyzer(unittest.TestCase):
 
         # last_digest_times.json（永続化ディレクトリに）
         times_data = {"weekly": {"timestamp": "", "last_processed": None}}
-        with open(
-            self.persistent_config / "last_digest_times.json", "w", encoding="utf-8"
-        ) as f:
+        with open(self.persistent_config / "last_digest_times.json", "w", encoding="utf-8") as f:
             json.dump(times_data, f)
 
     @pytest.mark.unit
