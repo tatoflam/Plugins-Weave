@@ -143,6 +143,16 @@ class TestPathResolver:
         assert "base_dir" in str(exc_info.value)
 
     @pytest.mark.unit
+    def test_empty_base_dir_raises_config_error(self) -> None:
+        """空のbase_dirはConfigError"""
+        config = {"base_dir": "", "paths": {"loops_dir": "data/Loops"}}
+
+        with pytest.raises(ConfigError) as exc_info:
+            PathResolver(config)
+
+        assert "base_dir" in str(exc_info.value)
+
+    @pytest.mark.unit
     def test_identity_file_path_configured(self, tmp_path: Path) -> None:
         """identity_file_pathが設定されている場合"""
         config = {
