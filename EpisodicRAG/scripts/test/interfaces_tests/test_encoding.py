@@ -114,7 +114,10 @@ class TestStdinEncoding:
         - 文字化けパターン「?」や「???」が含まれない
         """
         # 永続化設定ディレクトリの環境変数を含む環境
-        env = {**dict(os.environ), "EPISODICRAG_CONFIG_DIR": str(temp_plugin_root / ".persistent_config")}
+        env = {
+            **dict(os.environ),
+            "EPISODICRAG_CONFIG_DIR": str(temp_plugin_root / ".persistent_config"),
+        }
         result = subprocess.run(
             [
                 sys.executable,
@@ -167,7 +170,10 @@ class TestStdinEncoding:
         source_fileのファイル名が正しく保持されること
         """
         # 永続化設定ディレクトリの環境変数を含む環境
-        env = {**dict(os.environ), "EPISODICRAG_CONFIG_DIR": str(temp_plugin_root / ".persistent_config")}
+        env = {
+            **dict(os.environ),
+            "EPISODICRAG_CONFIG_DIR": str(temp_plugin_root / ".persistent_config"),
+        }
         result = subprocess.run(
             [
                 sys.executable,

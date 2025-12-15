@@ -114,9 +114,7 @@ class PathResolver:
         base_dir_setting = self.config.get("base_dir", "")
 
         if not base_dir_setting:
-            raise ConfigError(
-                config_key_missing_message("base_dir")
-            )
+            raise ConfigError(config_key_missing_message("base_dir"))
 
         # チルダ展開
         base_path = Path(base_dir_setting).expanduser()

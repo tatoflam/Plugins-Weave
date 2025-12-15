@@ -96,9 +96,7 @@ class TestUpdateDigestTimesCLI(unittest.TestCase):
         """last_processed引数不足でエラー"""
         from interfaces.update_digest_times import main
 
-        with patch(
-            "sys.argv", ["update_digest_times.py", "loop"]
-        ):
+        with patch("sys.argv", ["update_digest_times.py", "loop"]):
             with pytest.raises(SystemExit) as exc_info:
                 main()
             assert exc_info.value.code != 0
