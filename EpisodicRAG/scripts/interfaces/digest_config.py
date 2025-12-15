@@ -17,7 +17,7 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Union
 
 from domain.exceptions import FileIOError
 from domain.file_constants import CONFIG_FILENAME

@@ -15,7 +15,6 @@ import argparse
 import json
 import sys
 from dataclasses import asdict, dataclass, field
-from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from application.config import DigestConfig

@@ -67,7 +67,7 @@ class DigestConfig:
         - _config_validator: ConfigValidator - 設定とディレクトリ構造の検証
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         初期化
 

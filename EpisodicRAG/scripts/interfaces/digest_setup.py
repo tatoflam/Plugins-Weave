@@ -26,7 +26,6 @@ from domain.file_constants import (
     DIGEST_TIMES_TEMPLATE,
     GRAND_DIGEST_FILENAME,
     GRAND_DIGEST_TEMPLATE,
-    PLUGIN_CONFIG_DIR,
     SHADOW_GRAND_DIGEST_FILENAME,
     SHADOW_GRAND_DIGEST_TEMPLATE,
 )
@@ -256,7 +255,7 @@ class SetupManager:
 
     def _create_initial_files(self, config_data: Dict[str, Any]) -> List[str]:
         """初期ファイル作成（テンプレートから）"""
-        created_files = []
+        created_files: List[str] = []
 
         # テンプレートディレクトリがない場合はスキップ
         if self.template_dir is None:

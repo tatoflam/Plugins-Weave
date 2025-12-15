@@ -27,7 +27,7 @@ class TestProvisionalDirectoryStructure(unittest.TestCase):
         正しい: Digests/1_Weekly/Provisional/
         間違い: Digests/Provisional/1_Weekly/
         """
-        with TempPluginEnvironment() as env:
+        with TempPluginEnvironment():
             config = DigestConfig()
 
             for level in DIGEST_LEVEL_NAMES:
@@ -40,7 +40,7 @@ class TestProvisionalDirectoryStructure(unittest.TestCase):
 
     def test_all_level_dirs_have_correct_names(self) -> None:
         """各レベルディレクトリ名がLEVEL_CONFIGと一致することを検証"""
-        with TempPluginEnvironment() as env:
+        with TempPluginEnvironment():
             config = DigestConfig()
 
             for level in DIGEST_LEVEL_NAMES:
@@ -52,7 +52,7 @@ class TestProvisionalDirectoryStructure(unittest.TestCase):
 
     def test_provisional_dirs_exist_inside_level_dirs(self) -> None:
         """Provisionalディレクトリがレベルディレクトリ内に存在することを検証"""
-        with TempPluginEnvironment() as env:
+        with TempPluginEnvironment():
             config = DigestConfig()
 
             for level in DIGEST_LEVEL_NAMES:
@@ -128,7 +128,7 @@ class TestValidateDirectoryStructure(unittest.TestCase):
 
     def test_valid_structure_returns_empty_list(self) -> None:
         """正しい構造では空のエラーリストを返す"""
-        with TempPluginEnvironment() as env:
+        with TempPluginEnvironment():
             config = DigestConfig()
             errors = config.validate_directory_structure()
             self.assertEqual(errors, [])

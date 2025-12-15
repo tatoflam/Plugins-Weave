@@ -21,7 +21,6 @@ Examples:
 import argparse
 import io
 import sys
-from pathlib import Path
 
 # Windows環境でUTF-8入出力を有効化（CLI実行時のみ）
 if sys.platform == "win32" and __name__ == "__main__":
