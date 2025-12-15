@@ -19,7 +19,6 @@
 - [CLI Integration Tests](#cli-integration-tests-v400)
 - [Tools Tests](#tools-tests-v410)
 - [Encoding Tests](#encoding-tests-v420)
-- [Plugin Root Auto-Detection Tests](#plugin-root-auto-detection-tests-v500)
 - [Bandit Security Scan Integration](#bandit-security-scan-integration-v500)
 - [Persistent Configuration Directory](#persistent-configuration-directory-v520)
 
@@ -109,7 +108,7 @@ test/
 | **Config** | `test_config.py`, `test_path_resolver.py`, `test_threshold_provider.py`, `test_config_builder.py` | 15 |
 | **Infrastructure** | `test_json_repository.py`, `test_file_scanner.py`, `test_logging_config.py`, `test_path_validators.py`, `test_persistent_path.py` | 13 |
 | **Application** | `test_shadow_*.py`, `test_grand_digest.py`, `test_cascade_orchestrator.py`, `test_persistence.py` | 24 |
-| **Interfaces** | `test_finalize_from_shadow.py`, `test_*_cli_*.py`, `test_setup_*.py`, `test_auto_*.py`, `test_digest_auto_detection.py`, `test_cli_helpers.py`, `test_find_plugin_root.py` (v5.0.0+), `test_digest_readiness.py`, `test_digest_entry.py`, `test_encoding.py` | 28 |
+| **Interfaces** | `test_finalize_from_shadow.py`, `test_*_cli_*.py`, `test_setup_*.py`, `test_auto_*.py`, `test_digest_auto_detection.py`, `test_cli_helpers.py`, `test_digest_readiness.py`, `test_digest_entry.py`, `test_encoding.py` | 27 |
 | **Integration** | `test_e2e_workflow.py`, `test_full_cascade.py`, `test_config_integration.py` | 14 |
 | **CLI Integration** | `test_digest_*_cli.py`, `test_workflow_cli.py` | 4 |
 | **Performance** | `test_benchmarks.py` | 1 |
@@ -181,9 +180,11 @@ graph TD
 
 ```python
 def test_something(temp_plugin_env):
-    config = DigestConfig(plugin_root=temp_plugin_env.plugin_root)
+    config = DigestConfig()  # 環境変数経由で自動設定
     # テスト後に自動クリーンアップ
 ```
+
+> **v5.3.0変更**: `EPISODICRAG_CONFIG_DIR` 環境変数で永続化ディレクトリをテスト用にリダイレクトします。
 
 **Properties:**
 - `.plugin_root` - Pluginルートディレクトリ
@@ -225,7 +226,7 @@ def test_with_loops(sample_loop_files):
 
 ```python
 def test_with_mock(mock_digest_config):
-    assert mock_digest_config.plugin_root.exists()
+    assert mock_digest_config.config_file.exists()
 ```
 
 #### `level_hierarchy`
@@ -266,7 +267,7 @@ class TestFileNaming:
 class TestShadowUpdate:
     def test_update_adds_files_to_shadow(self, temp_plugin_env):
         # Arrange
-        config = DigestConfig(plugin_root=temp_plugin_env.plugin_root)
+        config = DigestConfig()  # 環境変数で設定済み
         manager = ShadowGrandDigestManager(config)
 
         # Act
@@ -430,30 +431,6 @@ Windows環境でsubprocess経由でstdinに日本語を渡す際、UTF-8エン�
 ```bash
 # エンコーディングテストのみ
 pytest scripts/test/interfaces_tests/test_encoding.py -v
-```
-
----
-
-## Plugin Root Auto-Detection Tests [v5.0.0+]
-
-プラグインルート自動検出機能のテスト。任意のディレクトリから `/digest` を実行可能にする。
-
-### テストファイル
-
-| ファイル | テスト数 | 対象 |
-|---------|---------|------|
-| `interfaces_tests/test_find_plugin_root.py` | 16 | プラグインルート検出 |
-
-### テスト構成
-
-- **Stage 1-3**: 単体テスト（`is_valid_plugin_root()`, `find_in_search_paths()`, `find_plugin_root()`）
-- **Stage 4**: CLI統合テスト（JSON/Text出力、エラー処理）
-- **Stage 5**: Property-based テスト（Hypothesis）
-
-### 実行方法
-
-```bash
-pytest scripts/test/interfaces_tests/test_find_plugin_root.py -v
 ```
 
 ---

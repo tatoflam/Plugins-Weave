@@ -24,7 +24,7 @@ from application.config import (
 from infrastructure.config import (
     ConfigLoader,
     PathResolver,
-    find_plugin_root,
+    get_persistent_config_dir,
     load_config,
 )
 ```
@@ -68,23 +68,19 @@ from infrastructure.config import (
 
 パス解決の基準ディレクトリ
 
-**デフォルト**: `.` (プラグインルート自身)
+> **v5.3.0変更**: `base_dir` は絶対パス必須になりました。相対パス（`"."`等）は使用できません。
 
 **設定例：**
-- `"."` (デフォルト): プラグインルート自身を基準とする（完全自己完結型）
-- `"subdir"`: プラグイン内のサブディレクトリ
+- `"~/.claude/plugins/.episodicrag"`: ホームディレクトリ配下（推奨）
 - `"~/DEV/production/EpisodicRAG"`: 外部パス（`trusted_external_paths`で許可が必要）
 - `"C:/Users/username/DEV/data"`: Windows絶対パス（`trusted_external_paths`で許可が必要）
 
 **パス解決の仕組み:**
 ```text
-# 相対パスの場合
-最終的なパス = {plugin_root} / {base_dir} / {paths.*_dir}
-
-# 絶対パスの場合（trusted_external_paths内である必要あり）
+# 絶対パス（trusted_external_paths内である必要あり）
 最終的なパス = {base_dir} / {paths.*_dir}
 
-例（外部パス）:
+例:
 base_dir = "~/DEV/production/EpisodicRAG"
 loops_dir = "data/Loops"
 
@@ -92,8 +88,9 @@ loops_dir = "data/Loops"
 ```
 
 **注意:**
-- 相対パスはプラグインルート基準で解釈されます
-- 絶対パス・チルダパスは`trusted_external_paths`での許可が必要です
+- 相対パスはエラーになります（絶対パス必須）
+- チルダ展開（`~`）はサポートされています
+- 外部パスは`trusted_external_paths`での許可が必要です
 
 ---
 
@@ -156,18 +153,18 @@ plugin_root外でアクセスを許可する絶対パスのリスト
 
 ### よくある設定パターン
 
-#### パターン1: 完全自己完結（推奨）
+#### パターン1: 永続化ディレクトリ内（推奨）
 
-プラグインをクリーンに管理したい場合：
+設定ファイルと同じディレクトリにデータを保存する場合：
 
 ```json
 {
-  "base_dir": ".",
+  "base_dir": "~/.claude/plugins/.episodicrag",
   "paths": {
-    "loops_dir": "data/Loops",
-    "digests_dir": "data/Digests",
-    "essences_dir": "data/Essences",
-    "identity_file_path": null
+    "loops_dir": "Loops",
+    "digests_dir": "Digests",
+    "essences_dir": "Identities",
+    "identity_file_path": "Identities/WeaveIdentity.md"
   },
   "levels": {
     "weekly_threshold": 5,
@@ -265,8 +262,10 @@ class LevelsConfigData(TypedDict, total=False):
 
 ```python
 class DigestConfig:
-    def __init__(self, plugin_root: Optional[Path] = None): ...
+    def __init__(self) -> None: ...
 ```
+
+> **v5.3.0変更**: `plugin_root` パラメータは廃止されました。設定ファイルの場所は永続化ディレクトリ（`~/.claude/plugins/.episodicrag/`）から自動検出されます。
 
 ### プロパティ（パス関連）
 
@@ -274,7 +273,6 @@ class DigestConfig:
 
 | プロパティ | 型 | 説明 |
 |-----------|-----|------|
-| `plugin_root` | `Path` | プラグインルートディレクトリ |
 | `config_file` | `Path` | 設定ファイルのパス |
 | `base_dir` | `Path` | 解決された基準ディレクトリ |
 | `loops_path` | `Path` | Loopファイル配置先 |
@@ -344,9 +342,6 @@ python -m interfaces.config_cli
 
 # パス設定を表示
 python -m interfaces.config_cli --show-paths
-
-# プラグインルートを指定
-python -m interfaces.config_cli --plugin-root /path/to/plugin
 ```
 
 ### スキルCLI (v4.0.0+)

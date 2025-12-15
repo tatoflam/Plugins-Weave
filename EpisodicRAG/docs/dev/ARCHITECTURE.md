@@ -137,8 +137,7 @@ scripts/
 │       ├── config_repository.py     # load_config
 │       ├── path_resolver.py         # PathResolver
 │       ├── path_validators.py       # PathValidatorChain (v4.1.0+)
-│       ├── persistent_path.py       # get_persistent_config_dir (v5.2.0+)
-│       ├── plugin_root_resolver.py  # find_plugin_root
+│       ├── persistent_path.py       # get_persistent_config_dir, get_config_path (v5.2.0+)
 │       └── error_messages.py        # エラーメッセージヘルパー
 │
 ├── application/                     # ユースケース
@@ -307,7 +306,7 @@ from domain.config import REQUIRED_CONFIG_KEYS
 ```python
 # 基本的な設定読み込み
 from application.config import DigestConfig
-config = DigestConfig()  # plugin_root自動検出
+config = DigestConfig()  # 永続化ディレクトリから設定を自動読み込み
 
 # ファイル操作
 from infrastructure import load_json, save_json
@@ -461,9 +460,9 @@ v4.0.0より、設定機能は各層のconfig/サブディレクトリに分散�
 class DigestConfig:
     """設定管理クラス（Facade）"""
 
-    def __init__(self, plugin_root: Optional[Path] = None):
+    def __init__(self) -> None:
         # 内部コンポーネントに責任を委譲
-        self._path_resolver = PathResolver(plugin_root, config)
+        self._path_resolver = PathResolver(config)  # base_dirは絶対パス必須
         self._threshold_provider = ThresholdProvider(config)
         self._level_path_service = LevelPathService(digests_path)
         self._config_validator = ConfigValidator(...)

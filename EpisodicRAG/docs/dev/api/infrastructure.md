@@ -26,12 +26,12 @@ from infrastructure import (
 
 # 設定管理（別サブパッケージ）
 from infrastructure.config import (
-    ConfigLoader, PathResolver, find_plugin_root, load_config,
+    ConfigLoader, PathResolver, load_config,
     # パス検証 (v4.1.0+)
-    PathValidatorChain, PluginRootValidator, TrustedExternalPathValidator,
+    PathValidatorChain, TrustedExternalPathValidator,
     ValidationContext, ValidationResult,
     # 永続化パス (v5.2.0+)
-    get_persistent_config_dir,
+    get_persistent_config_dir, get_config_path,
 )
 ```
 
@@ -387,15 +387,7 @@ data = with_error_context(
 > v4.0.0で追加。設定ファイルI/O・パス解決を担当。
 > アクセス: `from infrastructure.config import ...`
 
-### find_plugin_root()
-
-```python
-def find_plugin_root(script_path: Path) -> Path
-```
-
-起点パスからPluginルートディレクトリを検出。`.claude-plugin/config.json` が存在するディレクトリを返す。
-
-**例外**: `FileNotFoundError` - Pluginルートが見つからない場合
+> **v5.3.0変更**: `find_plugin_root()` は廃止されました。設定ファイルの場所は `get_persistent_config_dir()` で取得します。
 
 ### load_config()
 
@@ -440,8 +432,10 @@ base_dir基準のパス解決とセキュリティ検証を担当するクラス
 
 ```python
 class PathResolver:
-    def __init__(self, plugin_root: Path, config: ConfigData): ...
+    def __init__(self, config: ConfigData): ...
     def resolve_path(self, key: str) -> Path: ...
+    @property
+    def base_dir(self) -> Path: ...
     @property
     def loops_path(self) -> Path: ...
     @property
@@ -451,14 +445,16 @@ class PathResolver:
     def get_identity_file_path(self) -> Optional[Path]: ...
 ```
 
+> **v5.3.0変更**: `plugin_root` パラメータは廃止されました。`base_dir` は絶対パス必須です。
+
 **セキュリティ**: `trusted_external_paths` 設定で外部パスアクセスを制限。
 
 ```python
-from infrastructure.config import PathResolver, ConfigLoader, find_plugin_root
+from infrastructure.config import PathResolver, ConfigLoader, get_config_path
 
-plugin_root = find_plugin_root(Path(__file__))
-loader = ConfigLoader(plugin_root / "config.json")
-resolver = PathResolver(plugin_root, loader.load())
+config_path = get_config_path()
+loader = ConfigLoader(config_path)
+resolver = PathResolver(loader.load())
 
 loops = resolver.loops_path  # 絶対パス
 ```
@@ -480,10 +476,12 @@ Chain of Responsibility パターンによるパス検証。PathResolverの内�
 class ValidationContext:
     """パス検証のコンテキスト"""
     resolved_path: Path          # 解決済みパス
-    plugin_root: Path            # プラグインルート
+    base_dir: Path               # 基準ディレクトリ
     trusted_paths: List[Path]    # 信頼済み外部パス
     original_value: str          # 元の設定値
 ```
+
+> **v5.3.0変更**: `plugin_root` は `base_dir` に変更されました。
 
 ### ValidationResult
 
@@ -507,17 +505,6 @@ class PathValidator(ABC):
     def validate(self, context: ValidationContext) -> ValidationResult: ...
 
     def set_next(self, validator: "PathValidator") -> "PathValidator": ...
-```
-
-### PluginRootValidator
-
-パスがプラグインルート内にあるかを検証。
-
-```python
-class PluginRootValidator(PathValidator):
-    """plugin_root内のパスを許可"""
-
-    def validate(self, context: ValidationContext) -> ValidationResult
 ```
 
 ### TrustedExternalPathValidator
@@ -552,13 +539,13 @@ from infrastructure.config.path_validators import (
     PathValidatorChain, ValidationContext
 )
 
-# デフォルトチェーンを作成（PluginRoot → TrustedExternalPath）
+# デフォルトチェーンを作成
 chain = PathValidatorChain.create_default_chain()
 
 # 検証コンテキストを作成
 context = ValidationContext(
     resolved_path=Path("/some/path").resolve(),
-    plugin_root=Path("/plugin/root").resolve(),
+    base_dir=Path("~/.claude/plugins/.episodicrag").expanduser().resolve(),
     trusted_paths=[Path("/trusted/external").resolve()],
     original_value="/some/path"
 )
@@ -633,6 +620,7 @@ if callback("ファイルを上書きしますか？"):
 > **v4.1.0 更新**: PathValidatorChain（Chain of Responsibility）が追加されました。
 > **v5.0.0 更新**: LEVEL_CONFIGにloop層が追加されました（9レベル化）。
 > **v5.2.0 更新**: `get_persistent_config_dir()` が追加されました。config.jsonとlast_digest_times.jsonが永続化ディレクトリ（`~/.claude/plugins/.episodicrag/`）に移動。
+> **v5.3.0 更新**: `find_plugin_root()` が廃止されました。`plugin_root` パラメータは削除され、`base_dir` は絶対パス必須になりました。
 
 ---
 **EpisodicRAG** by Weave | [GitHub](https://github.com/Bizuayeu/Plugins-Weave)

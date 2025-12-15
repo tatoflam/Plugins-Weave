@@ -41,7 +41,6 @@ from interfaces import (
 9. [UpdateDigestTimes CLI](#updatedigesttimes-cliupdate_digest_timespy) *(v5.0.0+)*
 10. [ShadowStateChecker（内部CLI）](#shadowstatechecker内部cli)
 11. [DigestReadinessChecker（digest_readiness.py）](#digestreadinesscheckerdigest_readinesspy) *(v5.1.0+)*
-12. [FindPluginRoot CLI](#findpluginroot-clifind_plugin_rootpy) *(v5.1.0+)*
 
 ---
 
@@ -51,7 +50,7 @@ from interfaces import (
 
 ```python
 class SetupManager:
-    def __init__(self, plugin_root: Optional[Path] = None): ...
+    def __init__(self) -> None: ...
 
     def check(self) -> Dict[str, Any]: ...
     def init(self, config_data: Dict[str, Any], force: bool = False) -> SetupResult: ...
@@ -98,7 +97,7 @@ python -m interfaces.digest_setup init --config '...' --force
 
 ```python
 class ConfigEditor:
-    def __init__(self, plugin_root: Optional[Path] = None): ...
+    def __init__(self) -> None: ...
 
     def show(self) -> Dict[str, Any]: ...
     def update(self, new_config: Dict[str, Any]) -> Dict[str, Any]: ...
@@ -144,7 +143,7 @@ python -m interfaces.digest_config trusted-paths remove "~/DEV/production"
 
 ```python
 class DigestAutoAnalyzer:
-    def __init__(self, plugin_root: Optional[Path] = None): ...
+    def __init__(self) -> None: ...
 
     def analyze(self) -> AnalysisResult: ...
 ```
@@ -480,7 +479,6 @@ python -m interfaces.update_digest_times weekly 51
 |------|------|
 | `level` | ダイジェストレベル（loop, weekly, monthly等） |
 | `last_processed` | 設定する番号（int） |
-| `--plugin-root` | プラグインルートパス（オプション） |
 
 **使用例（CLI）**:
 
@@ -492,9 +490,6 @@ python -m interfaces.update_digest_times loop 259
 
 # Weekly処理完了記録
 python -m interfaces.update_digest_times weekly 51
-
-# プラグインルート指定
-python -m interfaces.update_digest_times loop 259 --plugin-root /path/to/plugin
 ```
 
 **出力例**:
@@ -516,7 +511,7 @@ Shadow状態判定CLI。`__all__`にエクスポートされていない内部CL
 
 ```python
 class ShadowStateChecker:
-    def __init__(self, plugin_root: Optional[Path] = None): ...
+    def __init__(self) -> None: ...
 
     def check(self, level: str) -> ShadowStateResult: ...
 ```
@@ -574,7 +569,7 @@ Digest確定可否判定CLI。SDGとProvisionalの完備状態を確認し、Dig
 
 ```python
 class DigestReadinessChecker:
-    def __init__(self, plugin_root: Optional[Path] = None): ...
+    def __init__(self) -> None: ...
 
     def check(self, level: str) -> DigestReadinessResult: ...
 ```
@@ -641,50 +636,7 @@ python -m interfaces.digest_readiness weekly
 
 ---
 
-## FindPluginRoot CLI（find_plugin_root.py）
-
-EpisodicRAGプラグインルートを自動検出するCLI。任意のディレクトリから実行可能。
-
-```python
-@dataclass
-class FindResult:
-    status: str  # "ok" | "error"
-    plugin_root: Optional[str] = None
-    error: Optional[str] = None
-```
-
-| メソッド | 説明 | 戻り値 |
-|---------|------|--------|
-| `find_plugin_root(search_paths)` | プラグインルートを検索 | `FindResult` |
-| `is_valid_plugin_root(path)` | パスが有効なプラグインルートか判定 | `bool` |
-
-**使用例（CLI）**:
-
-```bash
-cd scripts
-
-# JSON形式で出力（デフォルト）
-python -m interfaces.find_plugin_root --output json
-
-# テキスト形式で出力
-python -m interfaces.find_plugin_root --output text
-
-# カスタム検索パスを指定
-python -m interfaces.find_plugin_root --search-paths ~/DEV ~/.claude/plugins
-```
-
-**検索動作**:
-1. デフォルト検索パス: `~/.claude/plugins`, `~`
-2. `EpisodicRAG`ディレクトリを再帰検索（最大深度5）
-3. `.claude-plugin/GrandDigest.template.txt`の存在で有効なプラグインルートを判定
-
-**出力例**:
-```json
-{
-  "status": "ok",
-  "plugin_root": "/home/user/.claude/plugins/EpisodicRAG-Plugin@Plugins-Weave/EpisodicRAG"
-}
-```
+> **v5.3.0変更**: `FindPluginRoot CLI` は廃止されました。設定ファイルの場所は永続化ディレクトリ（`~/.claude/plugins/.episodicrag/`）から自動取得されます。また、全CLIクラスの `plugin_root` パラメータは削除されました。
 
 ---
 **EpisodicRAG** by Weave | [GitHub](https://github.com/Bizuayeu/Plugins-Weave)
