@@ -4,7 +4,7 @@
 
 EpisodicRAGプラグインの開発に興味を持っていただき、ありがとうございます！
 
-> **AIエージェント向け**: [.claude-plugin/CLAUDE.md](.claude-plugin/CLAUDE.md) を参照してください。
+> **AIエージェント向け**: [.claude/CLAUDE.md](.claude/CLAUDE.md) を参照してください。
 
 > **対応バージョン**: EpisodicRAG Plugin（[version.py](scripts/domain/version.py) 参照）
 

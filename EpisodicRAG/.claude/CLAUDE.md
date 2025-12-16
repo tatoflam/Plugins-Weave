@@ -96,7 +96,7 @@ export EPISODICRAG_CONFIG_DIR=/tmp/test-episodicrag
 python -m pytest test/ -v
 ```
 
-> 📖 詳細は [infrastructure.md](../docs/dev/api/infrastructure.md#persistent_pathpy) を参照
+> 📖 詳細は [infrastructure.md](../docs/dev/api/infrastructure.md#永続化パスinfrastructureconfigpersistent_pathpy-v520) を参照
 
 ---
 

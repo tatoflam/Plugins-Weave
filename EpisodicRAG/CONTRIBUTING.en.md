@@ -5,7 +5,7 @@ English | [日本語](CONTRIBUTING.md)
 
 Thank you for your interest in contributing to the EpisodicRAG plugin!
 
-> **For AI Agents**: See [.claude-plugin/CLAUDE.md](.claude-plugin/CLAUDE.md).
+> **For AI Agents**: See [.claude/CLAUDE.md](.claude/CLAUDE.md).
 
 > **Supported Version**: EpisodicRAG Plugin (see [version.py](scripts/domain/version.py))
 
