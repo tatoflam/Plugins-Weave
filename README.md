@@ -31,19 +31,19 @@ EpisodicRAG は、会話ログ（Loop ファイル）を階層的にダイジェ
 
 ## ドキュメントナビゲーション
 
-| あなたは... | 読むべきドキュメント |
-|------------|---------------------|
+| あなたの目的 | 読むべきドキュメント |
+|-------------|---------------------|
 | 📚 **全ドキュメント一覧** | [INDEX.md](EpisodicRAG/INDEX.md) |
 | 🚀 **初めて使う** | [QUICKSTART](EpisodicRAG/docs/user/QUICKSTART.md) → [用語集](EpisodicRAG/README.md) |
 | 📘 **日常的に使う** | [GUIDE](EpisodicRAG/docs/user/GUIDE.md) |
-| 📝 **早見表** | [CHEATSHEET](EpisodicRAG/docs/user/CHEATSHEET.md) |
+| 📝 **早見表を見たい** | [CHEATSHEET](EpisodicRAG/docs/user/CHEATSHEET.md) |
 | 🔧 **設定をカスタマイズしたい** | [digest-config](EpisodicRAG/skills/digest-config/SKILL.md) |
 | 📊 **統計・状態を確認したい** | [digest-auto](EpisodicRAG/skills/digest-auto/SKILL.md) |
-| ❓ **問題が発生した** | [FAQ](EpisodicRAG/docs/user/FAQ.md) → [TROUBLESHOOTING](EpisodicRAG/docs/user/TROUBLESHOOTING.md) |
-| 🛠️ **開発に参加する** | [CONTRIBUTING](EpisodicRAG/CONTRIBUTING.md) → [ARCHITECTURE](EpisodicRAG/docs/dev/ARCHITECTURE.md) |
+| ❓ **問題を解決したい** | [FAQ](EpisodicRAG/docs/user/FAQ.md) → [TROUBLESHOOTING](EpisodicRAG/docs/user/TROUBLESHOOTING.md) |
+| 🛠️ **開発に参加したい** | [CONTRIBUTING](EpisodicRAG/CONTRIBUTING.md) → [ARCHITECTURE](EpisodicRAG/docs/dev/ARCHITECTURE.md) |
 | 💡 **設計思想を理解したい** | [CONCEPT](EpisodicRAG/CONCEPT.md) |
-| 🤖 **AI/Claude 仕様** | [AI Spec Hub](EpisodicRAG/docs/README.md) |
-| 📋 **変更履歴を確認** | [CHANGELOG](EpisodicRAG/CHANGELOG.md) |
+| 🤖 **AI/Claude 仕様を見たい** | [AI Spec Hub](EpisodicRAG/docs/README.md) |
+| 📋 **変更履歴を確認したい** | [CHANGELOG](EpisodicRAG/CHANGELOG.md) |
 
 > **Note**: 主要ドキュメントは英語版も提供しています。
 > 詳細は [言語ポリシー](EpisodicRAG/README.md#言語ポリシー) を参照してください。
