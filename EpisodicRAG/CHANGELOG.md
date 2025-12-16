@@ -54,6 +54,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - 目次をパターン別に分離（読み飛ばしやすく）
   - 「出力例」→「エラー出力例」に改名（成功例は各Step 9へ移動）
 
+- **スキルドキュメント改善**
+  - 各SKILL.mdにTodoWrite使用ガイドを追加
+  - スキルドキュメント構造を共通化
+  - 使用例・出力例を最新化
+
 ---
 
 ## [5.0.0] - 2025-12-05

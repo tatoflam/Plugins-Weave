@@ -55,6 +55,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - TOC split by pattern for easier navigation
   - Renamed "Output Examples" to "Error Output Examples" (success examples moved to each Step 9)
 
+- **Skill documentation improvements**
+  - Added TodoWrite usage guide to each SKILL.md
+  - Standardized skill document structure
+  - Updated usage examples and output examples
+
 ---
 
 ## [5.0.0] - 2025-12-05
