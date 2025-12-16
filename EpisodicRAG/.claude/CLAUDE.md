@@ -10,20 +10,21 @@
 
 **概要**
 1. [プロジェクト概要](#プロジェクト概要)
-2. [ディレクトリ構成](#ディレクトリ構成)
-3. [永続化パス](#永続化パス-v520) *(v5.2.0+)*
+2. [利用可能な機能](#利用可能な機能)
+3. [ディレクトリ構成](#ディレクトリ構成)
+4. [永続化パス](#永続化パス-v520) *(v5.2.0+)*
 
 **アーキテクチャ**
-4. [Clean Architecture](#clean-architecture)
-5. [Single Source of Truth (SSoT)](#single-source-of-truth-ssot)
+5. [Clean Architecture](#clean-architecture)
+6. [Single Source of Truth (SSoT)](#single-source-of-truth-ssot)
 
 **開発ガイド**
-6. [開発ワークフロー](#開発ワークフロー)
-7. [コーディング規約](#コーディング規約)
+7. [開発ワークフロー](#開発ワークフロー)
+8. [コーディング規約](#コーディング規約)
 
 **リファレンス**
-8. [主要ファイル参照](#主要ファイル参照)
-9. [注意事項](#注意事項)
+9. [主要ファイル参照](#主要ファイル参照)
+10. [注意事項](#注意事項)
 
 ---
 
@@ -33,6 +34,44 @@ EpisodicRAGは、会話ログ（Loopファイル）を階層的にダイジェ�
 
 **バージョン**: [version.py](../scripts/domain/version.py) 参照
 **ファイルフォーマット**: 1.0
+
+---
+
+## 利用可能な機能
+
+### コマンド
+
+| コマンド | 用途 |
+|---------|------|
+| `/digest` | 新規Loop検出・分析（記憶定着） |
+| `/digest weekly` | Weekly Digest確定 |
+| `/digest monthly` | Monthly Digest確定 |
+
+> 📖 詳細: [commands/digest.md](../commands/digest.md)
+
+### スキル
+
+| スキル | 用途 |
+|--------|------|
+| `@digest-auto` | システム状態診断・推奨アクション |
+| `@digest-setup` | 初期セットアップ |
+| `@digest-config` | 設定変更 |
+
+### エージェント
+
+| エージェント | 用途 |
+|------------|------|
+| `DigestAnalyzer` | Loop/Digestの並列分析 |
+
+### 基本ワークフロー
+
+```text
+Loop追加 → /digest → Loop追加 → /digest → ...
+```
+
+この「記憶定着サイクル」を守ることで、AIは全てのLoopを記憶できます。
+
+> 📖 詳細: [用語集 - 記憶定着サイクル](../README.md#記憶定着サイクル)
 
 ---
 
@@ -212,6 +251,7 @@ from interfaces import DigestFinalizerFromShadow
 
 | 目的 | ファイル |
 |------|---------|
+| ドキュメント一覧 | `INDEX.md` |
 | API仕様 | `docs/dev/API_REFERENCE.md` |
 | アーキテクチャ | `docs/dev/ARCHITECTURE.md` |
 | トラブルシューティング | `docs/user/TROUBLESHOOTING.md` |
