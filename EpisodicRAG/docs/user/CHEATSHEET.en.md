@@ -1,4 +1,4 @@
-<!-- Last synced: 2025-12-02 -->
+<!-- Last synced: 2025-12-16 -->
 English | [日本語](CHEATSHEET.md)
 
 # EpisodicRAG Quick Reference
@@ -62,7 +62,7 @@ A one-page cheat sheet for quick reference of key features.
 
 | Item | Path |
 |------|------|
-| Config file | `.claude-plugin/config.json` |
+| Config file | `~/.claude/plugins/.episodicrag/config.json` |
 | Loop files | `{loops_dir}/` |
 | Digest files | `{digests_dir}/` |
 | GrandDigest | `{essences_dir}/GrandDigest.txt` |

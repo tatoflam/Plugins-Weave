@@ -359,40 +359,48 @@ v4.0.0で導入された`trusted_external_paths`によるセキュリティ検�
 
 ### 概要
 
-`config.json`の`trusted_external_paths`は、plugin_root外へのアクセスを許可するホワイトリスト。
+`config.json`の`trusted_external_paths`は、永続化パス外へのアクセスを許可するホワイトリスト。
 
-### パス判定ロジック
+### 永続化パス *(v5.2.0+)*
+
+設定ファイルは永続化パス `~/.claude/plugins/.episodicrag/` に保存されます。
 
 ```python
-def _is_external_path(self, path_str: str) -> bool:
-    """パスがplugin_root外を指すか判定"""
-    path = Path(path_str).expanduser()
+from infrastructure.config import get_persistent_config_dir, get_config_path
 
-    # 絶対パスの場合
-    if path.is_absolute():
-        try:
-            path.resolve().relative_to(self.plugin_root.resolve())
-            return False  # plugin_root内
-        except ValueError:
-            return True  # plugin_root外
+# 永続化ディレクトリ
+config_dir = get_persistent_config_dir()  # ~/.claude/plugins/.episodicrag/
 
-    # 相対パスで上位ディレクトリに出る場合
-    if ".." in str(path):
-        resolved = (self.plugin_root / path).resolve()
-        try:
-            resolved.relative_to(self.plugin_root.resolve())
-            return False
-        except ValueError:
-            return True
+# 設定ファイルパス
+config_path = get_config_path()  # ~/.claude/plugins/.episodicrag/config.json
+```
 
-    return False
+### パス検証ロジック
+
+```python
+def _validate_path_security(self, resolved_path: Path) -> None:
+    """パスが許可された範囲内かを検証"""
+    # 永続化ディレクトリ内は常に許可
+    persistent_dir = get_persistent_config_dir()
+    if self._is_subpath(resolved_path, persistent_dir):
+        return
+
+    # trusted_external_paths 内は許可
+    for trusted_path in self.trusted_external_paths:
+        if self._is_subpath(resolved_path, Path(trusted_path).expanduser()):
+            return
+
+    raise ConfigError(f"Access denied: {resolved_path} is outside trusted paths")
 ```
 
 ### ベストプラクティス
 
+- `base_dir` は絶対パス必須（v5.2.0+、相対パスはエラー）
 - 絶対パスまたは `~` で始まるパスのみ`trusted_external_paths`に登録
 - 外部パス検出時は`external_paths_detected`としてユーザーに警告
 - セキュリティのためデフォルトは空配列
+
+> 📖 詳細: [ARCHITECTURE.md](ARCHITECTURE.md#ディレクトリ構成)
 
 ---
 

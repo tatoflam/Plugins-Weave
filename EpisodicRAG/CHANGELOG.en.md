@@ -24,7 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **Persistent config directory**
+- **Persistent Path**
   - Moved config.json and last_digest_times.json to `~/.claude/plugins/.episodicrag/`
   - Configuration is no longer lost during Claude Code plugin auto-updates (delete → re-clone)
   - Environment variable `EPISODICRAG_CONFIG_DIR` allows custom path specification (for testing)
@@ -576,5 +576,4 @@ Developer migration guide:
 - **PATCH**: Backward-compatible bug fixes
 
 ---
-
-*For more details, see [ARCHITECTURE.md](docs/dev/ARCHITECTURE.md)*
+**EpisodicRAG** by Weave | [GitHub](https://github.com/Bizuayeu/Plugins-Weave)

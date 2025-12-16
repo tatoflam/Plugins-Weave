@@ -140,7 +140,6 @@ from domain.validators import validate_type, is_valid_dict, is_valid_list
 | `config_cli.py` | - | 設定CLIエントリーポイント |
 | `interface_helpers.py` | - | ヘルパー関数（`sanitize_filename`, `get_next_digest_number`） |
 | `cli_helpers.py` | - | CLI共通ヘルパー（`output_json`, `output_error`）*(v4.1.0+)* |
-| `find_plugin_root.py` | - | プラグインルート検出 |
 | `digest_entry.py` | - | Digestエントリーポイント |
 | `digest_readiness.py` | - | Digest準備状態チェック |
 | `update_digest_times.py` | - | Digestタイムスタンプ更新 |
@@ -159,7 +158,7 @@ v4.0.0より、設定管理機能は各層のサブディレクトリに分散�
 | 層 | Package | Purpose |
 |---|---------|---------|
 | **domain** | `domain/config/` | 設定定数（`REQUIRED_CONFIG_KEYS`, `THRESHOLD_KEYS`）、バリデーションヘルパー |
-| **infrastructure** | `infrastructure/config/` | 設定ファイルI/O（`ConfigLoader`, `ConfigRepository`）、パス解決（`PathResolver`, `PluginRootResolver`） |
+| **infrastructure** | `infrastructure/config/` | 設定ファイルI/O（`ConfigLoader`, `ConfigRepository`）、パス解決（`PathResolver`）、永続化パス（`get_persistent_config_dir`） |
 | **application** | `application/config/` | DigestConfig（Facade）、サービスクラス（`ConfigValidator`, `LevelPathService`, `ThresholdProvider`） |
 
 ```python
@@ -169,6 +168,12 @@ from application.config import DigestConfig
 config = DigestConfig()
 print(config.loops_path)
 print(config.get_threshold("weekly"))
+
+# 永続化パス取得（v5.2.0+）
+from infrastructure.config import get_persistent_config_dir, get_config_path
+
+config_dir = get_persistent_config_dir()   # ~/.claude/plugins/.episodicrag/
+config_file = get_config_path()            # ~/.claude/plugins/.episodicrag/config.json
 
 # 層別に直接使用する場合
 from domain.config import REQUIRED_CONFIG_KEYS

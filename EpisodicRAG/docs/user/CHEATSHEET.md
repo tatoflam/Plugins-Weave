@@ -61,7 +61,7 @@
 
 | 項目 | パス |
 |------|------|
-| 設定ファイル | `.claude-plugin/config.json` |
+| 設定ファイル | `~/.claude/plugins/.episodicrag/config.json` |
 | Loopファイル | `{loops_dir}/` |
 | Digestファイル | `{digests_dir}/` |
 | GrandDigest | `{essences_dir}/GrandDigest.txt` |

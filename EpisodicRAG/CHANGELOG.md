@@ -23,7 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **永続化設定ディレクトリ**
+- **永続化パス**
   - config.json と last_digest_times.json を `~/.claude/plugins/.episodicrag/` に移動
   - Claude Codeのプラグイン自動更新（削除→再clone）時に設定が消失しなくなりました
   - 環境変数 `EPISODICRAG_CONFIG_DIR` でカスタムパスを指定可能（テスト用）
@@ -575,5 +575,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **PATCH**: 後方互換性のあるバグ修正
 
 ---
-
-*For more details, see [ARCHITECTURE.md](docs/dev/ARCHITECTURE.md)*
+**EpisodicRAG** by Weave | [GitHub](https://github.com/Bizuayeu/Plugins-Weave)

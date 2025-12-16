@@ -1,5 +1,3 @@
-[EpisodicRAG](../README.md) > CLAUDE.md
-
 # CLAUDE.md - EpisodicRAG Plugin
 
 このファイルは、Claude CodeがEpisodicRAGプラグインを開発・操作する際のガイドラインです。
@@ -12,19 +10,20 @@
 
 **概要**
 1. [プロジェクト概要](#プロジェクト概要)
-2. [ディレクトリ構造](#ディレクトリ構造)
+2. [ディレクトリ構成](#ディレクトリ構成)
+3. [永続化パス](#永続化パス-v520) *(v5.2.0+)*
 
 **アーキテクチャ**
-3. [Clean Architecture](#clean-architecture)
-4. [Single Source of Truth (SSoT)](#single-source-of-truth-ssot)
+4. [Clean Architecture](#clean-architecture)
+5. [Single Source of Truth (SSoT)](#single-source-of-truth-ssot)
 
 **開発ガイド**
-5. [開発ワークフロー](#開発ワークフロー)
-6. [コーディング規約](#コーディング規約)
+6. [開発ワークフロー](#開発ワークフロー)
+7. [コーディング規約](#コーディング規約)
 
 **リファレンス**
-7. [主要ファイル参照](#主要ファイル参照)
-8. [注意事項](#注意事項)
+8. [主要ファイル参照](#主要ファイル参照)
+9. [注意事項](#注意事項)
 
 ---
 
@@ -37,7 +36,7 @@ EpisodicRAGは、会話ログ（Loopファイル）を階層的にダイジェ�
 
 ---
 
-## ディレクトリ構造
+## ディレクトリ構成
 
 ```text
 EpisodicRAG/
@@ -59,6 +58,45 @@ EpisodicRAG/
 ├── CHANGELOG.md             # バージョン履歴
 └── CONTRIBUTING.md          # 開発者ガイド
 ```
+
+---
+
+## 永続化パス *(v5.2.0+)*
+
+設定ファイルとデータは**永続化パス**に保存されます。プラグイン更新時も設定は保持されます。
+
+### デフォルトパス
+
+```text
+~/.claude/plugins/.episodicrag/
+├── config.json          # 設定ファイル（必須）
+├── Loops/               # Loopファイル（config.jsonで変更可）
+├── Digests/             # Digestファイル（config.jsonで変更可）
+└── Identities/          # Identityファイル（config.jsonで変更可）
+```
+
+### アクセス方法
+
+```python
+# 永続化パスの取得（推奨）
+from infrastructure.config import get_persistent_config_dir
+
+config_dir = get_persistent_config_dir()  # ~/.claude/plugins/.episodicrag/
+
+# 設定ファイルパスの取得
+from infrastructure.config import get_config_path
+
+config_path = get_config_path()  # ~/.claude/plugins/.episodicrag/config.json
+```
+
+### テスト時のオーバーライド
+
+```bash
+export EPISODICRAG_CONFIG_DIR=/tmp/test-episodicrag
+python -m pytest test/ -v
+```
+
+> 📖 詳細は [infrastructure.md](../docs/dev/api/infrastructure.md#persistent_pathpy) を参照
 
 ---
 
@@ -94,7 +132,6 @@ from application.config import DigestConfig
 from interfaces import DigestFinalizerFromShadow
 ```
 
-> ⚠️ 旧インポートパス（`from validators import ...`等）は動作しません。
 > 📖 詳細は [ARCHITECTURE.md](../docs/dev/ARCHITECTURE.md) を参照
 
 ---

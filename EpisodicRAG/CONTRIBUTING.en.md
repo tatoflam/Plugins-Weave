@@ -1,4 +1,4 @@
-<!-- Last synced: 2025-12-06 -->
+<!-- Last synced: 2025-12-16 -->
 English | [日本語](CONTRIBUTING.md)
 
 # Contributing to EpisodicRAG Plugin
@@ -24,8 +24,9 @@ This document explains how to set up the development environment, test code chan
 5. [Coding Standards](#coding-standards)
 6. [Testing](#testing)
 7. [Development Tools](#development-tools-v410) - Footer Checker, Link Checker *(v4.1.0+)*
-8. [Documentation](#documentation)
-9. [Support](#support)
+8. [Persistent Path](#persistent-path-v520) *(v5.2.0+)*
+9. [Documentation](#documentation)
+10. [Support](#support)
 
 ---
 
@@ -344,6 +345,33 @@ git status
    - Installation location: `~/.claude/plugins/EpisodicRAG-Plugin@Plugins-Weave/`
 
 For details, see [TROUBLESHOOTING.md](docs/user/TROUBLESHOOTING.md#開発環境とインストール環境の混在).
+
+---
+
+## Persistent Path *(v5.2.0+)*
+
+EpisodicRAG configuration files and data are stored in the **persistent path**. This prevents configuration loss during plugin updates.
+
+### Default Path
+
+```text
+~/.claude/plugins/.episodicrag/
+├── config.json          # Configuration file
+├── Loops/               # Loop files (configurable in config.json)
+├── Digests/             # Digest files (configurable in config.json)
+└── Identities/          # Identity files (configurable in config.json)
+```
+
+### Override via Environment Variable (For Testing)
+
+To change the persistent path during testing:
+
+```bash
+export EPISODICRAG_CONFIG_DIR=/tmp/test-episodicrag
+python -m pytest test/ -v
+```
+
+> 📖 Details: [ARCHITECTURE.md](docs/dev/ARCHITECTURE.md#ディレクトリ構成)
 
 ---
 

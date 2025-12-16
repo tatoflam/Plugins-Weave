@@ -23,8 +23,9 @@ EpisodicRAGプラグインの開発に興味を持っていただき、ありが
 5. [コーディング規約](#コーディング規約)
 6. [テスト](#テスト)
 7. [開発ツール](#開発ツール-v410) - フッターチェッカー、リンクチェッカー *(v4.1.0+)*
-8. [ドキュメント](#ドキュメント)
-9. [サポート](#サポート)
+8. [永続化パス](#永続化パス-v520) *(v5.2.0+)*
+9. [ドキュメント](#ドキュメント)
+10. [サポート](#サポート)
 
 ---
 
@@ -480,6 +481,33 @@ git status
    - インストール先: `~/.claude/plugins/EpisodicRAG-Plugin@Plugins-Weave/`
 
 詳細は[TROUBLESHOOTING.md](docs/user/TROUBLESHOOTING.md#開発環境とインストール環境の混在)を参照してください。
+
+---
+
+## 永続化パス *(v5.2.0+)*
+
+EpisodicRAGの設定ファイルとデータは **永続化パス** に保存されます。これにより、プラグインの更新時に設定が消失しなくなりました。
+
+### デフォルトパス
+
+```text
+~/.claude/plugins/.episodicrag/
+├── config.json          # 設定ファイル
+├── Loops/               # Loopファイル（config.jsonで変更可）
+├── Digests/             # Digestファイル（config.jsonで変更可）
+└── Identities/          # Identityファイル（config.jsonで変更可）
+```
+
+### 環境変数によるオーバーライド（テスト用）
+
+テスト時に永続化パスを変更する場合:
+
+```bash
+export EPISODICRAG_CONFIG_DIR=/tmp/test-episodicrag
+python -m pytest test/ -v
+```
+
+> 📖 詳細: [ARCHITECTURE.md](docs/dev/ARCHITECTURE.md#ディレクトリ構成)
 
 ---
 

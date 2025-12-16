@@ -1,4 +1,4 @@
-<!-- Last synced: 2025-12-14 -->
+<!-- Last synced: 2025-12-16 -->
 English | [日本語](README.md)
 
 # EpisodicRAG Plugin - Glossary & Reference
@@ -36,12 +36,14 @@ A collection of terminology definitions used in the EpisodicRAG plugin.
 - Skills and scripts operate relative to this directory
 - Example: `C:\Users\anyth\.claude\plugins\marketplaces\Plugins-Weave\EpisodicRAG`
 
-### Persistent Config Directory (v5.2.0+)
+### Persistent Path (v5.2.0+)
 **Definition**: Configuration storage that survives plugin auto-updates
 
 - **Location**: `~/.claude/plugins/.episodicrag/`
 - **Stored files**: `config.json`, `last_digest_times.json`
 - Configuration is preserved during Claude Code plugin auto-updates
+
+> 📖 Details: [ARCHITECTURE.md](docs/dev/ARCHITECTURE.md#ディレクトリ構成)
 
 ### Path Format Differences
 
@@ -432,6 +434,7 @@ Examples: W0001_CognitiveArchitecture.txt
 | Loop | [Basic Concepts](#loop) |
 | Mottled Memory | [Processes & Operations](#mottled-memory-まだらボケ) |
 | paths | [Basic Concepts](#paths) |
+| Persistent Path | [Basic Concepts](#persistent-path-v520) |
 | Placeholder | [Processes & Operations](#placeholder) |
 | plugin_root | [Basic Concepts](#plugin_root) |
 | Provisional Digest | [Memory Structure](#provisional-digest) |

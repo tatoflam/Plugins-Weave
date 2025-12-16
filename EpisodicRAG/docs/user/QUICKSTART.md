@@ -24,10 +24,6 @@ EpisodicRAGを最速でセットアップし、動作確認するためのガイ
 - Claude Code または Claude VSCode Extension がインストール済み
 - Python 3.x がインストール済み
 
-> **パス変数の凡例**:
-> - `{plugin_root}`: プラグインのインストール先（[用語集](../../README.md#plugin_root) 参照）
-> - `{loops_dir}`: config.jsonで設定されたLoopディレクトリ
-
 ---
 
 ## 全体の流れ

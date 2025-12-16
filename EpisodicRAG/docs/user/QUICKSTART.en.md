@@ -1,4 +1,4 @@
-<!-- Last synced: 2025-12-14 -->
+<!-- Last synced: 2025-12-16 -->
 English | [日本語](QUICKSTART.md)
 
 # 5-Minute Quickstart
@@ -24,10 +24,6 @@ A guide to set up EpisodicRAG as quickly as possible and verify it works.
 
 - Claude Code or Claude VSCode Extension installed
 - Python 3.x installed
-
-> **Path Variable Legend**:
-> - `{plugin_root}`: Plugin installation directory (see [Glossary](../../README.en.md#plugin_root))
-> - `{loops_dir}`: Loop directory configured in config.json
 
 ---
 

@@ -24,10 +24,8 @@
 
 ## ディレクトリ構成
 
-### Plugin構造（完全自己完結）
-
 ```text
-# 永続化設定ディレクトリ（v5.2.0+、プラグイン更新で消えない）
+# 永続化パス（v5.2.0+、プラグイン更新で消えない）
 ~/.claude/plugins/.episodicrag/
 ├── config.json                          # 設定ファイル（@digest-setupで生成）
 └── last_digest_times.json               # Digest処理時刻

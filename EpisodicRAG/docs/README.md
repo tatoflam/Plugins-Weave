@@ -12,6 +12,7 @@ AI/Claudeエージェント向けの技術仕様ハブです。
 
 ## 目次
 
+- [プラグイン構造](#プラグイン構造)
 - [v5.0.0 Breaking Changes](#v500-breaking-changes)
 - [v4.0.0 Breaking Changes](#v400-breaking-changes)
 - [Command Specifications](#command-specifications)
@@ -21,6 +22,16 @@ AI/Claudeエージェント向けの技術仕様ハブです。
 - [Learning Resources](#learning-resources)
 - [Developer Documentation](#developer-documentation)
 - [Documentation Map](#documentation-map)
+
+---
+
+## プラグイン構造
+
+設定ファイルとデータは `~/.claude/plugins/.episodicrag/` に保存されます（プラグイン更新時も保持）。
+
+> 📖 ディレクトリ構成: [ARCHITECTURE.md](dev/ARCHITECTURE.md#ディレクトリ構成)
+>
+> 📖 設定項目詳細: [config.md](dev/api/config.md)
 
 ---
 

@@ -124,7 +124,7 @@ test/
 |---------|------|------|
 | Domain層 | 90%+ | [Codecov参照](https://codecov.io/gh/Bizuayeu/Plugins-Weave) |
 | Application層 | 80%+ | 同上 |
-| 全体 | 80%+ | ~92% (2025-12 時点) |
+| 全体 | 80%+ | ~93% (2025-12 時点) |
 
 ### Test Markers
 

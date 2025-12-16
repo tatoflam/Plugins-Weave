@@ -35,12 +35,14 @@ EpisodicRAGプラグインで使用される専門用語の定義集です。
 - スキルやスクリプトはこのディレクトリを基準に動作
 - 例: `C:\Users\anyth\.claude\plugins\marketplaces\Plugins-Weave\EpisodicRAG`
 
-### 永続化設定ディレクトリ (v5.2.0+)
+### 永続化パス (v5.2.0+)
 **定義**: プラグイン自動更新で消えない設定保存先
 
 - **配置**: `~/.claude/plugins/.episodicrag/`
 - **保存されるファイル**: `config.json`, `last_digest_times.json`
 - Claude Codeのプラグイン自動更新時も設定が保持される
+
+> 📖 詳細: [ARCHITECTURE.md](docs/dev/ARCHITECTURE.md#ディレクトリ構成)
 
 ### パス形式の違い
 
@@ -437,6 +439,7 @@ L00001追加 → L00002追加 → /digest
 | ShadowGrandDigest | [記憶構造](#shadowgranddigest) |
 | Threshold | [プロセス・操作](#threshold閾値) |
 | まだらボケ | [プロセス・操作](#まだらボケ) |
+| 永続化パス | [基本概念](#永続化パス-v520) |
 
 ---
 

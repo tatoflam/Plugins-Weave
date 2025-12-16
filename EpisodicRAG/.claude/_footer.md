@@ -23,8 +23,10 @@
 - `CONCEPT.en.md`
 - `CONTRIBUTING.md`
 - `CONTRIBUTING.en.md`
+- `CHANGELOG.md`
+- `CHANGELOG.en.md`
 
-### EpisodicRAG/.claude-plugin/
+### EpisodicRAG/.claude/
 - `CLAUDE.md`
 
 ### EpisodicRAG/docs/

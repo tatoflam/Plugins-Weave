@@ -70,7 +70,7 @@ EpisodicRAGプラグインに関するよくある質問と回答集です。
 
 ### Q: trusted_external_pathsとは何ですか？
 
-**A**: v4.0.0で導入されたセキュリティ機能です。プラグインディレクトリ外のファイル（例：`~/DEV/Identity.md`）にアクセスする場合、config.jsonで明示的にホワイトリスト登録が必要です。
+**A**: v4.0.0で導入されたセキュリティ機能です。永続化ディレクトリ外のファイル（例：`~/DEV/Identity.md`）にアクセスする場合、config.jsonで明示的にホワイトリスト登録が必要です。
 
 ```json
 {
@@ -165,8 +165,8 @@ flowchart TB
 
 1. `{loops_dir}/` - 元データ（**最重要**）
 2. `{essences_dir}/` - GrandDigest, ShadowGrandDigest
-3. `.claude-plugin/config.json` - 設定
-4. `.claude-plugin/last_digest_times.json` - 状態追跡
+3. `~/.claude/plugins/.episodicrag/config.json` - 設定
+4. `~/.claude/plugins/.episodicrag/last_digest_times.json` - 状態追跡
 
 > 💡 `{loops_dir}/` さえあれば他は再構築可能です。
 
@@ -219,7 +219,7 @@ flowchart TB
 
 **A**: はい。EpisodicRAGは独立して動作します。
 
-- 設定ディレクトリは`.claude-plugin/`で分離
+- 設定は永続化ディレクトリ（`~/.claude/plugins/.episodicrag/`）で分離
 - 他プラグインとの干渉なし
 - コマンド名が重複しない限り問題なく併用可能
 

@@ -619,8 +619,7 @@ if callback("ファイルを上書きしますか？"):
 > **v4.0.0 更新**: 設定管理が `infrastructure/config/` サブパッケージとして追加されました。
 > **v4.1.0 更新**: PathValidatorChain（Chain of Responsibility）が追加されました。
 > **v5.0.0 更新**: LEVEL_CONFIGにloop層が追加されました（9レベル化）。
-> **v5.2.0 更新**: `get_persistent_config_dir()` が追加されました。config.jsonとlast_digest_times.jsonが永続化ディレクトリ（`~/.claude/plugins/.episodicrag/`）に移動。
-> **v5.3.0 更新**: `find_plugin_root()` が廃止されました。`plugin_root` パラメータは削除され、`base_dir` は絶対パス必須になりました。
+> **v5.2.0 更新**: `get_persistent_config_dir()` が追加されました。config.jsonとlast_digest_times.jsonが永続化パス（`~/.claude/plugins/.episodicrag/`）に移動し、`find_plugin_root()` は廃止されました。`plugin_root` パラメータの削除により、`base_dir` は絶対パス必須になりました。
 
 ---
 **EpisodicRAG** by Weave | [GitHub](https://github.com/Bizuayeu/Plugins-Weave)
